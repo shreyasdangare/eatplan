@@ -1,7 +1,11 @@
-"use client";
+ "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  IngredientAutocompleteInput,
+  IngredientOption
+} from "../../components/IngredientAutocompleteInput";
 
 type Ingredient = {
   id: string;
@@ -28,6 +32,11 @@ export default function NewDishPage() {
   const [newIngredientName, setNewIngredientName] = useState("");
   const [addingIngredient, setAddingIngredient] = useState(false);
 
+  const ingredientOptions: IngredientOption[] = useMemo(
+    () => ingredients.map((ing) => ({ id: ing.id, name: ing.name })),
+    [ingredients]
+  );
+
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/ingredients");
@@ -38,8 +47,19 @@ export default function NewDishPage() {
     })();
   }, []);
 
-  const handleAddIngredient = async () => {
-    const trimmed = newIngredientName.trim();
+  const addIngredientToSelection = (id: string) => {
+    setSelectedIngredients((prev) => {
+      const exists = prev.some((p) => p.ingredient_id === id);
+      if (exists) return prev;
+      return [
+        ...prev,
+        { ingredient_id: id, quantity: "", is_optional: false }
+      ];
+    });
+  };
+
+  const handleAddIngredient = async (nameToCreate: string) => {
+    const trimmed = nameToCreate.trim();
     if (!trimmed) return;
     setAddingIngredient(true);
     try {
@@ -59,11 +79,7 @@ export default function NewDishPage() {
           a.name.localeCompare(b.name)
         )
       );
-      // auto-select newly added ingredient
-      setSelectedIngredients((prev) => [
-        ...prev,
-        { ingredient_id: id, quantity: "", is_optional: false }
-      ]);
+      addIngredientToSelection(id);
       setNewIngredientName("");
     } finally {
       setAddingIngredient(false);
@@ -187,25 +203,21 @@ export default function NewDishPage() {
           />
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-slate-300">Ingredients</label>
-          </div>
-          <div className="flex gap-2">
-            <input
-              className="flex-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs"
-              placeholder="Add new ingredient (e.g., tomato)"
-              value={newIngredientName}
-              onChange={(e) => setNewIngredientName(e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={handleAddIngredient}
-              disabled={addingIngredient || !newIngredientName.trim()}
-              className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-900 disabled:opacity-60"
-            >
-              {addingIngredient ? "Adding…" : "Add"}
-            </button>
-          </div>
+          <IngredientAutocompleteInput
+            label="Ingredients"
+            ingredients={ingredientOptions}
+            value={newIngredientName}
+            onChange={setNewIngredientName}
+            onSelectExisting={(ingredient) => {
+              addIngredientToSelection(ingredient.id);
+            }}
+            onCreateNew={(name) => {
+              if (!addingIngredient) {
+                handleAddIngredient(name);
+              }
+            }}
+            disabled={addingIngredient}
+          />
           <div className="flex flex-wrap gap-1.5">
             {ingredients.map((ing) => {
               const selected = selectedIngredients.some(

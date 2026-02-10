@@ -57,7 +57,7 @@ export default function DishesHomePage() {
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold tracking-tight">
-            Dishes repository
+            काय खायचं?
           </h2>
           <p className="text-xs text-slate-400">
             Maintain all your dishes and their ingredients in one place.

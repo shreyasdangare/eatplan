@@ -1,6 +1,10 @@
-"use client";
+ "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import {
+  IngredientAutocompleteInput,
+  IngredientOption
+} from "../components/IngredientAutocompleteInput";
 
 type Ingredient = {
   id: string;
@@ -26,6 +30,7 @@ export function WhatCanICookClient() {
     almostCookable: SuggestionBucket[];
     others: SuggestionBucket[];
   } | null>(null);
+  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -42,6 +47,11 @@ export function WhatCanICookClient() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
+
+  const ingredientOptions: IngredientOption[] = ingredients.map((ing) => ({
+    id: ing.id,
+    name: ing.name
+  }));
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,29 +73,23 @@ export function WhatCanICookClient() {
   return (
     <div className="space-y-4">
       <form onSubmit={onSubmit} className="space-y-3">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <p className="text-xs text-slate-300">
-            Tap ingredients you have today:
+            Start typing to add ingredients you have today:
           </p>
-          <div className="flex flex-wrap gap-1.5">
-            {ingredients.map((ing) => {
-              const isActive = selected.includes(ing.id);
-              return (
-                <button
-                  type="button"
-                  key={ing.id}
-                  onClick={() => toggle(ing.id)}
-                  className={`rounded-full px-3 py-1 text-xs ${
-                    isActive
-                      ? "bg-emerald-500 text-emerald-950"
-                      : "bg-slate-800 text-slate-100"
-                  }`}
-                >
-                  {ing.name}
-                </button>
-              );
-            })}
-          </div>
+          <IngredientAutocompleteInput
+            label="Ingredients you have"
+            ingredients={ingredientOptions}
+            value={searchInput}
+            onChange={setSearchInput}
+            onSelectExisting={(ingredient) => {
+              toggle(ingredient.id);
+            }}
+            onCreateNew={() => {
+              // For \"what can I cook\" view, we don't allow creating new ingredients directly.
+              // User should add new ingredients via the dishes page first.
+            }}
+          />
         </div>
         <button
           type="submit"
