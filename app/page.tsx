@@ -71,7 +71,6 @@ export default function DishesHomePage() {
         </Link>
       </div>
       <Suspense fallback={<p className="text-sm text-slate-400">Loading…</p>}>
-        {/* @ts-expect-error Async Server Component */}
         <DishesList />
       </Suspense>
     </section>
