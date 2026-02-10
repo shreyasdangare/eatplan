@@ -74,7 +74,7 @@ export function WhatCanICookClient() {
     <div className="space-y-4">
       <form onSubmit={onSubmit} className="space-y-3">
         <div className="space-y-3">
-          <p className="text-xs text-slate-300">
+          <p className="text-xs font-medium text-amber-800">
             Start typing to add ingredients you have today:
           </p>
           <IngredientAutocompleteInput
@@ -94,7 +94,7 @@ export function WhatCanICookClient() {
         <button
           type="submit"
           disabled={loading || selected.length === 0}
-          className="w-full rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-950 disabled:opacity-50"
+          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm disabled:opacity-50 hover:bg-lime-400"
         >
           {loading ? "Finding dishes…" : "Find dishes"}
         </button>
@@ -114,18 +114,18 @@ export function WhatCanICookClient() {
                   : "Others";
               return (
                 <div key={bucketKey} className="space-y-2">
-                  <h3 className="text-xs font-semibold text-slate-200">
+                  <h3 className="text-xs font-semibold text-emerald-800">
                     {title}
                   </h3>
                   <ul className="space-y-1.5">
                     {bucket.map((dish) => (
-                      <li
-                        key={dish.id}
-                        className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-xs"
-                      >
+                        <li
+                          key={dish.id}
+                          className="flex items-center justify-between rounded-lg border border-lime-200 bg-lime-50/80 px-3 py-2 text-xs"
+                        >
                         <span>{dish.name}</span>
                         {dish.stats && (
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-lime-700">
                             {dish.stats.matchPct}% match
                           </span>
                         )}

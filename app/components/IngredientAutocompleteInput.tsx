@@ -198,11 +198,11 @@ export function IngredientAutocompleteInput({
   return (
     <div className="space-y-2" ref={containerRef}>
       <div className="flex items-center justify-between">
-        <label className="text-xs text-slate-300">{label}</label>
+        <label className="text-xs font-medium text-amber-800">{label}</label>
       </div>
       <div className="relative">
         <input
-          className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs"
+          className="w-full rounded-lg border border-orange-300 bg-white px-3 py-2 text-xs shadow-sm placeholder:text-amber-400"
           placeholder={placeholder}
           value={value}
           onChange={(e) => {
@@ -226,7 +226,7 @@ export function IngredientAutocompleteInput({
           <ul
             id={listboxId}
             role="listbox"
-            className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-800 bg-slate-900 text-xs shadow-lg"
+            className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-orange-200 bg-white text-xs shadow-lg"
           >
             {suggestions.map((item, index) => {
               const isActive = index === activeIndex;
@@ -236,7 +236,9 @@ export function IngredientAutocompleteInput({
                   role="option"
                   aria-selected={isActive}
                   className={`cursor-pointer px-3 py-1.5 ${
-                    isActive ? "bg-slate-800 text-slate-50" : "text-slate-100"
+                    isActive
+                      ? "bg-orange-100 text-orange-900"
+                      : "text-stone-800 hover:bg-orange-50"
                   }`}
                   onMouseDown={(e) => {
                     e.preventDefault();

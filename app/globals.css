@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 body {
-  @apply bg-slate-950 text-slate-50;
+  @apply min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 text-stone-900;
 }
 

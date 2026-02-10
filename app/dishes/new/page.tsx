@@ -146,21 +146,25 @@ export default function NewDishPage() {
 
   return (
     <section className="space-y-4">
-      <h2 className="text-base font-semibold tracking-tight">Add dish</h2>
+      <h2 className="text-base font-semibold tracking-tight text-amber-900">
+        Add dish
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4 text-sm">
         <div className="space-y-1">
-          <label className="text-xs text-slate-300">Name</label>
+          <label className="text-xs font-medium text-amber-800">Name</label>
           <input
             required
-            className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-slate-300">Description</label>
+          <label className="text-xs font-medium text-amber-800">
+            Description
+          </label>
           <textarea
-            className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             rows={2}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -168,9 +172,11 @@ export default function NewDishPage() {
         </div>
         <div className="flex gap-3">
           <div className="space-y-1 flex-1">
-            <label className="text-xs text-slate-300">Meal type</label>
+            <label className="text-xs font-medium text-amber-800">
+              Meal type
+            </label>
             <select
-              className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
               value={mealType}
               onChange={(e) => setMealType(e.target.value)}
             >
@@ -180,24 +186,24 @@ export default function NewDishPage() {
             </select>
           </div>
           <div className="space-y-1 w-28">
-            <label className="text-xs text-slate-300">
+            <label className="text-xs font-medium text-amber-800">
               Prep time (min)
             </label>
             <input
               type="number"
               min={0}
-              className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
               value={prepTime}
               onChange={(e) => setPrepTime(e.target.value)}
             />
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-slate-300">
+          <label className="text-xs font-medium text-amber-800">
             Tags (comma separated)
           </label>
           <input
-            className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
           />
@@ -230,8 +236,8 @@ export default function NewDishPage() {
                   onClick={() => toggleIngredient(ing.id)}
                   className={`rounded-full px-3 py-1 text-xs ${
                     selected
-                      ? "bg-emerald-500 text-emerald-950"
-                      : "bg-slate-800 text-slate-100"
+                      ? "bg-lime-400 text-lime-950 shadow-sm"
+                      : "bg-orange-100 text-orange-900"
                   }`}
                 >
                   {ing.name}
@@ -240,7 +246,7 @@ export default function NewDishPage() {
             })}
           </div>
           {selectedIngredients.length > 0 && (
-            <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-2">
+            <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-2">
               {selectedIngredients.map((sel) => {
                 const ing = ingredients.find(
                   (i) => i.id === sel.ingredient_id
@@ -254,7 +260,7 @@ export default function NewDishPage() {
                     <span className="w-28 truncate">{ing.name}</span>
                     <input
                       placeholder="Qty"
-                      className="flex-1 rounded border border-slate-800 bg-slate-950 px-2 py-1"
+                      className="flex-1 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
                       value={sel.quantity}
                       onChange={(e) =>
                         updateIngredient(
@@ -264,7 +270,7 @@ export default function NewDishPage() {
                         )
                       }
                     />
-                    <label className="flex items-center gap-1 text-[11px]">
+                    <label className="flex items-center gap-1 text-[11px] text-amber-800">
                       <input
                         type="checkbox"
                         checked={sel.is_optional}
@@ -287,7 +293,7 @@ export default function NewDishPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-950 disabled:opacity-60"
+          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm disabled:opacity-60 hover:bg-lime-400"
         >
           {loading ? "Saving…" : "Save dish"}
         </button>

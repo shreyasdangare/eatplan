@@ -18,8 +18,8 @@ async function DishesList() {
 
   if (!dishes.length) {
     return (
-      <p className="text-sm text-slate-400">
-        No dishes yet. Tap &ldquo;Add dish&rdquo; to create your first one.
+      <p className="text-sm text-amber-700">
+        No dishes yet. Tap “Add dish” to create your first one.
       </p>
     );
   }
@@ -29,19 +29,19 @@ async function DishesList() {
       {dishes.map((dish) => (
         <li
           key={dish.id}
-          className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm"
+          className="flex items-center justify-between rounded-xl border border-orange-200 bg-orange-50/80 px-3 py-2 text-sm shadow-sm"
         >
           <div>
             <p className="font-medium">{dish.name}</p>
             {dish.meal_type && (
-              <p className="text-[11px] uppercase tracking-wide text-slate-400">
+              <p className="text-[11px] uppercase tracking-wide text-amber-700">
                 {dish.meal_type}
               </p>
             )}
           </div>
           <Link
             href={`/dishes/${dish.id}`}
-            className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-900"
+            className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
           >
             View
           </Link>
@@ -56,21 +56,21 @@ export default function DishesHomePage() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold tracking-tight">
-            काय खायचं?
+          <h2 className="text-base font-semibold tracking-tight text-amber-900">
+            Dishes repository
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-amber-700">
             Maintain all your dishes and their ingredients in one place.
           </p>
         </div>
         <Link
           href="/dishes/new"
-          className="rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-medium text-emerald-950 hover:bg-emerald-400"
+          className="rounded-full bg-lime-500 px-3 py-1.5 text-xs font-semibold text-lime-950 shadow-sm hover:bg-lime-400"
         >
           + Add dish
         </Link>
       </div>
-      <Suspense fallback={<p className="text-sm text-slate-400">Loading…</p>}>
+      <Suspense fallback={<p className="text-sm text-amber-700">Loading…</p>}>
         <DishesList />
       </Suspense>
     </section>

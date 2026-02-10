@@ -39,11 +39,11 @@ export default async function DishDetailPage({ params }: PageProps) {
     <section className="space-y-4 text-sm">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold tracking-tight">
+          <h2 className="text-base font-semibold tracking-tight text-amber-900">
             {dish.name}
           </h2>
           {dish.meal_type && (
-            <p className="text-[11px] uppercase tracking-wide text-slate-400">
+            <p className="text-[11px] uppercase tracking-wide text-amber-700">
               {dish.meal_type}
             </p>
           )}
@@ -52,7 +52,7 @@ export default async function DishDetailPage({ params }: PageProps) {
           <DeleteDishButton id={dish.id as string} />
           <Link
             href="/"
-            className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-900"
+            className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
           >
             Back
           </Link>
@@ -60,11 +60,11 @@ export default async function DishDetailPage({ params }: PageProps) {
       </div>
 
       {dish.description && (
-        <p className="text-slate-200">{dish.description}</p>
+        <p className="text-sm text-stone-800">{dish.description}</p>
       )}
 
       {dish.prep_time_minutes != null && (
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-amber-700">
           Prep time: {dish.prep_time_minutes} min
         </p>
       )}
@@ -74,7 +74,7 @@ export default async function DishDetailPage({ params }: PageProps) {
           {dish.tags.map((tag: string) => (
             <span
               key={tag}
-              className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-100"
+              className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] text-orange-900"
             >
               {tag}
             </span>
@@ -85,7 +85,7 @@ export default async function DishDetailPage({ params }: PageProps) {
       <div className="space-y-3">
         {required && required.length > 0 && (
           <div className="space-y-1">
-            <h3 className="text-xs font-semibold text-slate-300">
+            <h3 className="text-xs font-semibold text-amber-800">
               Required ingredients
             </h3>
             <ul className="space-y-1">
@@ -93,7 +93,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                 <li key={di.id} className="flex justify-between gap-2">
                   <span>{di.ingredients?.name ?? "Unknown ingredient"}</span>
                   {di.quantity && (
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-amber-700">
                       {di.quantity}
                     </span>
                   )}
@@ -105,7 +105,7 @@ export default async function DishDetailPage({ params }: PageProps) {
 
         {optional && optional.length > 0 && (
           <div className="space-y-1">
-            <h3 className="text-xs font-semibold text-slate-300">
+            <h3 className="text-xs font-semibold text-amber-800">
               Optional ingredients
             </h3>
             <ul className="space-y-1">
@@ -113,7 +113,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                 <li key={di.id} className="flex justify-between gap-2">
                   <span>{di.ingredients?.name ?? "Unknown ingredient"}</span>
                   {di.quantity && (
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-amber-700">
                       {di.quantity}
                     </span>
                   )}
