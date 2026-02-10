@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(_: NextRequest, { params }: RouteParams) {
+export async function GET(
+  _: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
 
   const { data: dish, error } = await supabaseServer
@@ -29,7 +26,10 @@ export async function GET(_: NextRequest, { params }: RouteParams) {
   return NextResponse.json(dish);
 }
 
-export async function PATCH(req: NextRequest, { params }: RouteParams) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
   const body = await req.json();
 
@@ -57,7 +57,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   return NextResponse.json({ id: data.id });
 }
 
-export async function DELETE(_: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  _: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
 
   const { error } = await supabaseServer.from("dishes").delete().eq("id", id);
