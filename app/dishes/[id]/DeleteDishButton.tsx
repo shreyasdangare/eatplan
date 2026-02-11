@@ -18,7 +18,7 @@ export function DeleteDishButton({ id }: { id: string }) {
         alert("Failed to delete dish");
         return;
       }
-      router.push("/");
+      router.push("/recipes");
       router.refresh();
     } finally {
       setLoading(false);

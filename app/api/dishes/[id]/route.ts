@@ -7,7 +7,7 @@ export async function GET(_req: NextRequest, context: any) {
   const { data: dish, error } = await supabaseServer
     .from("dishes")
     .select(
-      "id, name, description, meal_type, prep_time_minutes, tags, dish_ingredients(id, ingredient_id, quantity, is_optional)"
+      "id, name, description, meal_type, prep_time_minutes, tags, servings, image_url, dish_ingredients(id, ingredient_id, quantity, amount, unit, is_optional)"
     )
     .eq("id", id)
     .single();

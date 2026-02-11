@@ -4,7 +4,7 @@ import { supabaseServer } from "@/lib/supabaseServer";
 export async function GET() {
   const { data, error } = await supabaseServer
     .from("dishes")
-    .select("id, name, description, meal_type, prep_time_minutes, tags")
+    .select("id, name, description, meal_type, prep_time_minutes, tags, image_url")
     .order("name", { ascending: true });
 
   if (error) {
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
     meal_type,
     prep_time_minutes,
     tags,
+    servings,
     ingredients
   } = body as {
     name?: string;
@@ -33,9 +34,12 @@ export async function POST(req: NextRequest) {
     meal_type?: string;
     prep_time_minutes?: number | null;
     tags?: string[] | null;
+    servings?: number | null;
     ingredients?: {
       ingredient_id: string;
       quantity?: string | null;
+      amount?: number | null;
+      unit?: string | null;
       is_optional?: boolean;
     }[];
   };
@@ -51,7 +55,8 @@ export async function POST(req: NextRequest) {
       description,
       meal_type,
       prep_time_minutes,
-      tags
+      tags,
+      servings: servings ?? null
     })
     .select("id")
     .single();
@@ -69,6 +74,8 @@ export async function POST(req: NextRequest) {
       dish_id: dish.id,
       ingredient_id: ing.ingredient_id,
       quantity: ing.quantity ?? null,
+      amount: ing.amount ?? null,
+      unit: ing.unit ?? null,
       is_optional: ing.is_optional ?? false
     }));
 

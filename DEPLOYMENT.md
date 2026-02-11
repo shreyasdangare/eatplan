@@ -5,10 +5,8 @@ This app is designed for **Next.js on Vercel** with a **Supabase Postgres** data
 ### 1. Create Supabase project
 
 - Go to the Supabase dashboard and create a new project.
-- In the SQL editor, run the statements from `db/schema.sql` to create:
-  - `dishes`
-  - `ingredients`
-  - `dish_ingredients`
+- In the SQL editor, run the statements from `db/schema.sql` to create tables. If you already have an existing database, run the scripts in `db/migrations/` to add new columns and tables.
+- For dish photos: in **Storage**, create a **public** bucket named `dish-images` (no extra settings required).
 
 ### 2. Configure API keys
 
@@ -31,7 +29,7 @@ The server-only Supabase client in `lib/supabaseServer.ts` uses these values.
 3. During setup:
    - Framework preset: **Next.js**
    - Root directory: repository root (where `package.json` lives)
-   - Environment variables: add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+   - Environment variables: add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Optional: `OPENAI_API_KEY` for the "Import from URL" feature (or users can enter their key in the form).
 4. Click **Deploy**. Vercel will run `npm install` and `npm run build` automatically.
 
 ### 4. Running locally

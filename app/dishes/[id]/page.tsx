@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { FavoriteButton } from "../../components/FavoriteButton";
 import { DeleteDishButton } from "./DeleteDishButton";
+import { DishImageUpload } from "./DishImageUpload";
+import { PortionScaling } from "./PortionScaling";
 
 interface PageProps {
   params: Promise<{
@@ -9,22 +12,44 @@ interface PageProps {
   }>;
 }
 
+const DISH_SELECT_FULL =
+  "id, name, description, meal_type, prep_time_minutes, tags, image_url, servings, dish_ingredients(id, ingredient_id, quantity, amount, unit, is_optional, ingredients(name))";
+const DISH_SELECT_LEGACY =
+  "id, name, description, meal_type, prep_time_minutes, tags, dish_ingredients(id, ingredient_id, quantity, is_optional, ingredients(name))";
+
 export default async function DishDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const { data: dish, error } = await supabaseServer
+  let result = await supabaseServer
     .from("dishes")
-    .select(
-      "id, name, description, meal_type, prep_time_minutes, tags, dish_ingredients(id, ingredient_id, quantity, is_optional, ingredients(name))"
-    )
+    .select(DISH_SELECT_FULL)
     .eq("id", id)
     .single();
+
+  if (result.error && result.error.code !== "PGRST116") {
+    const msg = result.error.message ?? "";
+    const maybeMissingColumn =
+      msg.includes("column") && (msg.includes("does not exist") || msg.includes("undefined"));
+    if (maybeMissingColumn) {
+      result = await supabaseServer
+        .from("dishes")
+        .select(DISH_SELECT_LEGACY)
+        .eq("id", id)
+        .single();
+    }
+  }
+
+  const { data: dish, error } = result;
 
   if (error || !dish) {
     if (error?.code === "PGRST116") {
       notFound();
     }
-    console.error("Error loading dish detail", error);
+    console.error(
+      "Error loading dish detail",
+      error?.message ?? error?.code ?? error,
+      error
+    );
     notFound();
   }
 
@@ -36,28 +61,40 @@ export default async function DishDetailPage({ params }: PageProps) {
   );
 
   return (
-    <section className="space-y-4 text-sm">
-      <div className="flex items-center justify-between gap-2">
+    <section className="space-y-5 text-sm lg:space-y-6 lg:text-base">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-amber-900">
+          <h2 className="text-lg font-semibold tracking-tight text-amber-900 dark:text-amber-200 lg:text-xl">
             {dish.name}
           </h2>
           {dish.meal_type && (
-            <p className="text-[11px] uppercase tracking-wide text-amber-700">
+            <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">
               {dish.meal_type}
             </p>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <FavoriteButton dishId={dish.id as string} />
+          <Link
+            href={`/dishes/${dish.id}/cook`}
+            className="rounded-full bg-lime-500 px-3 py-1.5 text-xs font-semibold text-lime-950 shadow-sm hover:bg-lime-400"
+          >
+            Cooking mode
+          </Link>
           <DeleteDishButton id={dish.id as string} />
           <Link
-            href="/"
-            className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
+            href="/recipes"
+            className="rounded-full bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
           >
             Back
           </Link>
         </div>
       </div>
+
+      <DishImageUpload
+        dishId={dish.id as string}
+        imageUrl={(dish as any).image_url ?? null}
+      />
 
       {dish.description && (
         <p className="text-sm text-stone-800">{dish.description}</p>
@@ -82,47 +119,11 @@ export default async function DishDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      <div className="space-y-3">
-        {required && required.length > 0 && (
-          <div className="space-y-1">
-            <h3 className="text-xs font-semibold text-amber-800">
-              Required ingredients
-            </h3>
-            <ul className="space-y-1">
-              {required.map((di: any) => (
-                <li key={di.id} className="flex justify-between gap-2">
-                  <span>{di.ingredients?.name ?? "Unknown ingredient"}</span>
-                  {di.quantity && (
-                    <span className="text-xs text-amber-700">
-                      {di.quantity}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {optional && optional.length > 0 && (
-          <div className="space-y-1">
-            <h3 className="text-xs font-semibold text-amber-800">
-              Optional ingredients
-            </h3>
-            <ul className="space-y-1">
-              {optional.map((di: any) => (
-                <li key={di.id} className="flex justify-between gap-2">
-                  <span>{di.ingredients?.name ?? "Unknown ingredient"}</span>
-                  {di.quantity && (
-                    <span className="text-xs text-amber-700">
-                      {di.quantity}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      <PortionScaling
+        baseServings={(dish as any).servings ?? null}
+        required={required ?? []}
+        optional={optional ?? []}
+      />
     </section>
   );
 }

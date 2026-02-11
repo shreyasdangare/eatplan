@@ -20,15 +20,22 @@ export default function NewDishPage() {
   const [mealType, setMealType] = useState<string>("both");
   const [prepTime, setPrepTime] = useState<string>("");
   const [tags, setTags] = useState<string>("");
+  const [servings, setServings] = useState<string>("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<
     {
       ingredient_id: string;
       quantity: string;
+      amount: number | null;
+      unit: string;
       is_optional: boolean;
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [importApiKey, setImportApiKey] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
   const [newIngredientName, setNewIngredientName] = useState("");
   const [addingIngredient, setAddingIngredient] = useState(false);
 
@@ -53,7 +60,7 @@ export default function NewDishPage() {
       if (exists) return prev;
       return [
         ...prev,
-        { ingredient_id: id, quantity: "", is_optional: false }
+        { ingredient_id: id, quantity: "", amount: null, unit: "", is_optional: false }
       ];
     });
   };
@@ -94,15 +101,15 @@ export default function NewDishPage() {
       }
       return [
         ...prev,
-        { ingredient_id: id, quantity: "", is_optional: false }
+        { ingredient_id: id, quantity: "", amount: null, unit: "", is_optional: false }
       ];
     });
   };
 
   const updateIngredient = (
     id: string,
-    field: "quantity" | "is_optional",
-    value: string | boolean
+    field: "quantity" | "amount" | "unit" | "is_optional",
+    value: string | number | null | boolean
   ) => {
     setSelectedIngredients((prev) =>
       prev.map((p) =>
@@ -111,6 +118,30 @@ export default function NewDishPage() {
           : p
       )
     );
+  };
+
+  const handleImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = importUrl.trim();
+    if (!url) return;
+    setImportError(null);
+    setImporting(true);
+    const res = await fetch("/api/import-recipe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url,
+        ...(importApiKey.trim() && { api_key: importApiKey.trim() })
+      })
+    });
+    setImporting(false);
+    if (res.ok) {
+      const data = (await res.json()) as { id: string };
+      router.push(`/dishes/${data.id}`);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setImportError((data as { error?: string })?.error ?? "Import failed");
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -126,7 +157,14 @@ export default function NewDishPage() {
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
-      ingredients: selectedIngredients
+      servings: servings ? Number(servings) : null,
+      ingredients: selectedIngredients.map((s) => ({
+        ingredient_id: s.ingredient_id,
+        quantity: s.quantity || null,
+        amount: s.amount ?? null,
+        unit: s.unit || null,
+        is_optional: s.is_optional
+      }))
     };
 
     const res = await fetch("/api/dishes", {
@@ -138,7 +176,7 @@ export default function NewDishPage() {
     setLoading(false);
 
     if (res.ok) {
-      router.push("/");
+      router.push("/recipes");
     } else {
       alert("Failed to save dish");
     }
@@ -146,9 +184,44 @@ export default function NewDishPage() {
 
   return (
     <section className="space-y-4">
-      <h2 className="text-base font-semibold tracking-tight text-amber-900">
+      <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
         Add dish
       </h2>
+
+      <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
+        <h3 className="mb-2 text-xs font-semibold text-amber-800 dark:text-amber-200">
+          Import from recipe URL
+        </h3>
+        <form onSubmit={handleImport} className="space-y-2">
+          <input
+            type="url"
+            placeholder="https://example.com/recipe"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            disabled={importing}
+          />
+          <input
+            type="password"
+            placeholder="OpenAI API key (optional if set in server)"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            value={importApiKey}
+            onChange={(e) => setImportApiKey(e.target.value)}
+            disabled={importing}
+          />
+          {importError && (
+            <p className="text-xs text-red-600 dark:text-red-400">{importError}</p>
+          )}
+          <button
+            type="submit"
+            disabled={importing || !importUrl.trim()}
+            className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm disabled:opacity-50 hover:bg-amber-400"
+          >
+            {importing ? "Importing…" : "Import recipe"}
+          </button>
+        </form>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4 text-sm">
         <div className="space-y-1">
           <label className="text-xs font-medium text-amber-800">Name</label>
@@ -195,6 +268,19 @@ export default function NewDishPage() {
               className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
               value={prepTime}
               onChange={(e) => setPrepTime(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1 w-24">
+            <label className="text-xs font-medium text-amber-800">
+              Servings
+            </label>
+            <input
+              type="number"
+              min={1}
+              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
+              value={servings}
+              onChange={(e) => setServings(e.target.value)}
+              placeholder="e.g. 2"
             />
           </div>
         </div>
@@ -255,17 +341,44 @@ export default function NewDishPage() {
                 return (
                   <div
                     key={sel.ingredient_id}
-                    className="flex items-center gap-2 text-xs"
+                    className="flex flex-wrap items-center gap-2 text-xs"
                   >
                     <span className="w-28 truncate">{ing.name}</span>
                     <input
-                      placeholder="Qty"
-                      className="flex-1 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
+                      placeholder="Qty (e.g. 2 cups)"
+                      className="min-w-[80px] flex-1 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
                       value={sel.quantity}
                       onChange={(e) =>
                         updateIngredient(
                           sel.ingredient_id,
                           "quantity",
+                          e.target.value
+                        )
+                      }
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      step="any"
+                      placeholder="Amt"
+                      className="w-16 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
+                      value={sel.amount ?? ""}
+                      onChange={(e) =>
+                        updateIngredient(
+                          sel.ingredient_id,
+                          "amount",
+                          e.target.value === "" ? null : Number(e.target.value)
+                        )
+                      }
+                    />
+                    <input
+                      placeholder="Unit"
+                      className="w-14 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
+                      value={sel.unit}
+                      onChange={(e) =>
+                        updateIngredient(
+                          sel.ingredient_id,
+                          "unit",
                           e.target.value
                         )
                       }

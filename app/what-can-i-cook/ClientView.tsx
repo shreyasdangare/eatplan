@@ -6,6 +6,22 @@ import {
   IngredientOption
 } from "../components/IngredientAutocompleteInput";
 
+const PANTRY_STORAGE_KEY = "jevan-pantry";
+
+function loadPantryIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(PANTRY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter((x): x is string => typeof x === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 type Ingredient = {
   id: string;
   name: string;
@@ -24,6 +40,7 @@ type SuggestionBucket = {
 export function WhatCanICookClient() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
+  const [pantryIds, setPantryIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<{
     fullyCookable: SuggestionBucket[];
@@ -40,6 +57,10 @@ export function WhatCanICookClient() {
         setIngredients(data);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    setPantryIds(loadPantryIds());
   }, []);
 
   const toggle = (id: string) => {
@@ -59,7 +80,10 @@ export function WhatCanICookClient() {
     const res = await fetch("/api/suggestions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ingredient_ids: selected })
+      body: JSON.stringify({
+        ingredient_ids: selected,
+        always_available_ids: pantryIds.length > 0 ? pantryIds : undefined
+      })
     });
     setLoading(false);
     if (res.ok) {
@@ -73,6 +97,11 @@ export function WhatCanICookClient() {
   return (
     <div className="space-y-4">
       <form onSubmit={onSubmit} className="space-y-3">
+        {pantryIds.length > 0 && (
+          <p className="text-[11px] text-amber-700">
+            Using your pantry ({pantryIds.length} items). Add extra ingredients below.
+          </p>
+        )}
         <div className="space-y-3">
           <p className="text-xs font-medium text-amber-800">
             Start typing to add ingredients you have today:
