@@ -14,6 +14,7 @@ type ExtractedRecipe = {
   description?: string;
   ingredients?: ExtractedIngredient[];
   servings?: number;
+  instructions?: string;
 };
 
 async function fetchPageText(url: string): Promise<string> {
@@ -40,12 +41,89 @@ Use this shape:
   "servings": number or null,
   "ingredients": [
     { "name": "ingredient name", "quantity": "2 cups", "amount": 2, "unit": "cups" }
-  ]
+  ],
+  "instructions": "Full cooking steps as a single string. Use numbered steps (1. ... 2. ...) or clear paragraphs. Include all steps from the recipe. If no steps are found, use empty string."
 }
-For each ingredient: "name" is required. Use "quantity" as display string (e.g. "2 cups"). If numeric, also set "amount" and "unit".`;
+For each ingredient: "name" is required. Use "quantity" as display string (e.g. "2 cups"). If numeric, also set "amount" and "unit".
+Always include "instructions" with the complete method/steps to cook the dish.`;
+
+const SCREENSHOT_USER_PROMPT = `Extract the recipe from this image (screenshot or photo). Use OCR to read all text. Reply with ONLY a valid JSON object in the same shape: name, description, servings, ingredients (each with name, quantity, amount, unit), and instructions as a single string with full cooking steps.`;
+
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
+
+async function fetchImageUrlForRecipe(recipeName: string): Promise<string | null> {
+  const key = process.env.UNSPLASH_ACCESS_KEY?.trim();
+  if (!key) return null;
+  const query = `${recipeName.trim()} food`;
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1`,
+      {
+        headers: { Authorization: `Client-ID ${key}` },
+        signal: AbortSignal.timeout(5000)
+      }
+    );
+    if (!res.ok) {
+      console.error("Unsplash search error", res.status);
+      return null;
+    }
+    const data = (await res.json()) as {
+      results?: { urls?: { regular?: string; small?: string } }[];
+    };
+    const url = data.results?.[0]?.urls?.regular ?? data.results?.[0]?.urls?.small ?? null;
+    return url;
+  } catch (e) {
+    console.error("Unsplash fetch error", e);
+    return null;
+  }
+}
+
+async function extractWithGeminiFromImage(
+  imageBase64: string,
+  mimeType: string,
+  apiKey: string
+): Promise<ExtractedRecipe> {
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(apiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: RECIPE_SYSTEM_PROMPT }]
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { inlineData: { mimeType, data: imageBase64 } },
+            { text: SCREENSHOT_USER_PROMPT }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 4000,
+        responseMimeType: "application/json"
+      }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
+  }
+
+  const data = (await res.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
+  const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
+  return JSON.parse(jsonStr) as ExtractedRecipe;
+}
 
 async function extractWithGemini(text: string, apiKey: string): Promise<ExtractedRecipe> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -61,7 +139,7 @@ async function extractWithGemini(text: string, apiKey: string): Promise<Extracte
       ],
       generationConfig: {
         temperature: 0.2,
-        maxOutputTokens: 2000,
+        maxOutputTokens: 4000,
         responseMimeType: "application/json"
       }
     })
@@ -118,88 +196,10 @@ async function extractWithOpenAI(
   return JSON.parse(jsonStr) as ExtractedRecipe;
 }
 
-export async function POST(req: NextRequest) {
-  const body = (await req.json()) as { url: string };
-  const { url } = body;
-
-  if (!url || typeof url !== "string") {
-    return NextResponse.json(
-      { error: "url is required" },
-      { status: 400 }
-    );
-  }
-
-  let targetUrl: URL;
-  try {
-    targetUrl = new URL(url);
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid URL" },
-      { status: 400 }
-    );
-  }
-  if (!["http:", "https:"].includes(targetUrl.protocol)) {
-    return NextResponse.json(
-      { error: "URL must be http or https" },
-      { status: 400 }
-    );
-  }
-
-  const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
-  const openaiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!geminiKey && !openaiKey) {
-    return NextResponse.json(
-      {
-        error:
-          "Recipe extraction requires GOOGLE_GEMINI_API_KEY or OPENAI_API_KEY in server environment."
-      },
-      { status: 400 }
-    );
-  }
-
-  let text: string;
-  try {
-    text = await fetchPageText(targetUrl.href);
-  } catch (e) {
-    console.error("Fetch error", e);
-    return NextResponse.json(
-      { error: "Failed to fetch URL or extract text" },
-      { status: 422 }
-    );
-  }
-
-  if (text.length < 100) {
-    return NextResponse.json(
-      { error: "Page has too little text to parse as a recipe" },
-      { status: 422 }
-    );
-  }
-
-  let recipe: ExtractedRecipe;
-  try {
-    if (geminiKey) {
-      recipe = await extractWithGemini(text, geminiKey);
-    } else {
-      recipe = await extractWithOpenAI(text, openaiKey!);
-    }
-  } catch (e) {
-    console.error("Recipe extract error", e);
-    return NextResponse.json(
-      {
-        error:
-          e instanceof Error ? e.message : "Failed to extract recipe with AI"
-      },
-      { status: 502 }
-    );
-  }
-
-  if (!recipe.name?.trim()) {
-    return NextResponse.json(
-      { error: "Could not extract recipe name" },
-      { status: 422 }
-    );
-  }
-
+async function saveExtractedRecipe(
+  recipe: ExtractedRecipe,
+  imageUrl?: string | null
+): Promise<{ id: string; name: string }> {
   const ingredients = recipe.ingredients ?? [];
   const ingredientIds: { id: string; name: string }[] = [];
 
@@ -238,17 +238,18 @@ export async function POST(req: NextRequest) {
       meal_type: "both",
       prep_time_minutes: null,
       tags: [],
-      servings: recipe.servings ?? null
+      servings: recipe.servings ?? null,
+      instructions: recipe.instructions?.trim() || null,
+      image_url: imageUrl ?? null
     })
     .select("id")
     .single();
 
   if (dishError || !dish) {
     console.error("Insert dish error", dishError);
-    return NextResponse.json(
-      { error: "Failed to create dish" },
-      { status: 500 }
-    );
+    const message =
+      dishError?.message ?? "Unknown error";
+    throw new Error(message);
   }
 
   const rows = ingredients
@@ -271,8 +272,151 @@ export async function POST(req: NextRequest) {
     await supabaseServer.from("dish_ingredients").insert(rows);
   }
 
-  return NextResponse.json(
-    { id: dish.id, name: recipe.name.trim() },
-    { status: 201 }
-  );
+  return { id: dish.id, name: recipe.name.trim() };
+}
+
+export async function POST(req: NextRequest) {
+  const contentType = req.headers.get("content-type") ?? "";
+  const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+
+  let recipe: ExtractedRecipe;
+
+  if (contentType.includes("multipart/form-data")) {
+    if (!geminiKey) {
+      return NextResponse.json(
+        { error: "Screenshot import requires GOOGLE_GEMINI_API_KEY." },
+        { status: 400 }
+      );
+    }
+    const formData = await req.formData();
+    const file = formData.get("file");
+    if (!file || !(file instanceof File)) {
+      return NextResponse.json(
+        { error: "file is required (image)" },
+        { status: 400 }
+      );
+    }
+    const type = (file.type?.toLowerCase() ?? "").replace(/^image\/jpg$/, "image/jpeg");
+    if (!ALLOWED_IMAGE_TYPES.includes(type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
+      return NextResponse.json(
+        { error: "Image must be PNG, JPEG, or WebP." },
+        { status: 400 }
+      );
+    }
+    const buf = await file.arrayBuffer();
+    if (buf.byteLength > MAX_IMAGE_BYTES) {
+      return NextResponse.json(
+        { error: "Image must be 10MB or smaller." },
+        { status: 400 }
+      );
+    }
+    const imageBase64 = Buffer.from(buf).toString("base64");
+    const mimeType = type;
+    try {
+      recipe = await extractWithGeminiFromImage(imageBase64, mimeType, geminiKey);
+    } catch (e) {
+      console.error("Screenshot extract error", e);
+      return NextResponse.json(
+        {
+          error:
+            e instanceof Error ? e.message : "Failed to extract recipe from image"
+        },
+        { status: 502 }
+      );
+    }
+  } else {
+    const body = (await req.json()) as { url: string };
+    const { url } = body;
+
+    if (!url || typeof url !== "string") {
+      return NextResponse.json(
+        { error: "url is required" },
+        { status: 400 }
+      );
+    }
+
+    let targetUrl: URL;
+    try {
+      targetUrl = new URL(url);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid URL" },
+        { status: 400 }
+      );
+    }
+    if (!["http:", "https:"].includes(targetUrl.protocol)) {
+      return NextResponse.json(
+        { error: "URL must be http or https" },
+        { status: 400 }
+      );
+    }
+
+    if (!geminiKey && !openaiKey) {
+      return NextResponse.json(
+        {
+          error:
+            "Recipe extraction requires GOOGLE_GEMINI_API_KEY or OPENAI_API_KEY in server environment."
+        },
+        { status: 400 }
+      );
+    }
+
+    let text: string;
+    try {
+      text = await fetchPageText(targetUrl.href);
+    } catch (e) {
+      console.error("Fetch error", e);
+      return NextResponse.json(
+        { error: "Failed to fetch URL or extract text" },
+        { status: 422 }
+      );
+    }
+
+    if (text.length < 100) {
+      return NextResponse.json(
+        { error: "Page has too little text to parse as a recipe" },
+        { status: 422 }
+      );
+    }
+
+    try {
+      if (geminiKey) {
+        recipe = await extractWithGemini(text, geminiKey);
+      } else {
+        recipe = await extractWithOpenAI(text, openaiKey!);
+      }
+    } catch (e) {
+      console.error("Recipe extract error", e);
+      return NextResponse.json(
+        {
+          error:
+            e instanceof Error ? e.message : "Failed to extract recipe with AI"
+        },
+        { status: 502 }
+      );
+    }
+  }
+
+  if (!recipe.name?.trim()) {
+    return NextResponse.json(
+      { error: "Could not extract recipe name" },
+      { status: 422 }
+    );
+  }
+
+  const imageUrl = await fetchImageUrlForRecipe(recipe.name);
+
+  try {
+    const result = await saveExtractedRecipe(recipe, imageUrl);
+    return NextResponse.json(result, { status: 201 });
+  } catch (e) {
+    console.error("Save recipe error", e);
+    const message =
+      e instanceof Error ? e.message : "Failed to create dish";
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
+  }
 }

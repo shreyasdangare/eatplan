@@ -33,6 +33,7 @@ export default function NewDishPage() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [importUrl, setImportUrl] = useState("");
+  const [importScreenshotFile, setImportScreenshotFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [newIngredientName, setNewIngredientName] = useState("");
@@ -140,6 +141,27 @@ export default function NewDishPage() {
     }
   };
 
+  const handleImportScreenshot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!importScreenshotFile) return;
+    setImportError(null);
+    setImporting(true);
+    const formData = new FormData();
+    formData.append("file", importScreenshotFile);
+    const res = await fetch("/api/import-recipe", {
+      method: "POST",
+      body: formData
+    });
+    setImporting(false);
+    if (res.ok) {
+      const data = (await res.json()) as { id: string };
+      router.push(`/dishes/${data.id}`);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setImportError((data as { error?: string })?.error ?? "Import failed");
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -206,6 +228,29 @@ export default function NewDishPage() {
             className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm disabled:opacity-50 hover:bg-amber-400"
           >
             {importing ? "Importing…" : "Import recipe"}
+          </button>
+        </form>
+
+        <h3 className="mb-2 mt-4 text-xs font-semibold text-amber-800 dark:text-amber-200">
+          Import from screenshot
+        </h3>
+        <form onSubmit={handleImportScreenshot} className="space-y-2">
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="w-full text-sm text-stone-600 file:mr-2 file:rounded-full file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-950 file:hover:bg-amber-400 dark:text-stone-300"
+            onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
+            disabled={importing}
+          />
+          {importError && (
+            <p className="text-xs text-red-600 dark:text-red-400">{importError}</p>
+          )}
+          <button
+            type="submit"
+            disabled={importing || !importScreenshotFile}
+            className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm disabled:opacity-50 hover:bg-amber-400"
+          >
+            {importing ? "Importing…" : "Import from screenshot"}
           </button>
         </form>
       </div>

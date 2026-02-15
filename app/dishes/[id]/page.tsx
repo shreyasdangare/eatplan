@@ -13,7 +13,7 @@ interface PageProps {
 }
 
 const DISH_SELECT_FULL =
-  "id, name, description, meal_type, prep_time_minutes, tags, image_url, servings, dish_ingredients(id, ingredient_id, quantity, amount, unit, is_optional, ingredients(name))";
+  "id, name, description, meal_type, prep_time_minutes, tags, image_url, servings, instructions, dish_ingredients(id, ingredient_id, quantity, amount, unit, is_optional, ingredients(name))";
 const DISH_SELECT_LEGACY =
   "id, name, description, meal_type, prep_time_minutes, tags, dish_ingredients(id, ingredient_id, quantity, is_optional, ingredients(name))";
 
@@ -98,6 +98,17 @@ export default async function DishDetailPage({ params }: PageProps) {
 
       {dish.description && (
         <p className="text-sm text-stone-800">{dish.description}</p>
+      )}
+
+      {(dish as { instructions?: string | null }).instructions && (
+        <div className="space-y-1">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+            Steps
+          </h3>
+          <div className="whitespace-pre-line rounded-lg border border-orange-200 bg-orange-50/50 p-3 text-sm text-stone-800 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-200">
+            {(dish as { instructions: string }).instructions}
+          </div>
+        </div>
       )}
 
       {dish.prep_time_minutes != null && (

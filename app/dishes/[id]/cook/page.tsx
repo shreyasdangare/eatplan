@@ -10,6 +10,7 @@ type DishData = {
   description?: string | null;
   prep_time_minutes?: number | null;
   servings?: number | null;
+  instructions?: string | null;
   dish_ingredients?: {
     id: string;
     quantity: string | null;
@@ -129,6 +130,17 @@ export default function CookModePage() {
           )}
         </ul>
       </section>
+
+      {dish.instructions && (
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">
+            Steps
+          </h2>
+          <div className="whitespace-pre-line rounded-lg border border-stone-200 bg-stone-50 p-4 text-lg leading-relaxed text-stone-800 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-200">
+            {dish.instructions}
+          </div>
+        </section>
+      )}
 
       <p className="text-sm text-stone-500 dark:text-stone-400">
         Screen will stay on while this page is open.

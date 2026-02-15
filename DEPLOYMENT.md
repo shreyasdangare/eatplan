@@ -44,6 +44,10 @@ The app uses **Google AI Studio (Gemini)** by default for extracting recipes fro
 
 If `GOOGLE_GEMINI_API_KEY` is not set, the app will fall back to `OPENAI_API_KEY` for recipe import (if set). At least one of them must be set for "Import from URL" to work.
 
+Screenshot import uses the same `GOOGLE_GEMINI_API_KEY`; users can upload an image (PNG, JPEG, or WebP) to extract a recipe via Gemini vision (OCR).
+
+**Auto recipe image (optional):** Set `UNSPLASH_ACCESS_KEY` to automatically attach a food photo from [Unsplash](https://unsplash.com/developers) when importing a recipe (URL or screenshot). Get an Access Key by creating an application at [Unsplash Developers](https://unsplash.com/developers). If unset, import still works; dishes simply have no auto image. Unsplash API [guidelines](https://unsplash.com/api-terms) require attribution; you can optionally show “Photo by [name] on Unsplash” near the dish image later.
+
 #### Restricting your Google AI Studio API key
 
 To reduce risk of abuse and control costs, restrict the key in Google AI Studio or Google Cloud Console.
