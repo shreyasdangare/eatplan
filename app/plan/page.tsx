@@ -178,6 +178,7 @@ export default function PlanPage() {
               date,
               slot_type,
               dish_id,
+              prepared_at: null,
               dishes: dish ? { id: dish.id, name: dish.name } : null
             }
           ];

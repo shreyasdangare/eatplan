@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       .select("project_id")
       .eq("id", connectionId)
       .single();
-    projectId = (conn as { project_id: string | null } | null)?.project_id ?? null;
+    projectId = (conn as { project_id: string | null } | null)?.project_id ?? undefined;
   }
 
   if (!projectId) {

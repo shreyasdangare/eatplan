@@ -128,11 +128,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const buf = Buffer.from(await file.arrayBuffer());
+  const arrayBuffer = await file.arrayBuffer();
   let wb: ExcelJS.Workbook;
   try {
     wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(buf);
+    // ExcelJS accepts ArrayBuffer at runtime; types conflict with Node's Buffer
+    await wb.xlsx.load(arrayBuffer as unknown as Parameters<ExcelJS.Workbook["xlsx"]["load"]>[0]);
   } catch {
     return NextResponse.json(
       { error: "Could not read Excel file. Ensure it is a valid .xlsx file." },
