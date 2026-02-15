@@ -32,6 +32,54 @@ async function fetchPageText(url: string): Promise<string> {
   return text.slice(0, 15000);
 }
 
+const RECIPE_SYSTEM_PROMPT = `You extract recipe data from web page text. Reply with ONLY a valid JSON object, no markdown or explanation.
+Use this shape:
+{
+  "name": "Recipe title",
+  "description": "Short description or leave empty",
+  "servings": number or null,
+  "ingredients": [
+    { "name": "ingredient name", "quantity": "2 cups", "amount": 2, "unit": "cups" }
+  ]
+}
+For each ingredient: "name" is required. Use "quantity" as display string (e.g. "2 cups"). If numeric, also set "amount" and "unit".`;
+
+async function extractWithGemini(text: string, apiKey: string): Promise<ExtractedRecipe> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: RECIPE_SYSTEM_PROMPT }]
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `Extract the recipe from this text:\n\n${text.slice(0, 12000)}` }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 2000,
+        responseMimeType: "application/json"
+      }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
+  }
+
+  const data = (await res.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
+  const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
+  return JSON.parse(jsonStr) as ExtractedRecipe;
+}
+
 async function extractWithOpenAI(
   text: string,
   apiKey: string
@@ -45,20 +93,7 @@ async function extractWithOpenAI(
     body: JSON.stringify({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content: `You extract recipe data from web page text. Reply with ONLY a valid JSON object, no markdown or explanation.
-Use this shape:
-{
-  "name": "Recipe title",
-  "description": "Short description or leave empty",
-  "servings": number or null,
-  "ingredients": [
-    { "name": "ingredient name", "quantity": "2 cups", "amount": 2, "unit": "cups" }
-  ]
-}
-For each ingredient: "name" is required. Use "quantity" as display string (e.g. "2 cups"). If numeric, also set "amount" and "unit".`
-        },
+        { role: "system", content: RECIPE_SYSTEM_PROMPT },
         {
           role: "user",
           content: `Extract the recipe from this text:\n\n${text.slice(0, 12000)}`
@@ -84,11 +119,8 @@ For each ingredient: "name" is required. Use "quantity" as display string (e.g. 
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as {
-    url: string;
-    api_key?: string;
-  };
-  const { url, api_key } = body;
+  const body = (await req.json()) as { url: string };
+  const { url } = body;
 
   if (!url || typeof url !== "string") {
     return NextResponse.json(
@@ -113,12 +145,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const apiKey = api_key?.trim() || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!geminiKey && !openaiKey) {
     return NextResponse.json(
       {
         error:
-          "OpenAI API key required. Set OPENAI_API_KEY in environment or pass api_key in the request."
+          "Recipe extraction requires GOOGLE_GEMINI_API_KEY or OPENAI_API_KEY in server environment."
       },
       { status: 400 }
     );
@@ -144,9 +177,13 @@ export async function POST(req: NextRequest) {
 
   let recipe: ExtractedRecipe;
   try {
-    recipe = await extractWithOpenAI(text, apiKey);
+    if (geminiKey) {
+      recipe = await extractWithGemini(text, geminiKey);
+    } else {
+      recipe = await extractWithOpenAI(text, openaiKey!);
+    }
   } catch (e) {
-    console.error("OpenAI extract error", e);
+    console.error("Recipe extract error", e);
     return NextResponse.json(
       {
         error:

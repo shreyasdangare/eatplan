@@ -33,7 +33,6 @@ export default function NewDishPage() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [importUrl, setImportUrl] = useState("");
-  const [importApiKey, setImportApiKey] = useState("");
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [newIngredientName, setNewIngredientName] = useState("");
@@ -129,10 +128,7 @@ export default function NewDishPage() {
     const res = await fetch("/api/import-recipe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        url,
-        ...(importApiKey.trim() && { api_key: importApiKey.trim() })
-      })
+      body: JSON.stringify({ url })
     });
     setImporting(false);
     if (res.ok) {
@@ -199,14 +195,6 @@ export default function NewDishPage() {
             className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
             value={importUrl}
             onChange={(e) => setImportUrl(e.target.value)}
-            disabled={importing}
-          />
-          <input
-            type="password"
-            placeholder="OpenAI API key (optional if set in server)"
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-            value={importApiKey}
-            onChange={(e) => setImportApiKey(e.target.value)}
             disabled={importing}
           />
           {importError && (
