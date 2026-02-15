@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./globals.css";
+import { HeaderTitle } from "./components/HeaderTitle";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ThemeToggle } from "./components/ThemeToggle";
 
@@ -21,17 +21,7 @@ export default function RootLayout({
           <div className="mx-auto flex min-h-screen min-w-0 max-w-3xl flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 px-4 py-4 text-stone-900 sm:px-6 lg:max-w-5xl lg:px-10 lg:py-6 dark:from-stone-900 dark:via-stone-800 dark:to-stone-900 dark:text-stone-100">
             <header className="mb-6 border-b border-orange-200/70 dark:border-stone-600 pb-4 lg:mb-8 lg:pb-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Link
-                  href="/"
-                  className="flex items-baseline gap-2 shrink-0 hover:opacity-90"
-                >
-                  <h1 className="text-xl font-semibold tracking-tight text-orange-900 sm:text-2xl dark:text-orange-200">
-                    काय खायचं?
-                  </h1>
-                  <span className="text-xs text-amber-700 dark:text-amber-300">
-                    Meal planner by PP
-                  </span>
-                </Link>
+                <HeaderTitle />
                 <div className="flex flex-wrap items-center gap-2">
                   <ThemeToggle />
                   <nav

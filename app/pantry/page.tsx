@@ -9,7 +9,7 @@ import {
 
 const PANTRY_STORAGE_KEY = "jevan-pantry";
 
-function loadPantryIds(): string[] {
+function loadPantryIdsLocal(): string[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(PANTRY_STORAGE_KEY);
@@ -23,27 +23,37 @@ function loadPantryIds(): string[] {
   }
 }
 
-function savePantryIds(ids: string[]) {
+function savePantryIdsLocal(ids: string[]) {
   if (typeof window === "undefined") return;
   localStorage.setItem(PANTRY_STORAGE_KEY, JSON.stringify(ids));
 }
 
 type Ingredient = { id: string; name: string };
+type PantryItem = { ingredient_id: string; amount: number | null; unit: string | null };
 
 export default function PantryPage() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [pantryIds, setPantryIds] = useState<string[]>([]);
+  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [searchInput, setSearchInput] = useState("");
+  const [addAmount, setAddAmount] = useState<string>("");
+  const [addUnit, setAddUnit] = useState<string>("");
   const [mounted, setMounted] = useState(false);
+  const [connected, setConnected] = useState<boolean | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [editUnit, setEditUnit] = useState("");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-    setPantryIds(loadPantryIds());
-  }, [mounted]);
+    (async () => {
+      const res = await fetch("/api/auth/todoist/status");
+      const data = (await res.json()) as { connected: boolean };
+      setConnected(data.connected);
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -55,18 +65,110 @@ export default function PantryPage() {
     })();
   }, []);
 
-  const savePantry = useCallback((ids: string[]) => {
-    setPantryIds(ids);
-    savePantryIds(ids);
-  }, []);
+  useEffect(() => {
+    if (!mounted) return;
+    if (connected === true) {
+      fetch("/api/pantry")
+        .then((res) => res.json())
+        .then((data: { items?: PantryItem[]; ingredient_ids?: string[] }) => {
+          const items = data?.items ?? [];
+          if (items.length > 0) {
+            setPantryItems(items);
+          } else {
+            const ids = Array.isArray(data?.ingredient_ids) ? data.ingredient_ids : [];
+            setPantryItems(ids.map((ingredient_id) => ({ ingredient_id, amount: null, unit: null })));
+          }
+        })
+        .catch(() => setPantryItems([]));
+    } else if (connected === false) {
+      const ids = loadPantryIdsLocal();
+      setPantryItems(ids.map((ingredient_id) => ({ ingredient_id, amount: null, unit: null })));
+    }
+  }, [mounted, connected]);
 
-  const addToPantry = (id: string) => {
-    if (pantryIds.includes(id)) return;
-    savePantry([...pantryIds, id]);
-  };
+  const pantryIds = pantryItems.map((p) => p.ingredient_id);
 
-  const removeFromPantry = (id: string) => {
-    savePantry(pantryIds.filter((x) => x !== id));
+  const savePantry = useCallback(
+    (ids: string[]) => {
+      setPantryItems((prev) => {
+        const next = prev.filter((p) => ids.includes(p.ingredient_id));
+        const added = ids.filter((id) => !prev.some((p) => p.ingredient_id === id));
+        return [...next, ...added.map((ingredient_id) => ({ ingredient_id, amount: null as number | null, unit: null as string | null }))];
+      });
+      if (!connected) savePantryIdsLocal(ids);
+    },
+    [connected]
+  );
+
+  const addToPantry = useCallback(
+    async (id: string, amount?: number | null, unit?: string | null) => {
+      if (pantryIds.includes(id)) return;
+      if (connected) {
+        const res = await fetch("/api/pantry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ingredient_id: id,
+            amount: amount ?? null,
+            unit: unit ?? null,
+          }),
+        });
+        if (res.ok) {
+          setPantryItems((prev) => [
+            ...prev,
+            { ingredient_id: id, amount: amount ?? null, unit: unit ?? null },
+          ]);
+        }
+        return;
+      }
+      savePantry([...pantryIds, id]);
+    },
+    [connected, pantryIds, savePantry]
+  );
+
+  const updatePantryQuantity = useCallback(
+    async (ingredientId: string, amount: number | null, unit: string | null) => {
+      if (connected) {
+        const res = await fetch("/api/pantry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ingredient_id: ingredientId,
+            amount,
+            unit,
+          }),
+        });
+        if (res.ok) {
+          setPantryItems((prev) =>
+            prev.map((p) =>
+              p.ingredient_id === ingredientId ? { ...p, amount, unit } : p
+            )
+          );
+        }
+      }
+      setEditingId(null);
+    },
+    [connected]
+  );
+
+  const removeFromPantry = useCallback(
+    async (id: string) => {
+      if (connected) {
+        await fetch(`/api/pantry?ingredient_id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        setPantryItems((prev) => prev.filter((p) => p.ingredient_id !== id));
+        return;
+      }
+      savePantry(pantryIds.filter((x) => x !== id));
+    },
+    [connected, pantryIds, savePantry]
+  );
+
+  const startEdit = (item: PantryItem) => {
+    setEditingId(item.ingredient_id);
+    setEditAmount(item.amount != null ? String(item.amount) : "");
+    setEditUnit(item.unit ?? "");
   };
 
   const ingredientOptions: IngredientOption[] = ingredients.map((ing) => ({
@@ -74,9 +176,8 @@ export default function PantryPage() {
     name: ing.name
   }));
 
-  const pantryIngredients = pantryIds
-    .map((id) => ingredients.find((i) => i.id === id))
-    .filter((x): x is Ingredient => !!x);
+  const getIngredientName = (id: string) =>
+    ingredients.find((i) => i.id === id)?.name ?? id;
 
   return (
     <section className="space-y-4">
@@ -86,7 +187,9 @@ export default function PantryPage() {
             My pantry
           </h2>
           <p className="text-xs text-amber-700">
-            Ingredients you always have. Used in &quot;What can I cook?&quot;
+            {connected
+              ? "What you have (synced from Todoist or added here). Add amount and unit for deduction when you mark meals prepared."
+              : "Ingredients you have. Connect Todoist in Shopping list to sync checked-off items."}
           </p>
         </div>
         <Link
@@ -104,39 +207,125 @@ export default function PantryPage() {
           value={searchInput}
           onChange={setSearchInput}
           onSelectExisting={(ing) => {
-            addToPantry(ing.id);
+            const amt = addAmount.trim() ? parseFloat(addAmount) : null;
+            const u = addUnit.trim() || null;
+            addToPantry(ing.id, amt ?? null, u);
             setSearchInput("");
+            setAddAmount("");
+            setAddUnit("");
           }}
           onCreateNew={() => {}}
         />
+        <div className="flex gap-2 items-center text-xs">
+          <label className="text-amber-800">Amount (optional)</label>
+          <input
+            type="number"
+            step="any"
+            min="0"
+            placeholder="e.g. 2"
+            value={addAmount}
+            onChange={(e) => setAddAmount(e.target.value)}
+            className="w-20 rounded border border-orange-200 px-2 py-1"
+          />
+          <label className="text-amber-800">Unit (optional)</label>
+          <input
+            type="text"
+            placeholder="e.g. kg"
+            value={addUnit}
+            onChange={(e) => setAddUnit(e.target.value)}
+            className="w-20 rounded border border-orange-200 px-2 py-1"
+          />
+        </div>
       </div>
 
       <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3">
         <h3 className="text-xs font-semibold text-amber-800">
-          In pantry ({pantryIngredients.length})
+          In pantry ({pantryItems.length})
         </h3>
-        {pantryIngredients.length === 0 ? (
+        {pantryItems.length === 0 ? (
           <p className="text-sm text-amber-700">
             No ingredients yet. Add items above.
           </p>
         ) : (
-          <ul className="flex flex-wrap gap-2">
-            {pantryIngredients.map((ing) => (
-              <li
-                key={ing.id}
-                className="flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs shadow-sm"
-              >
-                {ing.name}
-                <button
-                  type="button"
-                  onClick={() => removeFromPantry(ing.id)}
-                  className="text-amber-600 hover:text-red-600"
-                  aria-label={`Remove ${ing.name}`}
+          <ul className="space-y-2">
+            {pantryItems.map((item) => {
+              const name = getIngredientName(item.ingredient_id);
+              const isEditing = editingId === item.ingredient_id;
+              return (
+                <li
+                  key={item.ingredient_id}
+                  className="flex flex-wrap items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs shadow-sm"
                 >
-                  ×
-                </button>
-              </li>
-            ))}
+                  <span>{name}</span>
+                  {isEditing ? (
+                    <>
+                      <input
+                        type="number"
+                        step="any"
+                        min="0"
+                        placeholder="Amount"
+                        value={editAmount}
+                        onChange={(e) => setEditAmount(e.target.value)}
+                        className="w-16 rounded border border-orange-200 px-1.5 py-0.5"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Unit"
+                        value={editUnit}
+                        onChange={(e) => setEditUnit(e.target.value)}
+                        className="w-14 rounded border border-orange-200 px-1.5 py-0.5"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updatePantryQuantity(
+                            item.ingredient_id,
+                            editAmount.trim() ? parseFloat(editAmount) : null,
+                            editUnit.trim() || null
+                          )
+                        }
+                        className="text-lime-600 hover:underline"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingId(null)}
+                        className="text-amber-600 hover:underline"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {(item.amount != null || (item.unit && item.unit.trim())) && (
+                        <span className="text-amber-700">
+                          {item.amount != null ? item.amount : ""}
+                          {item.unit?.trim() ? ` ${item.unit}` : ""}
+                        </span>
+                      )}
+                      {connected && (
+                        <button
+                          type="button"
+                          onClick={() => startEdit(item)}
+                          className="text-amber-600 hover:underline"
+                        >
+                          Edit qty
+                        </button>
+                      )}
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeFromPantry(item.ingredient_id)}
+                    className="text-amber-600 hover:text-red-600 ml-auto"
+                    aria-label={`Remove ${name}`}
+                  >
+                    ×
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

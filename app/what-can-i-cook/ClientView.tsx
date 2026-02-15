@@ -8,7 +8,7 @@ import {
 
 const PANTRY_STORAGE_KEY = "jevan-pantry";
 
-function loadPantryIds(): string[] {
+function loadPantryIdsLocal(): string[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(PANTRY_STORAGE_KEY);
@@ -48,6 +48,7 @@ export function WhatCanICookClient() {
     others: SuggestionBucket[];
   } | null>(null);
   const [searchInput, setSearchInput] = useState("");
+  const [todoistConnected, setTodoistConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -60,8 +61,23 @@ export function WhatCanICookClient() {
   }, []);
 
   useEffect(() => {
-    setPantryIds(loadPantryIds());
+    fetch("/api/auth/todoist/status")
+      .then((r) => r.json())
+      .then((d: { connected: boolean }) => setTodoistConnected(d.connected));
   }, []);
+
+  useEffect(() => {
+    if (todoistConnected === true) {
+      fetch("/api/pantry")
+        .then((r) => r.json())
+        .then((d: { ingredient_ids?: string[] }) => {
+          setPantryIds(Array.isArray(d?.ingredient_ids) ? d.ingredient_ids : []);
+        })
+        .catch(() => setPantryIds([]));
+    } else if (todoistConnected === false) {
+      setPantryIds(loadPantryIdsLocal());
+    }
+  }, [todoistConnected]);
 
   const toggle = (id: string) => {
     setSelected((prev) =>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { DishesListWithFilter } from "../components/DishesListWithFilter";
+import { RecipesSheetActions } from "../components/RecipesSheetActions";
 
 async function DishesList() {
   const { data: dishes, error } = await supabaseServer
@@ -32,12 +33,15 @@ export default function RecipesPage() {
             Your recipe collection. Add recipes and ingredients, filter by tag or favorites.
           </p>
         </div>
-        <Link
-          href="/dishes/new"
-          className="shrink-0 rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm hover:bg-lime-400"
-        >
-          + Add recipe
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Link
+            href="/dishes/new"
+            className="shrink-0 rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm hover:bg-lime-400"
+          >
+            + Add recipe
+          </Link>
+          <RecipesSheetActions />
+        </div>
       </div>
       <Suspense fallback={<p className="text-sm text-amber-700">Loading…</p>}>
         <DishesList />

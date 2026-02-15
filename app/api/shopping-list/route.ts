@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { getConnectionId } from "@/lib/todoistAuth";
 
 type AggregatedLine = {
   ingredient_id: string;
@@ -9,13 +10,30 @@ type AggregatedLine = {
   unit?: string | null;
 };
 
-export async function POST(req: NextRequest) {
-  const body = (await req.json()) as { dish_ids?: string[] };
-  const dishIds = body.dish_ids ?? [];
+type ShoppingListItem = AggregatedLine & {
+  in_stock_reason?: string;
+};
 
-  if (dishIds.length === 0) {
-    return NextResponse.json({ lines: [] });
-  }
+async function getDishIdsFromDateRange(
+  from: string,
+  to: string
+): Promise<string[]> {
+  const { data, error } = await supabaseServer
+    .from("meal_plans")
+    .select("dish_id")
+    .gte("date", from)
+    .lte("date", to)
+    .not("dish_id", "is", null);
+
+  if (error || !data) return [];
+  const ids = [...new Set((data as { dish_id: string }[]).map((r) => r.dish_id).filter(Boolean))];
+  return ids;
+}
+
+async function aggregateIngredients(
+  dishIds: string[]
+): Promise<AggregatedLine[]> {
+  if (dishIds.length === 0) return [];
 
   const { data: rows, error } = await supabaseServer
     .from("dish_ingredients")
@@ -24,13 +42,7 @@ export async function POST(req: NextRequest) {
     )
     .in("dish_id", dishIds);
 
-  if (error || !rows) {
-    console.error("Error fetching dish ingredients for shopping list", error);
-    return NextResponse.json(
-      { error: "Failed to build shopping list" },
-      { status: 500 }
-    );
-  }
+  if (error || !rows) return [];
 
   const byIngredient = new Map<
     string,
@@ -85,7 +97,7 @@ export async function POST(req: NextRequest) {
     if (entry.quantityStrings.length > 0) {
       parts.push(...entry.quantityStrings);
     }
-    quantity_display = parts.join(", ");
+    quantity_display = parts.length ? parts.join(", ") : "";
 
     lines.push({
       ingredient_id: ingredientId,
@@ -100,5 +112,153 @@ export async function POST(req: NextRequest) {
     a.ingredient_name.localeCompare(b.ingredient_name)
   );
 
-  return NextResponse.json({ lines });
+  return lines;
+}
+
+function splitByPantry(
+  lines: AggregatedLine[],
+  pantry: { ingredient_id: string; amount: number | null; unit: string | null }[]
+): { to_buy: ShoppingListItem[]; in_stock: ShoppingListItem[] } {
+  const pantryByIngredient = new Map(
+    pantry.map((p) => [p.ingredient_id, { amount: p.amount, unit: p.unit }])
+  );
+
+  const to_buy: ShoppingListItem[] = [];
+  const in_stock: ShoppingListItem[] = [];
+
+  for (const line of lines) {
+    const p = pantryByIngredient.get(line.ingredient_id);
+    if (!p) {
+      to_buy.push(line);
+      continue;
+    }
+    const pantryAmount = p.amount;
+    const pantryUnit = p.unit ?? null;
+    const requiredAmount = line.amount;
+    const requiredUnit = line.unit ?? null;
+
+    if (pantryAmount == null) {
+      in_stock.push({
+        ...line,
+        in_stock_reason: "In pantry",
+      });
+      continue;
+    }
+    if (
+      requiredAmount != null &&
+      requiredUnit != null &&
+      pantryUnit !== null &&
+      requiredUnit === pantryUnit &&
+      pantryAmount >= requiredAmount
+    ) {
+      in_stock.push({
+        ...line,
+        in_stock_reason: `In pantry: ${pantryAmount} ${pantryUnit}`,
+      });
+      continue;
+    }
+    if (requiredAmount == null || requiredUnit == null || requiredUnit !== pantryUnit) {
+      in_stock.push({
+        ...line,
+        in_stock_reason: `In pantry: ${pantryAmount}${pantryUnit ? ` ${pantryUnit}` : ""}`,
+      });
+      continue;
+    }
+    const needMore = requiredAmount - pantryAmount;
+    if (needMore <= 0) {
+      in_stock.push({
+        ...line,
+        in_stock_reason: `In pantry: ${pantryAmount} ${pantryUnit}`,
+      });
+    } else {
+      to_buy.push({
+        ...line,
+        quantity_display: `Need ${needMore} more ${requiredUnit}`,
+        amount: needMore,
+        unit: requiredUnit,
+      });
+    }
+  }
+
+  return { to_buy, in_stock };
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+
+  if (!from || !to) {
+    return NextResponse.json(
+      { error: "Query params from and to (YYYY-MM-DD) required" },
+      { status: 400 }
+    );
+  }
+
+  const dishIds = await getDishIdsFromDateRange(from, to);
+  const lines = await aggregateIngredients(dishIds);
+
+  const connectionId = await getConnectionId();
+  if (!connectionId) {
+    return NextResponse.json({
+      to_buy: lines,
+      in_stock: [],
+    });
+  }
+
+  const { data: pantryRows } = await supabaseServer
+    .from("pantry")
+    .select("ingredient_id, amount, unit")
+    .eq("connection_id", connectionId);
+
+  const pantry = (pantryRows ?? []).map((r: { ingredient_id: string; amount: number | null; unit: string | null }) => ({
+    ingredient_id: r.ingredient_id,
+    amount: r.amount,
+    unit: r.unit,
+  }));
+
+  const { to_buy, in_stock } = splitByPantry(lines, pantry);
+  return NextResponse.json({ to_buy, in_stock });
+}
+
+export async function POST(req: NextRequest) {
+  const body = (await req.json()) as {
+    dish_ids?: string[];
+    from?: string;
+    to?: string;
+  };
+
+  let dishIds = body.dish_ids ?? [];
+  if (dishIds.length === 0 && body.from && body.to) {
+    dishIds = await getDishIdsFromDateRange(body.from, body.to);
+  }
+
+  const lines = await aggregateIngredients(dishIds);
+
+  const connectionId = await getConnectionId();
+  if (!connectionId) {
+    return NextResponse.json({
+      to_buy: lines,
+      in_stock: [],
+      lines,
+    });
+  }
+
+  const { data: pantryRows } = await supabaseServer
+    .from("pantry")
+    .select("ingredient_id, amount, unit")
+    .eq("connection_id", connectionId);
+
+  const pantry = (pantryRows ?? []).map((r: { ingredient_id: string; amount: number | null; unit: string | null }) => ({
+    ingredient_id: r.ingredient_id,
+    amount: r.amount,
+    unit: r.unit,
+  }));
+
+  const { to_buy, in_stock } = splitByPantry(lines, pantry);
+  return NextResponse.json({
+    to_buy,
+    in_stock,
+    lines: to_buy.concat(in_stock),
+  });
 }

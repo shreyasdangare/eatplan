@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabaseServer
     .from("meal_plans")
-    .select("id, date, slot_type, dish_id, dishes(id, name)")
+    .select("id, date, slot_type, dish_id, prepared_at, dishes(id, name)")
     .gte("date", from)
     .lte("date", to)
     .order("date", { ascending: true });

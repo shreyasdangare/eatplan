@@ -29,7 +29,7 @@ The server-only Supabase client in `lib/supabaseServer.ts` uses these values.
 3. During setup:
    - Framework preset: **Next.js**
    - Root directory: repository root (where `package.json` lives)
-   - Environment variables: add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Optional: `OPENAI_API_KEY` for the "Import from URL" feature (or users can enter their key in the form).
+   - Environment variables: add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Optional: `OPENAI_API_KEY` for the "Import from URL" feature; `TODOIST_CLIENT_ID` and `TODOIST_CLIENT_SECRET` for Todoist (Shopping list sync).
 4. Click **Deploy**. Vercel will run `npm install` and `npm run build` automatically.
 
 ### 4. Running locally
@@ -50,3 +50,13 @@ npm run dev
 
 Visit `http://localhost:3000` on desktop or phone (same Wi‑Fi) to use the app.
 
+### 5. Todoist integration (optional)
+
+To enable "Sign in with Todoist" and syncing checked-off Todoist tasks into the pantry:
+
+1. Create an app at [Todoist App Management Console](https://developer.todoist.com/appconsole.html).
+2. Set the OAuth redirect URL to `https://your-domain.com/api/auth/todoist/callback` (or `http://localhost:3000/api/auth/todoist/callback` for local dev).
+3. Add to `.env.local` (and Vercel env):
+   - `TODOIST_CLIENT_ID` – from the Todoist app
+   - `TODOIST_CLIENT_SECRET` – from the Todoist app
+4. Run the migration `db/migrations/005_todoist_pantry.sql` if you have an existing DB (schema.sql already includes these tables for new installs).

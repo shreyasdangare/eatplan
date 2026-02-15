@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 
-export async function GET(_req: NextRequest, context: any) {
-  const { id } = context.params as { id: string };
+export async function GET(
+  _req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
 
   const { data: dish, error } = await supabaseServer
     .from("dishes")
@@ -23,8 +26,11 @@ export async function GET(_req: NextRequest, context: any) {
   return NextResponse.json(dish);
 }
 
-export async function PATCH(req: NextRequest, context: any) {
-  const { id } = context.params as { id: string };
+export async function PATCH(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   const body = await req.json();
 
   const { data, error } = await supabaseServer
@@ -51,8 +57,11 @@ export async function PATCH(req: NextRequest, context: any) {
   return NextResponse.json({ id: data.id });
 }
 
-export async function DELETE(_req: NextRequest, context: any) {
-  const { id } = context.params as { id: string };
+export async function DELETE(
+  _req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
 
   const { error } = await supabaseServer.from("dishes").delete().eq("id", id);
 

@@ -34,12 +34,18 @@ function DroppableSlot({
   date,
   slot,
   current,
-  onClear
+  prepared,
+  onClear,
+  onMarkPrepared,
+  preparing
 }: {
   date: string;
   slot: string;
   current: string | null;
+  prepared: boolean;
   onClear: () => void;
+  onMarkPrepared: () => void;
+  preparing: boolean;
 }) {
   const slotId = `${date}:${slot}`;
   const { setNodeRef, isOver } = useDroppable({ id: slotId });
@@ -50,20 +56,37 @@ function DroppableSlot({
         ref={setNodeRef}
         className={`min-h-[36px] rounded border border-dashed p-1 ${
           isOver ? "border-orange-500 bg-orange-100" : "border-orange-200 bg-orange-50/50"
-        }`}
+        } ${prepared ? "bg-lime-50/80 border-lime-300" : ""}`}
       >
         {current ? (
-          <span className="flex items-center justify-between gap-1">
-            <span className="truncate">{current}</span>
-            <button
-              type="button"
-              onClick={onClear}
-              className="shrink-0 text-amber-600 hover:text-red-600"
-              aria-label="Clear slot"
-            >
-              ×
-            </button>
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="flex items-center justify-between gap-1">
+              <span className={`truncate ${prepared ? "line-through text-amber-600" : ""}`}>
+                {current}
+              </span>
+              <button
+                type="button"
+                onClick={onClear}
+                className="shrink-0 text-amber-600 hover:text-red-600"
+                aria-label="Clear slot"
+              >
+                ×
+              </button>
+            </span>
+            {!prepared && (
+              <button
+                type="button"
+                disabled={preparing}
+                onClick={onMarkPrepared}
+                className="text-[10px] text-lime-700 hover:underline disabled:opacity-50"
+              >
+                {preparing ? "…" : "Mark as prepared"}
+              </button>
+            )}
+            {prepared && (
+              <span className="text-[10px] text-lime-700">Prepared</span>
+            )}
+          </div>
         ) : (
           <span className="text-amber-500">—</span>
         )}
@@ -78,6 +101,7 @@ type PlanEntry = {
   date: string;
   slot_type: string;
   dish_id: string | null;
+  prepared_at: string | null;
   dishes?: { id: string; name: string } | null;
 };
 
@@ -115,6 +139,7 @@ export default function PlanPage() {
   const [plans, setPlans] = useState<PlanEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeDish, setActiveDish] = useState<Dish | null>(null);
+  const [preparingSlot, setPreparingSlot] = useState<string | null>(null);
 
   const weekDates = getWeekDates(weekStart);
   const from = weekDates[0];
@@ -173,6 +198,41 @@ export default function PlanPage() {
         : null;
     },
     [plans, dishes]
+  );
+
+  const getSlotPrepared = useCallback(
+    (date: string, slot_type: string) => {
+      const p = plans.find(
+        (x) => x.date === date && x.slot_type === slot_type
+      );
+      return !!p?.prepared_at;
+    },
+    [plans]
+  );
+
+  const handleMarkPrepared = useCallback(
+    async (date: string, slot_type: string) => {
+      setPreparingSlot(`${date}:${slot_type}`);
+      try {
+        const res = await fetch("/api/meal-plans/prepare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, slot_type }),
+        });
+        if (res.ok) {
+          setPlans((prev) =>
+            prev.map((p) =>
+              p.date === date && p.slot_type === slot_type
+                ? { ...p, prepared_at: new Date().toISOString() }
+                : p
+            )
+          );
+        }
+      } finally {
+        setPreparingSlot(null);
+      }
+    },
+    []
   );
 
   const sensors = useSensors(
@@ -314,7 +374,10 @@ export default function PlanPage() {
                         date={date}
                         slot={slot}
                         current={getSlotDish(date, slot) ?? null}
+                        prepared={getSlotPrepared(date, slot)}
                         onClear={() => setSlot(date, slot, null)}
+                        onMarkPrepared={() => handleMarkPrepared(date, slot)}
+                        preparing={preparingSlot === `${date}:${slot}`}
                       />
                     ))}
                   </tr>
