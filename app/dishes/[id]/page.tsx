@@ -60,82 +60,105 @@ export default async function DishDetailPage({ params }: PageProps) {
     (di: any) => di.is_optional
   );
 
+  const imageUrl = (dish as { image_url?: string | null }).image_url ?? null;
+  const instructions = (dish as { instructions?: string | null }).instructions;
+  const servings = (dish as { servings?: number | null }).servings;
+
   return (
-    <section className="space-y-5 text-sm lg:space-y-6 lg:text-base">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight text-amber-900 dark:text-amber-200 lg:text-xl">
-            {dish.name}
-          </h2>
-          {dish.meal_type && (
-            <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">
-              {dish.meal_type}
-            </p>
-          )}
+    <article className="pb-12">
+      {/* Hero */}
+      <div className="-mx-4 sm:-mx-6 lg:-mx-10">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-stone-200 dark:bg-stone-700 sm:aspect-[21/9]">
+          <DishImageUpload
+            dishId={dish.id as string}
+            imageUrl={imageUrl}
+            variant="hero"
+          />
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <FavoriteButton dishId={dish.id as string} />
-          <Link
-            href={`/dishes/${dish.id}/cook`}
-            className="rounded-full bg-lime-500 px-3 py-1.5 text-xs font-semibold text-lime-950 shadow-sm hover:bg-lime-400"
-          >
-            Cooking mode
-          </Link>
-          <DeleteDishButton id={dish.id as string} />
-          <Link
-            href="/recipes"
-            className="rounded-full bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
-          >
-            Back
-          </Link>
+        <div className="px-4 sm:px-6 lg:px-10">
+          <div className="relative -mt-16 rounded-t-2xl border border-b-0 border-stone-200 bg-white px-5 pb-6 pt-6 dark:border-stone-700 dark:bg-stone-900 sm:px-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100 sm:text-3xl">
+                  {dish.name}
+                </h1>
+                <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-stone-500 dark:text-stone-400">
+                  {dish.meal_type && (
+                    <span className="uppercase tracking-wide">{dish.meal_type}</span>
+                  )}
+                  {dish.prep_time_minutes != null && (
+                    <span>{dish.prep_time_minutes} min prep</span>
+                  )}
+                  {servings != null && servings > 0 && (
+                    <span>Serves {servings}</span>
+                  )}
+                </div>
+                {dish.tags && dish.tags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {dish.tags.map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="rounded-lg bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600 dark:bg-stone-700 dark:text-stone-400"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <FavoriteButton dishId={dish.id as string} />
+                <Link
+                  href={`/dishes/${dish.id}/edit`}
+                  className="inline-flex items-center rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
+                >
+                  Edit recipe
+                </Link>
+                <Link
+                  href={`/dishes/${dish.id}/cook`}
+                  className="inline-flex items-center rounded-xl bg-stone-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-200"
+                >
+                  Cooking mode
+                </Link>
+                <Link
+                  href="/recipes"
+                  className="inline-flex items-center rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
+                >
+                  Back
+                </Link>
+                <DeleteDishButton id={dish.id as string} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <DishImageUpload
-        dishId={dish.id as string}
-        imageUrl={(dish as any).image_url ?? null}
-      />
+      {/* Content */}
+      <div className="mt-0 space-y-6 border border-t-0 border-stone-200 bg-white px-4 pb-8 dark:border-stone-700 dark:bg-stone-900 sm:px-6 lg:px-10">
+        {dish.description && (
+          <p className="pt-6 text-stone-600 dark:text-stone-400">
+            {dish.description}
+          </p>
+        )}
 
-      {dish.description && (
-        <p className="text-sm text-stone-800">{dish.description}</p>
-      )}
+        <PortionScaling
+          baseServings={servings ?? null}
+          required={required ?? []}
+          optional={optional ?? []}
+        />
 
-      {(dish as { instructions?: string | null }).instructions && (
-        <div className="space-y-1">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-200">
-            Steps
-          </h3>
-          <div className="whitespace-pre-line rounded-lg border border-orange-200 bg-orange-50/50 p-3 text-sm text-stone-800 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-200">
-            {(dish as { instructions: string }).instructions}
-          </div>
-        </div>
-      )}
-
-      {dish.prep_time_minutes != null && (
-        <p className="text-xs text-amber-700">
-          Prep time: {dish.prep_time_minutes} min
-        </p>
-      )}
-
-      {dish.tags && dish.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {dish.tags.map((tag: string) => (
-            <span
-              key={tag}
-              className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] text-orange-900"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <PortionScaling
-        baseServings={(dish as any).servings ?? null}
-        required={required ?? []}
-        optional={optional ?? []}
-      />
-    </section>
+        {instructions && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+              Steps
+            </h2>
+            <div className="whitespace-pre-line rounded-xl border border-stone-200 bg-stone-50/80 p-4 text-stone-800 dark:border-stone-700 dark:bg-stone-800/50 dark:text-stone-200">
+              {instructions}
+            </div>
+          </section>
+        )}
+      </div>
+    </article>
   );
 }
 

@@ -49,6 +49,8 @@ Always include "instructions" with the complete method/steps to cook the dish.`;
 
 const SCREENSHOT_USER_PROMPT = `Extract the recipe from this image (screenshot or photo). Use OCR to read all text. Reply with ONLY a valid JSON object in the same shape: name, description, servings, ingredients (each with name, quantity, amount, unit), and instructions as a single string with full cooking steps.`;
 
+const VIDEO_USER_PROMPT = `Extract the recipe from this cooking video (e.g. reel, tutorial). Use what you see and hear: on-screen text, spoken instructions, and visuals. Reply with ONLY a valid JSON object in the same shape: name, description, servings, ingredients (each with name, quantity, amount, unit), and instructions as a single string with full cooking steps.`;
+
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -158,42 +160,122 @@ async function extractWithGemini(text: string, apiKey: string): Promise<Extracte
   return JSON.parse(jsonStr) as ExtractedRecipe;
 }
 
-async function extractWithOpenAI(
-  text: string,
+function isYouTubeUrl(url: URL): boolean {
+  const host = url.hostname.toLowerCase();
+  const path = url.pathname.toLowerCase();
+  if (host === "www.youtube.com" || host === "youtube.com") {
+    return (
+      path === "/watch" ||
+      path.startsWith("/embed/") ||
+      path.startsWith("/v/") ||
+      path.startsWith("/shorts/")
+    );
+  }
+  if (host === "youtu.be") {
+    return path.length > 1;
+  }
+  return false;
+}
+
+function normalizeYouTubeUrl(url: URL): string {
+  const host = url.hostname.toLowerCase();
+  if (host === "youtu.be") {
+    const id = url.pathname.slice(1).split("/")[0].split("?")[0];
+    return id ? `https://www.youtube.com/watch?v=${id}` : url.href;
+  }
+  if (host === "www.youtube.com" || host === "youtube.com") {
+    const path = url.pathname;
+    const shortsMatch = path.match(/^\/shorts\/([^/?]+)/i);
+    if (shortsMatch) {
+      return `https://www.youtube.com/watch?v=${shortsMatch[1]}`;
+    }
+  }
+  return url.href;
+}
+
+async function extractWithGeminiFromYouTube(
+  youtubeUrl: string,
   apiKey: string
 ): Promise<ExtractedRecipe> {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(apiUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: RECIPE_SYSTEM_PROMPT },
+      systemInstruction: {
+        parts: [{ text: RECIPE_SYSTEM_PROMPT }]
+      },
+      contents: [
         {
           role: "user",
-          content: `Extract the recipe from this text:\n\n${text.slice(0, 12000)}`
+          parts: [
+            {
+              fileData: {
+                mimeType: "video/youtube",
+                fileUri: youtubeUrl
+              }
+            },
+            { text: VIDEO_USER_PROMPT }
+          ]
         }
       ],
-      max_tokens: 2000,
-      temperature: 0.2
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 4000,
+        responseMimeType: "application/json"
+      }
     })
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`OpenAI API error: ${res.status} ${err.slice(0, 200)}`);
+    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
   }
 
   const data = (await res.json()) as {
-    choices?: { message?: { content?: string } }[];
+    candidates?: {
+      content?: { parts?: { text?: string }[] };
+      finishReason?: string;
+    }[];
+    promptFeedback?: { blockReason?: string };
   };
-  const raw =
-    data.choices?.[0]?.message?.content?.trim() ?? "";
+  const candidate = data.candidates?.[0];
+  const blockReason = data.promptFeedback?.blockReason ?? candidate?.finishReason;
+  if (blockReason === "SAFETY" || blockReason === "RECITATION" || blockReason === "BLOCKED") {
+    throw new Error("Video was blocked by the model. Try a different video.");
+  }
+  const raw = candidate?.content?.parts?.[0]?.text?.trim() ?? "";
+  if (!raw) {
+    throw new Error("No recipe could be extracted from the video. The model returned no content.");
+  }
   const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
-  return JSON.parse(jsonStr) as ExtractedRecipe;
+  let recipe: ExtractedRecipe;
+  try {
+    recipe = JSON.parse(jsonStr) as ExtractedRecipe;
+  } catch {
+    throw new Error("Could not parse recipe from video. Try a different video or link.");
+  }
+  return recipe;
+}
+
+function isErrorLikeRecipe(recipe: ExtractedRecipe): boolean {
+  const name = (recipe.name ?? "").trim().toLowerCase();
+  const noIngredients = !recipe.ingredients?.length;
+  const noInstructions = !(recipe.instructions ?? "").trim();
+  const errorPhrases = [
+    "no recipe",
+    "could not",
+    "unable to",
+    "not found",
+    "cannot extract",
+    "couldn't extract",
+    "no content",
+    "did not find",
+    "unable to find"
+  ];
+  if (errorPhrases.some((p) => name.includes(p))) return true;
+  if (noIngredients && noInstructions) return true;
+  return false;
 }
 
 async function saveExtractedRecipe(
@@ -278,7 +360,6 @@ async function saveExtractedRecipe(
 export async function POST(req: NextRequest) {
   const contentType = req.headers.get("content-type") ?? "";
   const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
-  const openaiKey = process.env.OPENAI_API_KEY?.trim();
 
   let recipe: ExtractedRecipe;
 
@@ -352,55 +433,75 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!geminiKey && !openaiKey) {
+    if (!geminiKey) {
       return NextResponse.json(
-        {
-          error:
-            "Recipe extraction requires GOOGLE_GEMINI_API_KEY or OPENAI_API_KEY in server environment."
-        },
+        { error: "Recipe import requires GOOGLE_GEMINI_API_KEY in server environment." },
         { status: 400 }
       );
     }
 
-    let text: string;
-    try {
-      text = await fetchPageText(targetUrl.href);
-    } catch (e) {
-      console.error("Fetch error", e);
-      return NextResponse.json(
-        { error: "Failed to fetch URL or extract text" },
-        { status: 422 }
-      );
-    }
-
-    if (text.length < 100) {
-      return NextResponse.json(
-        { error: "Page has too little text to parse as a recipe" },
-        { status: 422 }
-      );
-    }
-
-    try {
-      if (geminiKey) {
-        recipe = await extractWithGemini(text, geminiKey);
-      } else {
-        recipe = await extractWithOpenAI(text, openaiKey!);
+    if (isYouTubeUrl(targetUrl)) {
+      const youtubeUrl = normalizeYouTubeUrl(targetUrl);
+      try {
+        recipe = await extractWithGeminiFromYouTube(youtubeUrl, geminiKey);
+      } catch (e) {
+        console.error("YouTube recipe extract error", e);
+        return NextResponse.json(
+          {
+            error:
+              e instanceof Error ? e.message : "Failed to extract recipe from YouTube video"
+          },
+          { status: 502 }
+        );
       }
-    } catch (e) {
-      console.error("Recipe extract error", e);
-      return NextResponse.json(
-        {
-          error:
-            e instanceof Error ? e.message : "Failed to extract recipe with AI"
-        },
-        { status: 502 }
-      );
+    } else {
+      let text: string;
+      try {
+        text = await fetchPageText(targetUrl.href);
+      } catch (e) {
+        console.error("Fetch error", e);
+        return NextResponse.json(
+          { error: "Failed to fetch URL or extract text" },
+          { status: 422 }
+        );
+      }
+
+      if (text.length < 100) {
+        return NextResponse.json(
+          { error: "Page has too little text to parse as a recipe" },
+          { status: 422 }
+        );
+      }
+
+      try {
+        recipe = await extractWithGemini(text, geminiKey);
+      } catch (e) {
+        console.error("Recipe extract error", e);
+        return NextResponse.json(
+          {
+            error:
+              e instanceof Error ? e.message : "Failed to extract recipe with AI"
+          },
+          { status: 502 }
+        );
+      }
     }
   }
 
   if (!recipe.name?.trim()) {
     return NextResponse.json(
       { error: "Could not extract recipe name" },
+      { status: 422 }
+    );
+  }
+
+  if (isErrorLikeRecipe(recipe)) {
+    console.warn("Recipe import rejected (error-like response):", recipe.name?.slice(0, 80));
+    return NextResponse.json(
+      {
+        error:
+          "No recipe could be extracted from this video. Try a different link or ensure the video shows a clear recipe (ingredients and steps)."
+      },
       { status: 422 }
     );
   }

@@ -24,7 +24,7 @@ The server-only Supabase client in `lib/supabaseServer.ts` uses these values.
 
 #### Recipe import (Import from URL)
 
-The app uses **Google AI Studio (Gemini)** by default for extracting recipes from URLs. Set your API key in the server environment so all users can use the feature without entering a key.
+The app uses **Google AI Studio (Gemini)** for all recipe extraction (URLs, screenshots, and YouTube videos). Set your API key in the server environment so all users can use the feature without entering a key.
 
 **Where to save the API key**
 
@@ -42,9 +42,9 @@ The app uses **Google AI Studio (Gemini)** by default for extracting recipes fro
    - **Environment:** Production (and optionally Preview / Development if you use them).  
    Redeploy after adding or changing variables.
 
-If `GOOGLE_GEMINI_API_KEY` is not set, the app will fall back to `OPENAI_API_KEY` for recipe import (if set). At least one of them must be set for "Import from URL" to work.
+Recipe import (from URL, screenshot, or YouTube) requires `GOOGLE_GEMINI_API_KEY`; there is no fallback. If the key is not set, "Import from URL" and screenshot import will return an error.
 
-Screenshot import uses the same `GOOGLE_GEMINI_API_KEY`; users can upload an image (PNG, JPEG, or WebP) to extract a recipe via Gemini vision (OCR).
+Screenshot import uses the same key; users can upload an image (PNG, JPEG, or WebP) to extract a recipe via Gemini vision (OCR). **YouTube links** are supported natively: paste a YouTube video URL (e.g. a cooking reel) and Gemini will extract the recipe from the video.
 
 **Auto recipe image (optional):** Set `UNSPLASH_ACCESS_KEY` to automatically attach a food photo from [Unsplash](https://unsplash.com/developers) when importing a recipe (URL or screenshot). Get an Access Key by creating an application at [Unsplash Developers](https://unsplash.com/developers). If unset, import still works; dishes simply have no auto image. Unsplash API [guidelines](https://unsplash.com/api-terms) require attribution; you can optionally show “Photo by [name] on Unsplash” near the dish image later.
 
@@ -94,7 +94,7 @@ Keeping the key in server-side environment variables (e.g. `GOOGLE_GEMINI_API_KE
 3. During setup:
    - Framework preset: **Next.js**
    - Root directory: repository root (where `package.json` lives)
-   - Environment variables: add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. For "Import from URL" set `GOOGLE_GEMINI_API_KEY` (recommended) or `OPENAI_API_KEY`. Optional: `TODOIST_CLIENT_ID` and `TODOIST_CLIENT_SECRET` for Todoist (Shopping list sync).
+   - Environment variables: add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. For recipe import (URL, screenshot, YouTube) set `GOOGLE_GEMINI_API_KEY`. Optional: `TODOIST_CLIENT_ID` and `TODOIST_CLIENT_SECRET` for Todoist (Shopping list sync).
 4. Click **Deploy**. Vercel will run `npm install` and `npm run build` automatically.
 
 ### 4. Running locally

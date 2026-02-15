@@ -208,12 +208,12 @@ export default function NewDishPage() {
 
       <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
         <h3 className="mb-2 text-xs font-semibold text-amber-800 dark:text-amber-200">
-          Import from recipe URL
+          Import from recipe URL or YouTube
         </h3>
         <form onSubmit={handleImport} className="space-y-2">
           <input
             type="url"
-            placeholder="https://example.com/recipe"
+            placeholder="https://example.com/recipe or https://youtube.com/watch?v=..."
             className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
             value={importUrl}
             onChange={(e) => setImportUrl(e.target.value)}

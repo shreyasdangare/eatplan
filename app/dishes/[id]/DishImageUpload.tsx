@@ -5,10 +5,12 @@ import { useState } from "react";
 
 export function DishImageUpload({
   dishId,
-  imageUrl: initialImageUrl
+  imageUrl: initialImageUrl,
+  variant = "default"
 }: {
   dishId: string;
   imageUrl: string | null;
+  variant?: "default" | "hero";
 }) {
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
@@ -38,16 +40,22 @@ export function DishImageUpload({
     }
   };
 
+  const isHero = variant === "hero";
+  const imageClass = isHero
+    ? "h-full w-full object-cover"
+    : "h-48 w-full rounded-xl object-cover shadow-sm";
+  const wrapperClass = isHero ? "relative h-full w-full" : "relative";
+
   return (
-    <div className="space-y-2">
+    <div className={isHero ? "h-full" : "space-y-2"}>
       {imageUrl ? (
-        <div className="relative">
+        <div className={wrapperClass}>
           <img
             src={imageUrl}
             alt="Dish"
-            className="h-48 w-full rounded-lg object-cover shadow-sm"
+            className={imageClass}
           />
-          <label className="absolute bottom-2 right-2 cursor-pointer rounded bg-black/60 px-2 py-1 text-[11px] text-white hover:bg-black/80">
+          <label className="absolute bottom-3 right-3 cursor-pointer rounded-lg bg-black/70 px-3 py-1.5 text-xs text-white backdrop-blur-sm hover:bg-black/80">
             Change photo
             <input
               type="file"
@@ -59,7 +67,13 @@ export function DishImageUpload({
           </label>
         </div>
       ) : (
-        <label className="flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-orange-200 bg-orange-50/50 p-4 text-center text-sm text-amber-700 hover:border-orange-300 hover:bg-orange-50">
+        <label
+          className={
+            isHero
+              ? "flex h-full min-h-[200px] w-full cursor-pointer flex-col items-center justify-center bg-stone-100 p-6 text-center text-sm text-stone-500 dark:bg-stone-700 dark:text-stone-400"
+              : "flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-200 bg-stone-50/80 p-4 text-center text-sm text-stone-500 hover:border-stone-300 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-800/50 dark:hover:bg-stone-800"
+          }
+        >
           {uploading ? (
             "Uploading…"
           ) : (
@@ -77,7 +91,7 @@ export function DishImageUpload({
         </label>
       )}
       {error && (
-        <p className="text-xs text-red-600">{error}</p>
+        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
       )}
     </div>
   );
