@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { supabaseServer } from "@/lib/supabaseServer";
 
 const REQUIRED_COLUMNS = ["name", "ingredients"];
@@ -12,6 +12,44 @@ type ImportRow = {
   tags?: string;
   ingredients?: string;
 };
+
+function cellToValue(v: unknown): string | number {
+  if (v == null) return "";
+  if (typeof v === "number") return v;
+  if (v instanceof Date) return v.toISOString();
+  if (typeof v === "object" && v !== null && "richText" in v) {
+    const rt = (v as { richText?: Array<{ text: string }> }).richText;
+    return Array.isArray(rt) ? rt.map((t) => t.text).join("") : String(v);
+  }
+  return String(v);
+}
+
+/** Build array of row objects from first worksheet using row 1 as headers */
+function sheetToJson(ws: ExcelJS.Worksheet): Record<string, unknown>[] {
+  const rowCount = ws.actualRowCount ?? 0;
+  if (rowCount < 2) return [];
+
+  const headerRow = ws.getRow(1);
+  const headers: string[] = [];
+  const numCols = ws.actualColumnCount ?? 0;
+  for (let c = 1; c <= numCols; c++) {
+    const val = headerRow.getCell(c).value;
+    headers.push(val != null ? String(val).trim() : "");
+  }
+
+  const data: Record<string, unknown>[] = [];
+  for (let r = 2; r <= rowCount; r++) {
+    const row = ws.getRow(r);
+    const obj: Record<string, unknown> = {};
+    headers.forEach((h, i) => {
+      if (!h) return;
+      const v = row.getCell(i + 1).value;
+      obj[h] = cellToValue(v);
+    });
+    data.push(obj);
+  }
+  return data;
+}
 
 function parseNumber(val: unknown): number | null {
   if (val === null || val === undefined || val === "") return null;
@@ -91,28 +129,25 @@ export async function POST(req: NextRequest) {
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
-  let wb: XLSX.WorkBook;
+  let wb: ExcelJS.Workbook;
   try {
-    wb = XLSX.read(buf, { type: "buffer" });
-  } catch (e) {
+    wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(buf);
+  } catch {
     return NextResponse.json(
       { error: "Could not read Excel file. Ensure it is a valid .xlsx file." },
       { status: 400 }
     );
   }
 
-  const sheetName = wb.SheetNames[0];
-  if (!sheetName) {
+  const ws = wb.worksheets[0];
+  if (!ws) {
     return NextResponse.json(
       { error: "Excel file has no sheets." },
       { status: 400 }
     );
   }
-  const ws = wb.Sheets[sheetName];
-  const data = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
-    defval: "",
-    raw: false
-  });
+  const data = sheetToJson(ws);
 
   if (!data.length) {
     return NextResponse.json(
