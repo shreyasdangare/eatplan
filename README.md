@@ -1,5 +1,7 @@
 ## Jevan – Meal planner web app
 
+**Live:** [https://eatplan.app/](https://eatplan.app/) — *काय खायचं?* (What to eat?) — plan meals, manage recipes, build shopping lists, and cook with what you have. Installable as a PWA on Android and iOS.
+
 This project uses the following stack:
 
 - **Framework**: Next.js (App Router, TypeScript)
