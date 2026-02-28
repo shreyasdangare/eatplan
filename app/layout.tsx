@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { HeaderTitle } from "./components/HeaderTitle";
 import { AuthLinks } from "./components/AuthLinks";
+import { InstallPrompt } from "./components/InstallPrompt";
 
 export const metadata: Metadata = {
   title: "काय खायचं? – Meal Planner",
@@ -12,7 +13,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  userScalable: true
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: "#ea580c",
 };
 
 export default function RootLayout({
@@ -22,6 +25,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body>
         <div className="mx-auto flex min-h-screen min-w-0 max-w-3xl flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 px-4 py-4 text-stone-900 sm:px-6 lg:max-w-5xl lg:px-10 lg:py-6">
           <header className="mb-4 border-b border-orange-200/70 pb-4 sm:mb-6 lg:mb-8 lg:pb-6">
@@ -72,6 +79,7 @@ export default function RootLayout({
               </div>
             </div>
           </header>
+          <InstallPrompt />
           <main className="flex-1 pb-8 min-h-0 lg:pb-12">{children}</main>
         </div>
       </body>
