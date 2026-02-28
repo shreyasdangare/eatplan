@@ -179,43 +179,43 @@ export default function ShoppingListPage() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-amber-900">
+          <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
             Shopping list
           </h2>
-          <p className="text-xs text-amber-700">
+          <p className="text-xs text-amber-700 dark:text-amber-300">
             From this week’s meal plan (Mon–Sun). Connect Todoist to push items and sync pantry.
           </p>
         </div>
         <Link
           href="/"
-          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
+          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
         >
           Home
         </Link>
       </div>
 
       {authError && (
-        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
           {authError}
         </p>
       )}
 
-      <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3 space-y-2">
-        <h3 className="text-xs font-semibold text-amber-800">
+      <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3 space-y-2 dark:border-stone-600 dark:bg-stone-800/80">
+        <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200">
           Todoist – push list & sync pantry
         </h3>
         {todoistConnected === null ? (
-          <p className="text-xs text-amber-700">Checking…</p>
+          <p className="text-xs text-amber-700 dark:text-amber-300">Checking…</p>
         ) : todoistConnected ? (
           <div className="space-y-2">
-            <p className="text-xs text-amber-700">
+            <p className="text-xs text-amber-700 dark:text-amber-300">
               Connected. Choose a project for shopping tasks, then push or sync.
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <select
                 value={syncProjectId}
                 onChange={(e) => setSyncProjectId(e.target.value)}
-                className="rounded border border-orange-200 bg-white px-2 py-1.5 text-xs"
+                className="rounded border border-orange-200 bg-white px-2 py-1.5 text-xs dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100"
               >
                 {todoistProjects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -242,18 +242,18 @@ export default function ShoppingListPage() {
               <button
                 type="button"
                 onClick={disconnect}
-                className="rounded-full border border-amber-300 px-3 py-1.5 text-xs text-amber-800 hover:bg-amber-100"
+                className="rounded-full border border-amber-300 px-3 py-1.5 text-xs text-amber-800 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-stone-700"
               >
                 Disconnect
               </button>
             </div>
             {syncResult !== null && (
-              <p className="text-[11px] text-amber-700">
+              <p className="text-[11px] text-amber-700 dark:text-amber-300">
                 Added {syncResult.added} to pantry, {syncResult.skipped} not matched.
               </p>
             )}
             {pushResult !== null && (
-              <p className="text-[11px] text-amber-700">
+              <p className="text-[11px] text-amber-700 dark:text-amber-300">
                 {pushResult.created > 0 && <span>{pushResult.created} item{pushResult.created !== 1 ? "s" : ""} added to Todoist.</span>}
                 {pushResult.failed > 0 && <span> {pushResult.failed} failed (check console for details).</span>}
                 {pushResult.created === 0 && pushResult.failed === 0 && (
@@ -265,7 +265,7 @@ export default function ShoppingListPage() {
         ) : (
           <a
             href="/api/auth/todoist"
-            className="inline-block rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
+            className="inline-block rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
           >
             Sign in with Todoist
           </a>
@@ -273,12 +273,12 @@ export default function ShoppingListPage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-amber-700">Loading list…</p>
+        <p className="text-sm text-amber-700 dark:text-amber-300">Loading list…</p>
       ) : (
         <>
-          <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3">
+          <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold text-amber-800">
+              <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200">
                 To buy
               </h3>
               {toBuy.length > 0 && (
@@ -286,7 +286,7 @@ export default function ShoppingListPage() {
                   <button
                     type="button"
                     onClick={copyList}
-                    className="rounded-full bg-amber-200 px-2 py-1 text-[11px] font-medium text-amber-900 hover:bg-amber-300"
+                    className="rounded-full bg-amber-200 px-2 py-1 text-[11px] font-medium text-amber-900 hover:bg-amber-300 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700"
                   >
                     Copy list
                   </button>
@@ -294,15 +294,15 @@ export default function ShoppingListPage() {
               )}
             </div>
             {toBuy.length === 0 && inStock.length === 0 ? (
-              <p className="text-sm text-amber-700">
+              <p className="text-sm text-amber-700 dark:text-amber-300">
                 No ingredients this week. Plan meals on the Plan page first.
               </p>
             ) : toBuy.length === 0 ? (
-              <p className="text-sm text-amber-700">
+              <p className="text-sm text-amber-700 dark:text-amber-300">
                 Everything is in stock. Nothing to buy.
               </p>
             ) : (
-              <ul className="space-y-1.5 text-sm">
+              <ul className="space-y-1.5 text-sm dark:text-stone-200">
                 {toBuy.map((l) => (
                   <li
                     key={l.ingredient_id}
@@ -310,7 +310,7 @@ export default function ShoppingListPage() {
                   >
                     <span>{l.ingredient_name}</span>
                     {l.quantity_display && (
-                      <span className="text-amber-700">{l.quantity_display}</span>
+                      <span className="text-amber-700 dark:text-amber-300">{l.quantity_display}</span>
                     )}
                   </li>
                 ))}
@@ -319,11 +319,11 @@ export default function ShoppingListPage() {
           </div>
 
           {inStock.length > 0 && (
-            <div className="rounded-lg border border-orange-200 bg-orange-50/50 p-3">
-              <h3 className="text-xs font-semibold text-amber-800 mb-2">
+            <div className="rounded-lg border border-orange-200 bg-orange-50/50 p-3 dark:border-stone-600 dark:bg-stone-800/50">
+              <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200 mb-2">
                 Already in pantry (not added to list)
               </h3>
-              <ul className="space-y-1 text-sm text-amber-700">
+              <ul className="space-y-1 text-sm text-amber-700 dark:text-amber-300">
                 {inStock.map((l) => (
                   <li key={l.ingredient_id} className="flex justify-between gap-2">
                     <span>{l.ingredient_name}</span>

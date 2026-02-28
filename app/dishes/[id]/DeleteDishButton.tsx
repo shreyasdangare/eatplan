@@ -30,7 +30,7 @@ export function DeleteDishButton({ id }: { id: string }) {
       type="button"
       onClick={onDelete}
       disabled={loading}
-      className="rounded-full border border-red-500 px-3 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-60"
+      className="rounded-full border border-red-500 px-3 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-60 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-500/20"
     >
       {loading ? "Deleting…" : "Delete"}
     </button>

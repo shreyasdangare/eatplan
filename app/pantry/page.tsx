@@ -183,10 +183,10 @@ export default function PantryPage() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-amber-900">
+          <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
             My pantry
           </h2>
-          <p className="text-xs text-amber-700">
+          <p className="text-xs text-amber-700 dark:text-amber-300">
             {connected
               ? "What you have (synced from Todoist or added here). Add amount and unit for deduction when you mark meals prepared."
               : "Ingredients you have. Connect Todoist in Shopping list to sync checked-off items."}
@@ -194,7 +194,7 @@ export default function PantryPage() {
         </div>
         <Link
           href="/"
-          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
+          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
         >
           Home
         </Link>
@@ -217,7 +217,7 @@ export default function PantryPage() {
           onCreateNew={() => {}}
         />
         <div className="flex gap-2 items-center text-xs">
-          <label className="text-amber-800">Amount (optional)</label>
+          <label className="text-amber-800 dark:text-amber-200">Amount (optional)</label>
           <input
             type="number"
             step="any"
@@ -225,25 +225,25 @@ export default function PantryPage() {
             placeholder="e.g. 2"
             value={addAmount}
             onChange={(e) => setAddAmount(e.target.value)}
-            className="w-20 rounded border border-orange-200 px-2 py-1"
+            className="w-20 rounded border border-orange-200 px-2 py-1 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
           />
-          <label className="text-amber-800">Unit (optional)</label>
+          <label className="text-amber-800 dark:text-amber-200">Unit (optional)</label>
           <input
             type="text"
             placeholder="e.g. kg"
             value={addUnit}
             onChange={(e) => setAddUnit(e.target.value)}
-            className="w-20 rounded border border-orange-200 px-2 py-1"
+            className="w-20 rounded border border-orange-200 px-2 py-1 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
           />
         </div>
       </div>
 
-      <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3">
-        <h3 className="text-xs font-semibold text-amber-800">
+      <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
+        <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200">
           In pantry ({pantryItems.length})
         </h3>
         {pantryItems.length === 0 ? (
-          <p className="text-sm text-amber-700">
+          <p className="text-sm text-amber-700 dark:text-amber-300">
             No ingredients yet. Add items above.
           </p>
         ) : (
@@ -254,7 +254,7 @@ export default function PantryPage() {
               return (
                 <li
                   key={item.ingredient_id}
-                  className="flex flex-wrap items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs shadow-sm"
+                  className="flex flex-wrap items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs shadow-sm dark:bg-stone-700 dark:text-stone-200"
                 >
                   <span>{name}</span>
                   {isEditing ? (
@@ -266,14 +266,14 @@ export default function PantryPage() {
                         placeholder="Amount"
                         value={editAmount}
                         onChange={(e) => setEditAmount(e.target.value)}
-                        className="w-16 rounded border border-orange-200 px-1.5 py-0.5"
+                        className="w-16 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
                       />
                       <input
                         type="text"
                         placeholder="Unit"
                         value={editUnit}
                         onChange={(e) => setEditUnit(e.target.value)}
-                        className="w-14 rounded border border-orange-200 px-1.5 py-0.5"
+                        className="w-14 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
                       />
                       <button
                         type="button"
@@ -299,7 +299,7 @@ export default function PantryPage() {
                   ) : (
                     <>
                       {(item.amount != null || (item.unit && item.unit.trim())) && (
-                        <span className="text-amber-700">
+                        <span className="text-amber-700 dark:text-amber-300">
                           {item.amount != null ? item.amount : ""}
                           {item.unit?.trim() ? ` ${item.unit}` : ""}
                         </span>
@@ -308,7 +308,7 @@ export default function PantryPage() {
                         <button
                           type="button"
                           onClick={() => startEdit(item)}
-                          className="text-amber-600 hover:underline"
+                          className="text-amber-600 hover:underline dark:text-amber-400"
                         >
                           Edit qty
                         </button>
@@ -318,7 +318,7 @@ export default function PantryPage() {
                   <button
                     type="button"
                     onClick={() => removeFromPantry(item.ingredient_id)}
-                    className="text-amber-600 hover:text-red-600 ml-auto"
+                    className="text-amber-600 hover:text-red-600 dark:text-amber-400 dark:hover:text-red-400 ml-auto"
                     aria-label={`Remove ${name}`}
                   >
                     ×

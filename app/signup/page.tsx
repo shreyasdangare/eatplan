@@ -49,15 +49,15 @@ function SignupForm() {
   if (signupSuccess) {
     return (
       <section className="mx-auto max-w-sm space-y-6 pt-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
           Check your email
         </h1>
-        <p className="text-stone-600">
+        <p className="text-stone-600 dark:text-stone-400">
           We&apos;ve sent you a confirmation link. Click it to verify your account, then log in.
         </p>
         <Link
           href="/login"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:opacity-90"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:opacity-90 dark:bg-stone-700 dark:hover:bg-stone-600"
         >
           Go to Log in
         </Link>
@@ -67,12 +67,12 @@ function SignupForm() {
 
   return (
     <section className="mx-auto max-w-sm space-y-6 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
+      <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
         Sign up
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="email" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
             Email
           </label>
           <input
@@ -82,11 +82,11 @@ function SignupForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="password" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
             Password
           </label>
           <input
@@ -97,12 +97,12 @@ function SignupForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
-          <p className="mt-1 text-xs text-stone-500">At least 6 characters</p>
+          <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">At least 6 characters</p>
         </div>
         <div>
-          <label htmlFor="confirm_password" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="confirm_password" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
             Confirm password
           </label>
           <input
@@ -113,11 +113,11 @@ function SignupForm() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>
         <div>
-          <label htmlFor="preferred_name" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="preferred_name" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
             What should we call you?
           </label>
           <input
@@ -127,23 +127,23 @@ function SignupForm() {
             placeholder="e.g. Shreyas"
             value={preferredName}
             onChange={(e) => setPreferredName(e.target.value)}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
         <button
           type="submit"
           disabled={loading}
-          className="w-full min-h-[44px] rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800 active:opacity-90 disabled:opacity-50"
+          className="w-full min-h-[44px] rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800 active:opacity-90 disabled:opacity-50 dark:bg-stone-700 dark:hover:bg-stone-600"
         >
           {loading ? "Creating account…" : "Sign up"}
         </button>
       </form>
-      <p className="text-center text-sm text-stone-600">
+      <p className="text-center text-sm text-stone-600 dark:text-stone-400">
         Already have an account?{" "}
-        <Link href={`/login?next=${encodeURIComponent(next)}`} className="text-orange-700 hover:underline">
+        <Link href={`/login?next=${encodeURIComponent(next)}`} className="text-orange-700 hover:underline dark:text-orange-400">
           Log in
         </Link>
       </p>
@@ -153,7 +153,7 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-sm pt-8 animate-pulse rounded-lg bg-stone-200 h-64" />}>
+    <Suspense fallback={<div className="mx-auto max-w-sm pt-8 animate-pulse rounded-lg bg-stone-200 dark:bg-stone-700 h-64" />}>
       <SignupForm />
     </Suspense>
   );

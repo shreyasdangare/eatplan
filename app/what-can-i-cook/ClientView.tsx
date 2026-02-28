@@ -114,12 +114,12 @@ export function WhatCanICookClient() {
     <div className="space-y-4">
       <form onSubmit={onSubmit} className="space-y-3">
         {pantryIds.length > 0 && (
-          <p className="text-[11px] text-amber-700">
+          <p className="text-[11px] text-amber-700 dark:text-amber-300">
             Using your pantry ({pantryIds.length} items). Add extra ingredients below.
           </p>
         )}
         <div className="space-y-3">
-          <p className="text-xs font-medium text-amber-800">
+          <p className="text-xs font-medium text-amber-800 dark:text-amber-200">
             Start typing to add ingredients you have today:
           </p>
           <IngredientAutocompleteInput
@@ -139,7 +139,7 @@ export function WhatCanICookClient() {
         <button
           type="submit"
           disabled={loading || selected.length === 0}
-          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm disabled:opacity-50 hover:bg-lime-400"
+          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm disabled:opacity-50 hover:bg-lime-400 dark:bg-lime-600 dark:hover:bg-lime-500"
         >
           {loading ? "Finding dishes…" : "Find dishes"}
         </button>
@@ -159,18 +159,18 @@ export function WhatCanICookClient() {
                   : "Others";
               return (
                 <div key={bucketKey} className="space-y-2">
-                  <h3 className="text-xs font-semibold text-emerald-800">
+                  <h3 className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
                     {title}
                   </h3>
                   <ul className="space-y-1.5">
                     {bucket.map((dish) => (
                         <li
                           key={dish.id}
-                          className="flex items-center justify-between rounded-lg border border-lime-200 bg-lime-50/80 px-3 py-2 text-xs"
+                          className="flex items-center justify-between rounded-lg border border-lime-200 bg-lime-50/80 px-3 py-2 text-xs dark:border-lime-800 dark:bg-lime-950/50 dark:text-stone-200"
                         >
                         <span>{dish.name}</span>
                         {dish.stats && (
-                          <span className="text-[11px] text-lime-700">
+                          <span className="text-[11px] text-lime-700 dark:text-lime-400">
                             {dish.stats.matchPct}% match
                           </span>
                         )}

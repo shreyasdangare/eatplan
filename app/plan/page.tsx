@@ -36,7 +36,7 @@ function DraggableDish({ dish }: { dish: Dish }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className="shrink-0 cursor-grab rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 active:cursor-grabbing"
+      className="shrink-0 cursor-grab rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 active:cursor-grabbing dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:border-orange-600 dark:hover:bg-stone-600 dark:hover:text-orange-200"
     >
       {dish.name}
     </button>
@@ -64,21 +64,21 @@ function DroppableSlot({
   const { setNodeRef, isOver } = useDroppable({ id: slotId });
 
   return (
-    <td className="min-w-0 border-b border-stone-200/80 p-0 align-top sm:min-w-[7rem]">
+    <td className="min-w-0 border-b border-stone-200/80 p-0 align-top dark:border-stone-600 sm:min-w-[7rem]">
       <div
         ref={setNodeRef}
         className={`relative min-h-[4.25rem] rounded-lg border-2 border-dashed p-2 transition-colors ${
           isOver
-            ? "border-orange-400 bg-orange-50"
-            : "border-stone-200 bg-stone-50/50 hover:border-stone-300"
-        } ${prepared ? "border-lime-300/80 bg-lime-50/80" : ""}`}
+            ? "border-orange-400 bg-orange-50 dark:border-orange-500 dark:bg-orange-950/50"
+            : "border-stone-200 bg-stone-50/50 hover:border-stone-300 dark:border-stone-600 dark:bg-stone-800/50 dark:hover:border-stone-500"
+        } ${prepared ? "border-lime-300/80 bg-lime-50/80 dark:border-lime-600 dark:bg-lime-950/40" : ""}`}
       >
         {current ? (
           <div className="flex h-full flex-col gap-1">
             <div className="flex items-start justify-between gap-1">
               <span
                 className={`min-w-0 flex-1 truncate text-xs font-medium ${
-                  prepared ? "line-through text-stone-500" : "text-stone-800"
+                  prepared ? "line-through text-stone-500 dark:text-stone-400" : "text-stone-800 dark:text-stone-200"
                 }`}
                 title={current}
               >
@@ -87,7 +87,7 @@ function DroppableSlot({
               <button
                 type="button"
                 onClick={onClear}
-                className="shrink-0 rounded p-0.5 text-stone-400 hover:bg-stone-200 hover:text-red-600"
+                className="shrink-0 rounded p-0.5 text-stone-400 hover:bg-stone-200 hover:text-red-600 dark:text-stone-500 dark:hover:bg-stone-600 dark:hover:text-red-400"
                 aria-label="Clear slot"
               >
                 ×
@@ -98,18 +98,18 @@ function DroppableSlot({
                 type="button"
                 disabled={preparing}
                 onClick={onMarkPrepared}
-                className="mt-auto text-[10px] font-medium text-lime-700 hover:underline disabled:opacity-50"
+                className="mt-auto text-[10px] font-medium text-lime-700 hover:underline disabled:opacity-50 dark:text-lime-400"
               >
                 {preparing ? "…" : "Mark prepared"}
               </button>
             ) : (
-              <span className="mt-auto text-[10px] font-medium text-lime-600">
+              <span className="mt-auto text-[10px] font-medium text-lime-600 dark:text-lime-400">
                 ✓ Prepared
               </span>
             )}
           </div>
         ) : (
-          <span className="flex min-h-[2.5rem] items-center text-[11px] text-stone-400">
+          <span className="flex min-h-[2.5rem] items-center text-[11px] text-stone-400 dark:text-stone-500">
             Drop recipe
           </span>
         )}
@@ -301,7 +301,7 @@ export default function PlanPage() {
   if (loading) {
     return (
       <section className="flex min-h-[12rem] items-center justify-center">
-        <p className="text-sm text-stone-500">Loading plan…</p>
+        <p className="text-sm text-stone-500 dark:text-stone-400">Loading plan…</p>
       </section>
     );
   }
@@ -311,24 +311,24 @@ export default function PlanPage() {
       {/* Header + week nav */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100 sm:text-3xl">
             This week
           </h1>
-          <p className="mt-0.5 text-sm text-stone-500">
+          <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
             Drag recipes into slots. Mark prepared when done.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-xl border border-stone-200 bg-white shadow-sm">
+          <div className="flex items-center rounded-xl border border-stone-200 bg-white shadow-sm dark:border-stone-600 dark:bg-stone-800">
             <button
               type="button"
               onClick={prevWeek}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-l-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 active:opacity-80"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-l-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 active:opacity-80 dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-stone-100"
               aria-label="Previous week"
             >
               ←
             </button>
-            <span className="flex min-h-[44px] items-center border-x border-stone-200 px-3 py-2 text-sm font-medium text-stone-800 sm:px-4">
+            <span className="flex min-h-[44px] items-center border-x border-stone-200 px-3 py-2 text-sm font-medium text-stone-800 dark:border-stone-600 dark:text-stone-200 sm:px-4">
               {weekStart.toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "short"
@@ -341,7 +341,7 @@ export default function PlanPage() {
             <button
               type="button"
               onClick={nextWeek}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-r-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 active:opacity-80"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-r-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 active:opacity-80 dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-stone-100"
               aria-label="Next week"
             >
               →
@@ -349,7 +349,7 @@ export default function PlanPage() {
           </div>
           <Link
             href="/"
-            className="hidden rounded-xl border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50 sm:inline-block"
+            className="hidden rounded-xl border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-700 sm:inline-block"
           >
             Home
           </Link>
@@ -362,15 +362,15 @@ export default function PlanPage() {
         onDragEnd={handleDragEnd}
       >
         {/* Recipe strip: horizontal scroll, scales to many dishes */}
-        <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-3">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+        <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
             Recipes — drag into a slot below
           </p>
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
             {dishes.length === 0 ? (
-              <p className="py-2 text-xs text-stone-500">
+              <p className="py-2 text-xs text-stone-500 dark:text-stone-400">
                 No recipes yet.{" "}
-                <Link href="/recipes" className="font-medium text-orange-600 underline">
+                <Link href="/recipes" className="font-medium text-orange-600 underline dark:text-orange-400">
                   Add recipes
                 </Link>
               </p>
@@ -383,18 +383,18 @@ export default function PlanPage() {
         </div>
 
         {/* Grid: sticky header + sticky first column for large plans */}
-        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm dark:border-stone-600 dark:bg-stone-800">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[32rem] border-collapse text-left">
               <thead>
-                <tr className="border-b border-stone-200 bg-stone-50">
-                  <th className="sticky left-0 z-10 min-w-[5rem] border-b border-r border-stone-200 bg-stone-50 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600">
+                <tr className="border-b border-stone-200 bg-stone-50 dark:border-stone-600 dark:bg-stone-800">
+                  <th className="sticky left-0 z-10 min-w-[5rem] border-b border-r border-stone-200 bg-stone-50 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400">
                     Day
                   </th>
                   {SLOTS.map((s) => (
                     <th
                       key={s}
-                      className="min-w-0 border-b border-stone-200 px-2 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600 sm:min-w-[7rem] sm:px-3"
+                      className="min-w-0 border-b border-stone-200 px-2 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600 dark:border-stone-600 dark:text-stone-400 sm:min-w-[7rem] sm:px-3"
                     >
                       <span className="flex items-center gap-1.5">
                         <span aria-hidden>{SLOT_ICONS[s]}</span>
@@ -405,15 +405,15 @@ export default function PlanPage() {
                 </tr>
               </thead>
               <tbody>
-                {weekDates.map((date, rowIndex) => (
+                  {weekDates.map((date, rowIndex) => (
                   <tr
                     key={date}
-                    className={rowIndex % 2 === 1 ? "bg-stone-50/30" : undefined}
+                    className={rowIndex % 2 === 1 ? "bg-stone-50/30 dark:bg-stone-800/50" : undefined}
                   >
                     <th
                       scope="row"
-                      className={`sticky left-0 z-10 min-w-[5rem] border-b border-r border-stone-200 px-3 py-2 text-left text-xs font-medium text-stone-800 ${
-                        rowIndex % 2 === 1 ? "bg-stone-50/50" : "bg-white"
+                      className={`sticky left-0 z-10 min-w-[5rem] border-b border-r border-stone-200 px-3 py-2 text-left text-xs font-medium text-stone-800 dark:border-stone-600 dark:text-stone-200 ${
+                        rowIndex % 2 === 1 ? "bg-stone-50/50 dark:bg-stone-800/50" : "bg-white dark:bg-stone-800"
                       }`}
                     >
                       {new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
@@ -443,16 +443,16 @@ export default function PlanPage() {
 
         <DragOverlay dropAnimation={null}>
           {activeDish ? (
-            <div className="rounded-full border border-orange-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 shadow-lg">
+            <div className="rounded-full border border-orange-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 shadow-lg dark:border-orange-600 dark:bg-stone-700 dark:text-stone-100">
               {activeDish.name}
             </div>
           ) : null}
         </DragOverlay>
       </DndContext>
 
-      <p className="text-center text-xs text-stone-500">
+      <p className="text-center text-xs text-stone-500 dark:text-stone-400">
         Build a{" "}
-        <Link href="/shopping-list" className="font-medium text-orange-600 underline hover:text-orange-700">
+        <Link href="/shopping-list" className="font-medium text-orange-600 underline hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
           shopping list
         </Link>{" "}
         from your planned dishes.

@@ -48,11 +48,11 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
 
   if (!dishes.length) {
     return (
-      <div className="rounded-2xl border border-stone-200 bg-stone-50/80 p-8 text-center">
-        <p className="text-sm text-stone-600">
+      <div className="rounded-2xl border border-stone-200 bg-stone-50/80 p-8 text-center dark:border-stone-600 dark:bg-stone-800/80">
+        <p className="text-sm text-stone-600 dark:text-stone-400">
           No recipes yet.
         </p>
-        <p className="mt-1 text-sm text-stone-500">
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-500">
           Add one from a URL or screenshot to get started.
         </p>
       </div>
@@ -67,8 +67,8 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
             onClick={() => setShowFavoritesOnly((v) => !v)}
             className={`min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium transition sm:py-1.5 ${
               showFavoritesOnly
-                ? "bg-stone-900 text-white"
-                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+                ? "bg-stone-900 text-white dark:bg-stone-600 dark:text-white"
+                : "bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-700 dark:text-stone-300 dark:hover:bg-stone-600"
             }`}
           >
             Favorites
@@ -80,8 +80,8 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
               onClick={() => toggleTag(tag)}
               className={`min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium transition sm:py-1.5 ${
                 selectedTags.has(tag)
-                  ? "bg-stone-900 text-white"
-                  : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+                  ? "bg-stone-900 text-white dark:bg-stone-600 dark:text-white"
+                  : "bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-700 dark:text-stone-300 dark:hover:bg-stone-600"
               }`}
             >
               {tag}
@@ -94,7 +94,7 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
                 setSelectedTags(new Set());
                 setShowFavoritesOnly(false);
               }}
-              className="min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium text-stone-500 hover:text-stone-700 sm:py-1.5"
+              className="min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 sm:py-1.5"
             >
               Clear
             </button>
@@ -102,8 +102,8 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
         </div>
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredDishes.length === 0 ? (
-          <li className="col-span-full rounded-2xl border border-stone-200 bg-stone-50/80 p-8 text-center">
-            <p className="text-sm text-stone-600">
+          <li className="col-span-full rounded-2xl border border-stone-200 bg-stone-50/80 p-8 text-center dark:border-stone-600 dark:bg-stone-800/80">
+            <p className="text-sm text-stone-600 dark:text-stone-400">
               No recipes match the current filters.
             </p>
           </li>
@@ -112,9 +112,9 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
             <li key={dish.id}>
               <Link
                 href={`/dishes/${dish.id}`}
-                className="group block overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:border-stone-300 hover:shadow-md hover:shadow-stone-200/50"
+                className="group block overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:border-stone-300 hover:shadow-md hover:shadow-stone-200/50 dark:border-stone-600 dark:bg-stone-800 dark:hover:border-stone-500"
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100 dark:bg-stone-700">
                   {dish.image_url ? (
                     <img
                       src={dish.image_url}
@@ -122,7 +122,7 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
                       className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-stone-300">
+                    <div className="flex h-full w-full items-center justify-center text-stone-300 dark:text-stone-500">
                       <span className="text-4xl" aria-hidden>🍽</span>
                     </div>
                   )}
@@ -137,7 +137,7 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
                       e.preventDefault();
                       toggleFavorite(dish.id);
                     }}
-                    className="absolute right-2 top-2 z-10 rounded-full bg-white/90 p-1.5 text-lg shadow-sm backdrop-blur-sm hover:bg-white"
+                    className="absolute right-2 top-2 z-10 rounded-full bg-white/90 p-1.5 text-lg shadow-sm backdrop-blur-sm hover:bg-white dark:bg-stone-800/90 dark:hover:bg-stone-700"
                     aria-label={isFavorite(dish.id) ? "Remove from favorites" : "Add to favorites"}
                   >
                     {isFavorite(dish.id) ? "❤️" : "🤍"}

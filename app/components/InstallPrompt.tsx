@@ -67,11 +67,11 @@ export function InstallPrompt() {
     <div
       role="status"
       aria-label="Install app hint"
-      className="mx-auto mb-4 flex max-w-3xl items-start gap-3 rounded-xl border border-orange-200/80 bg-orange-50/90 px-4 py-3 shadow-sm sm:px-4 lg:max-w-5xl"
+      className="mx-auto mb-4 flex max-w-3xl items-start gap-3 rounded-xl border border-orange-200/80 bg-orange-50/90 px-4 py-3 shadow-sm dark:border-stone-600 dark:bg-stone-800/90 sm:px-4 lg:max-w-5xl"
     >
       <div className="flex-1 min-w-0">
         {ios ? (
-          <p className="text-sm text-orange-900">
+          <p className="text-sm text-orange-900 dark:text-orange-200">
             Install this app: tap the Share button{" "}
             <span aria-hidden className="inline-block font-bold">
               ⎋
@@ -92,7 +92,7 @@ export function InstallPrompt() {
             <button
               type="button"
               onClick={handleAndroidInstall}
-              className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 active:opacity-90"
+              className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 active:opacity-90 dark:bg-orange-500 dark:hover:bg-orange-600"
             >
               Install app
             </button>
@@ -103,7 +103,7 @@ export function InstallPrompt() {
         type="button"
         onClick={handleDismiss}
         aria-label="Dismiss install hint"
-        className="shrink-0 rounded-full p-1.5 text-orange-600 hover:bg-orange-100 active:opacity-80"
+        className="shrink-0 rounded-full p-1.5 text-orange-600 hover:bg-orange-100 active:opacity-80 dark:text-orange-400 dark:hover:bg-stone-700"
       >
         <span aria-hidden>×</span>
       </button>

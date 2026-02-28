@@ -60,13 +60,13 @@ export function AuthLinks() {
   if (user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="max-w-[100px] truncate text-sm text-stone-600 sm:max-w-[180px]">
+        <span className="max-w-[100px] truncate text-sm text-stone-600 dark:text-stone-400 sm:max-w-[180px]">
           {user.user_metadata?.preferred_name?.trim() || user.email}
         </span>
         <button
           type="button"
           onClick={handleLogout}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-orange-900 hover:bg-orange-100 active:opacity-80"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
         >
           Log out
         </button>
@@ -77,7 +77,7 @@ export function AuthLinks() {
   return (
     <Link
       href="/login"
-      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-orange-900 hover:bg-orange-100 active:opacity-80"
+      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
     >
       Log in
     </Link>
