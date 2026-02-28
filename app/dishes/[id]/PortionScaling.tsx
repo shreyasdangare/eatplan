@@ -44,7 +44,7 @@ export function PortionScaling({
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-3">
-        <label className="text-sm font-medium text-stone-700 dark:text-stone-300">
+        <label className="text-sm font-medium text-stone-700">
           Servings
         </label>
         <input
@@ -53,9 +53,9 @@ export function PortionScaling({
           max={20}
           value={desired}
           onChange={(e) => setDesired(Number(e.target.value))}
-          className="flex-1 accent-stone-800 dark:accent-stone-200"
+          className="flex-1 accent-stone-800"
         />
-        <span className="w-8 text-sm font-medium text-stone-900 dark:text-stone-100">
+        <span className="w-8 text-sm font-medium text-stone-900">
           {desired}
         </span>
       </div>
@@ -77,19 +77,19 @@ function IngredientList({
     <div className="space-y-4">
       {required.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
             Ingredients
           </h2>
           <ul className="space-y-2">
             {required.map((di) => (
               <li
                 key={di.id}
-                className="flex justify-between gap-4 border-b border-stone-100 py-2 last:border-0 dark:border-stone-700"
+                className="flex justify-between gap-4 border-b border-stone-100 py-2 last:border-0"
               >
-                <span className="text-stone-800 dark:text-stone-200">
+                <span className="text-stone-800">
                   {di.ingredients?.name ?? "Unknown ingredient"}
                 </span>
-                <span className="shrink-0 text-stone-500 dark:text-stone-400">
+                <span className="shrink-0 text-stone-500">
                   {renderQty(di)}
                 </span>
               </li>
@@ -99,14 +99,14 @@ function IngredientList({
       )}
       {optional.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
             Optional
           </h2>
           <ul className="space-y-2">
             {optional.map((di) => (
               <li
                 key={di.id}
-                className="flex justify-between gap-4 border-b border-stone-100 py-2 text-stone-600 last:border-0 dark:border-stone-700 dark:text-stone-400"
+                className="flex justify-between gap-4 border-b border-stone-100 py-2 text-stone-600 last:border-0"
               >
                 <span>{di.ingredients?.name ?? "Unknown ingredient"}</span>
                 <span className="shrink-0">{renderQty(di)}</span>

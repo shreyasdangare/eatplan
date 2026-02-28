@@ -2,27 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const FAVORITES_KEY = "jevan-favorites";
-
-function loadFavorites(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(FAVORITES_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed)
-      ? parsed.filter((x): x is string => typeof x === "string")
-      : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveFavorites(ids: string[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
-}
-
 export function useFavorites() {
   const [ids, setIds] = useState<string[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -32,15 +11,42 @@ export function useFavorites() {
   }, []);
 
   useEffect(() => {
-    if (mounted) setIds(loadFavorites());
+    if (!mounted) return;
+    let cancelled = false;
+    fetch("/api/favorites")
+      .then((res) => (res.ok ? res.json() : { favoriteIds: [] }))
+      .then((data: { favoriteIds?: string[] }) => {
+        if (!cancelled && Array.isArray(data?.favoriteIds))
+          setIds(data.favoriteIds);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [mounted]);
 
   const toggle = useCallback((dishId: string) => {
     setIds((prev) => {
-      const next = prev.includes(dishId)
+      const isCurrently = prev.includes(dishId);
+      const next = isCurrently
         ? prev.filter((x) => x !== dishId)
         : [...prev, dishId];
-      saveFavorites(next);
+      const method = isCurrently ? "DELETE" : "POST";
+      const url =
+        method === "DELETE"
+          ? `/api/favorites?dish_id=${encodeURIComponent(dishId)}`
+          : "/api/favorites";
+      fetch(url, {
+        method,
+        ...(method === "POST" && {
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dish_id: dishId }),
+        }),
+      }).catch(() => {
+        fetch("/api/favorites")
+          .then((r) => (r.ok ? r.json() : { favoriteIds: [] }))
+          .then((d: { favoriteIds?: string[] }) => setIds(d?.favoriteIds ?? []));
+      });
       return next;
     });
   }, []);

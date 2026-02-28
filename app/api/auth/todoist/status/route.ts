@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { getConnectionId } from "@/lib/todoistAuth";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { getSession } from "@/lib/supabaseServerClient";
 
 export async function GET() {
-  const connectionId = await getConnectionId();
+  const { user } = await getSession();
+  if (!user) {
+    return NextResponse.json({ connected: false, project_id: null });
+  }
+  const connectionId = await getConnectionId(user.id);
   if (!connectionId) {
     return NextResponse.json({ connected: false, project_id: null });
   }

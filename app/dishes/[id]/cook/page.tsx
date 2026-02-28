@@ -82,45 +82,45 @@ export default function CookModePage() {
         </Link>
       </div>
 
-      <h1 className="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
+      <h1 className="text-3xl font-bold tracking-tight text-stone-900">
         {dish.name}
       </h1>
 
       {dish.prep_time_minutes != null && (
-        <p className="text-xl text-amber-700 dark:text-amber-300">
+        <p className="text-xl text-amber-700">
           Prep: {dish.prep_time_minutes} min
         </p>
       )}
 
       {dish.description && (
-        <p className="text-xl leading-relaxed text-stone-700 dark:text-stone-300">
+        <p className="text-xl leading-relaxed text-stone-700">
           {dish.description}
         </p>
       )}
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">
+        <h2 className="text-2xl font-semibold text-stone-900">
           Ingredients
         </h2>
         <ul className="space-y-3 text-xl">
           {required.map((di) => (
             <li
               key={di.id}
-              className="flex justify-between gap-4 border-b border-stone-200 pb-2 dark:border-stone-600"
+              className="flex justify-between gap-4 border-b border-stone-200 pb-2"
             >
               <span>{di.ingredients?.name ?? "—"}</span>
-              <span className="text-amber-700 dark:text-amber-300">{qty(di)}</span>
+              <span className="text-amber-700">{qty(di)}</span>
             </li>
           ))}
           {optional.length > 0 && (
             <>
-              <li className="pt-2 text-lg font-medium text-stone-500 dark:text-stone-400">
+              <li className="pt-2 text-lg font-medium text-stone-500">
                 Optional
               </li>
               {optional.map((di) => (
                 <li
                   key={di.id}
-                  className="flex justify-between gap-4 border-b border-stone-200 pb-2 text-stone-600 dark:border-stone-600 dark:text-stone-400"
+                  className="flex justify-between gap-4 border-b border-stone-200 pb-2 text-stone-600"
                 >
                   <span>{di.ingredients?.name ?? "—"}</span>
                   <span>{qty(di)}</span>
@@ -133,16 +133,16 @@ export default function CookModePage() {
 
       {dish.instructions && (
         <section className="space-y-4">
-          <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">
+          <h2 className="text-2xl font-semibold text-stone-900">
             Steps
           </h2>
-          <div className="whitespace-pre-line rounded-lg border border-stone-200 bg-stone-50 p-4 text-lg leading-relaxed text-stone-800 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-200">
+          <div className="whitespace-pre-line rounded-lg border border-stone-200 bg-stone-50 p-4 text-lg leading-relaxed text-stone-800">
             {dish.instructions}
           </div>
         </section>
       )}
 
-      <p className="text-sm text-stone-500 dark:text-stone-400">
+      <p className="text-sm text-stone-500">
         Screen will stay on while this page is open.
       </p>
     </div>

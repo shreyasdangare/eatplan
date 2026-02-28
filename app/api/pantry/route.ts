@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getConnectionId } from "@/lib/todoistAuth";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 export async function GET() {
-  const connectionId = await getConnectionId();
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json({ items: [] });
   }
@@ -31,7 +35,10 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const connectionId = await getConnectionId();
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json(
       { error: "Connect Todoist first" },
@@ -74,7 +81,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const connectionId = await getConnectionId();
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json(
       { error: "Connect Todoist first" },

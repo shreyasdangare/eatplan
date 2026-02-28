@@ -1,0 +1,76 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getSupabaseClient } from "@/lib/supabaseBrowser";
+
+export function AuthLinks() {
+  const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+    let cancelled = false;
+    getSupabaseClient()
+      .then((supabase) => {
+        if (cancelled) return;
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!cancelled) setUser(session?.user ?? null);
+        });
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+          if (!cancelled) setUser(session?.user ?? null);
+        });
+        return () => subscription.unsubscribe();
+      })
+      .catch(() => {
+        // Config missing; show Log in link only
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const supabase = await getSupabaseClient();
+      await supabase.auth.signOut();
+      router.push("/");
+      router.refresh();
+    } catch {
+      router.push("/");
+      router.refresh();
+    }
+  };
+
+  if (!mounted) return null;
+
+  if (user) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="max-w-[120px] truncate text-sm text-stone-600 sm:max-w-[180px]">
+          {user.email}
+        </span>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="rounded-full px-3 py-2 text-sm text-orange-900 hover:bg-orange-100"
+        >
+          Log out
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href="/login"
+      className="rounded-full px-3 py-2 text-sm text-orange-900 hover:bg-orange-100"
+    >
+      Log in
+    </Link>
+  );
+}

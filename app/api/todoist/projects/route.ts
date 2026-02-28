@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { getConnectionToken } from "@/lib/todoistAuth";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 const TODOIST_SYNC_URL = "https://api.todoist.com/api/v1/sync";
 
 export async function GET() {
-  const token = await getConnectionToken();
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const token = await getConnectionToken(auth.user.id);
   if (!token) {
     return NextResponse.json(
       { error: "Connect Todoist first" },

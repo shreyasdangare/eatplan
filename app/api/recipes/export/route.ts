@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 const COLUMNS = [
   "name",
@@ -39,11 +40,15 @@ function toExportRow(dish: DishRow): Record<string, string | number | null> {
 }
 
 export async function GET() {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { data: dishes, error } = await supabaseServer
     .from("dishes")
     .select(
       "id, name, description, meal_type, prep_time_minutes, tags, dish_ingredients(ingredients(name))"
     )
+    .eq("user_id", auth.user.id)
     .order("name", { ascending: true });
 
   if (error) {

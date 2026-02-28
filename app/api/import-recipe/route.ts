@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 type ExtractedIngredient = {
   name: string;
@@ -280,6 +281,7 @@ function isErrorLikeRecipe(recipe: ExtractedRecipe): boolean {
 
 async function saveExtractedRecipe(
   recipe: ExtractedRecipe,
+  userId: string,
   imageUrl?: string | null
 ): Promise<{ id: string; name: string }> {
   const ingredients = recipe.ingredients ?? [];
@@ -315,6 +317,7 @@ async function saveExtractedRecipe(
   const { data: dish, error: dishError } = await supabaseServer
     .from("dishes")
     .insert({
+      user_id: userId,
       name: recipe.name.trim(),
       description: recipe.description?.trim() || null,
       meal_type: "both",
@@ -358,6 +361,9 @@ async function saveExtractedRecipe(
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const contentType = req.headers.get("content-type") ?? "";
   const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
 
@@ -509,7 +515,7 @@ export async function POST(req: NextRequest) {
   const imageUrl = await fetchImageUrlForRecipe(recipe.name);
 
   try {
-    const result = await saveExtractedRecipe(recipe, imageUrl);
+    const result = await saveExtractedRecipe(recipe, auth.user.id, imageUrl);
     return NextResponse.json(result, { status: 201 });
   } catch (e) {
     console.error("Save recipe error", e);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getConnectionId, getConnectionToken } from "@/lib/todoistAuth";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 // Use api/v1 (rest/v1 and rest/v2 are deprecated and return 410)
 const TODOIST_TASKS_URL = "https://api.todoist.com/api/v1/tasks";
@@ -11,7 +12,10 @@ type ToBuyItem = {
 };
 
 export async function POST(req: NextRequest) {
-  const connectionId = await getConnectionId();
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json(
       { error: "Connect Todoist first" },
@@ -19,7 +23,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const token = await getConnectionToken();
+  const token = await getConnectionToken(auth.user.id);
   if (!token) {
     return NextResponse.json(
       { error: "Todoist connection not found" },

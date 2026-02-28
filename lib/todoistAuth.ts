@@ -11,13 +11,24 @@ const COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 365, // 1 year
 };
 
-export async function getConnectionId(): Promise<string | null> {
+/** Returns the Todoist connection id for the given user if the cookie matches and belongs to that user. */
+export async function getConnectionId(userId: string): Promise<string | null> {
   const store = await cookies();
-  return store.get(CONNECTION_COOKIE)?.value ?? null;
+  const raw = store.get(CONNECTION_COOKIE)?.value ?? null;
+  if (!raw) return null;
+  const { data } = await supabaseServer
+    .from("todoist_connections")
+    .select("id, user_id")
+    .eq("id", raw)
+    .single();
+  if (!data || (data as { user_id: string | null }).user_id !== userId)
+    return null;
+  return (data as { id: string }).id;
 }
 
-export async function getConnectionToken(): Promise<string | null> {
-  const connectionId = await getConnectionId();
+/** Returns the Todoist access token for the given user if the connection exists and belongs to that user. */
+export async function getConnectionToken(userId: string): Promise<string | null> {
+  const connectionId = await getConnectionId(userId);
   if (!connectionId) return null;
   const { data } = await supabaseServer
     .from("todoist_connections")

@@ -14,19 +14,32 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
+const SLOT_LABELS: Record<string, string> = {
+  breakfast: "Breakfast",
+  lunch: "Lunch",
+  dinner: "Dinner"
+};
+
+const SLOT_ICONS: Record<string, string> = {
+  breakfast: "☀️",
+  lunch: "🍽",
+  dinner: "🌙"
+};
+
 function DraggableDish({ dish }: { dish: Dish }) {
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: dish.id
   });
   return (
-    <li
+    <button
+      type="button"
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className="cursor-grab rounded bg-white px-2 py-1.5 text-xs shadow-sm active:cursor-grabbing"
+      className="shrink-0 cursor-grab rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 active:cursor-grabbing"
     >
       {dish.name}
-    </li>
+    </button>
   );
 }
 
@@ -51,44 +64,54 @@ function DroppableSlot({
   const { setNodeRef, isOver } = useDroppable({ id: slotId });
 
   return (
-    <td className="min-w-[80px] border border-orange-200 bg-white p-1 align-top">
+    <td className="min-w-0 border-b border-stone-200/80 p-0 align-top sm:min-w-[7rem]">
       <div
         ref={setNodeRef}
-        className={`min-h-[36px] rounded border border-dashed p-1 ${
-          isOver ? "border-orange-500 bg-orange-100" : "border-orange-200 bg-orange-50/50"
-        } ${prepared ? "bg-lime-50/80 border-lime-300" : ""}`}
+        className={`relative min-h-[4.25rem] rounded-lg border-2 border-dashed p-2 transition-colors ${
+          isOver
+            ? "border-orange-400 bg-orange-50"
+            : "border-stone-200 bg-stone-50/50 hover:border-stone-300"
+        } ${prepared ? "border-lime-300/80 bg-lime-50/80" : ""}`}
       >
         {current ? (
-          <div className="flex flex-col gap-0.5">
-            <span className="flex items-center justify-between gap-1">
-              <span className={`truncate ${prepared ? "line-through text-amber-600" : ""}`}>
+          <div className="flex h-full flex-col gap-1">
+            <div className="flex items-start justify-between gap-1">
+              <span
+                className={`min-w-0 flex-1 truncate text-xs font-medium ${
+                  prepared ? "line-through text-stone-500" : "text-stone-800"
+                }`}
+                title={current}
+              >
                 {current}
               </span>
               <button
                 type="button"
                 onClick={onClear}
-                className="shrink-0 text-amber-600 hover:text-red-600"
+                className="shrink-0 rounded p-0.5 text-stone-400 hover:bg-stone-200 hover:text-red-600"
                 aria-label="Clear slot"
               >
                 ×
               </button>
-            </span>
-            {!prepared && (
+            </div>
+            {!prepared ? (
               <button
                 type="button"
                 disabled={preparing}
                 onClick={onMarkPrepared}
-                className="text-[10px] text-lime-700 hover:underline disabled:opacity-50"
+                className="mt-auto text-[10px] font-medium text-lime-700 hover:underline disabled:opacity-50"
               >
-                {preparing ? "…" : "Mark as prepared"}
+                {preparing ? "…" : "Mark prepared"}
               </button>
-            )}
-            {prepared && (
-              <span className="text-[10px] text-lime-700">Prepared</span>
+            ) : (
+              <span className="mt-auto text-[10px] font-medium text-lime-600">
+                ✓ Prepared
+              </span>
             )}
           </div>
         ) : (
-          <span className="text-amber-500">—</span>
+          <span className="flex min-h-[2.5rem] items-center text-[11px] text-stone-400">
+            Drop recipe
+          </span>
         )}
       </div>
     </td>
@@ -218,7 +241,7 @@ export default function PlanPage() {
         const res = await fetch("/api/meal-plans/prepare", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date, slot_type }),
+          body: JSON.stringify({ date, slot_type })
         });
         if (res.ok) {
           setPlans((prev) =>
@@ -254,7 +277,7 @@ export default function PlanPage() {
     const over = e.over?.id;
     if (!over || typeof over !== "string") return;
     const [date, slot_type] = over.split(":");
-    if (date && slot_type && SLOTS.includes(slot_type as any)) {
+    if (date && slot_type && SLOTS.includes(slot_type as (typeof SLOTS)[number])) {
       setSlot(date, slot_type, dishId);
     }
   };
@@ -277,53 +300,60 @@ export default function PlanPage() {
 
   if (loading) {
     return (
-      <section className="space-y-4">
-        <p className="text-sm text-amber-700">Loading plan…</p>
+      <section className="flex min-h-[12rem] items-center justify-center">
+        <p className="text-sm text-stone-500">Loading plan…</p>
       </section>
     );
   }
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
+    <section className="space-y-6 pb-8">
+      {/* Header + week nav */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-amber-900">
-            Weekly plan
-          </h2>
-          <p className="text-xs text-amber-700">
-            Drag dishes onto a day and meal slot.
+          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+            This week
+          </h1>
+          <p className="mt-0.5 text-sm text-stone-500">
+            Drag recipes into slots. Mark prepared when done.
           </p>
         </div>
-        <Link
-          href="/"
-          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400"
-        >
-          Home
-        </Link>
-      </div>
-
-      <div className="flex items-center justify-between gap-2 text-sm">
-        <button
-          type="button"
-          onClick={prevWeek}
-          className="rounded-full bg-orange-100 px-3 py-1 text-amber-900 hover:bg-orange-200"
-        >
-          Previous week
-        </button>
-        <span className="text-amber-800">
-          {weekStart.toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short"
-          })}{" "}
-          – {weekDates[6]}
-        </span>
-        <button
-          type="button"
-          onClick={nextWeek}
-          className="rounded-full bg-orange-100 px-3 py-1 text-amber-900 hover:bg-orange-200"
-        >
-          Next week
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center rounded-xl border border-stone-200 bg-white shadow-sm">
+            <button
+              type="button"
+              onClick={prevWeek}
+              className="rounded-l-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+              aria-label="Previous week"
+            >
+              ←
+            </button>
+            <span className="border-x border-stone-200 px-4 py-2 text-sm font-medium text-stone-800">
+              {weekStart.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short"
+              })}{" "}
+              – {new Date(weekDates[6] + "T12:00:00").toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short"
+              })}
+            </span>
+            <button
+              type="button"
+              onClick={nextWeek}
+              className="rounded-r-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+              aria-label="Next week"
+            >
+              →
+            </button>
+          </div>
+          <Link
+            href="/"
+            className="hidden rounded-xl border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50 sm:inline-block"
+          >
+            Home
+          </Link>
+        </div>
       </div>
 
       <DndContext
@@ -331,44 +361,67 @@ export default function PlanPage() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-8">
-          <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-2 md:col-span-1">
-            <p className="mb-2 text-[11px] font-semibold text-amber-800 dark:text-amber-200">
-              Recipes
-            </p>
-            <ul className="space-y-1">
-              {dishes.map((d) => (
+        {/* Recipe strip: horizontal scroll, scales to many dishes */}
+        <div className="rounded-xl border border-stone-200 bg-stone-50/80 p-3">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+            Recipes — drag into a slot below
+          </p>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            {dishes.length === 0 ? (
+              <p className="py-2 text-xs text-stone-500">
+                No recipes yet.{" "}
+                <Link href="/recipes" className="font-medium text-orange-600 underline">
+                  Add recipes
+                </Link>
+              </p>
+            ) : (
+              dishes.map((d) => (
                 <DraggableDish key={d.id} dish={d} />
-              ))}
-            </ul>
+              ))
+            )}
           </div>
+        </div>
 
-          <div className="overflow-x-auto md:col-span-7">
-            <table className="w-full min-w-[400px] border-collapse text-xs">
+        {/* Grid: sticky header + sticky first column for large plans */}
+        <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[32rem] border-collapse text-left">
               <thead>
-                <tr>
-                  <th className="border border-orange-200 bg-orange-100 p-1 text-left font-semibold text-amber-900">
+                <tr className="border-b border-stone-200 bg-stone-50">
+                  <th className="sticky left-0 z-10 min-w-[5rem] border-b border-r border-stone-200 bg-stone-50 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600">
                     Day
                   </th>
                   {SLOTS.map((s) => (
                     <th
                       key={s}
-                      className="border border-orange-200 bg-orange-100 p-1 capitalize text-amber-900"
+                      className="min-w-0 border-b border-stone-200 px-2 py-3 text-xs font-semibold uppercase tracking-wider text-stone-600 sm:min-w-[7rem] sm:px-3"
                     >
-                      {s}
+                      <span className="flex items-center gap-1.5">
+                        <span aria-hidden>{SLOT_ICONS[s]}</span>
+                        {SLOT_LABELS[s]}
+                      </span>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {weekDates.map((date) => (
-                  <tr key={date}>
-                    <td className="border border-orange-200 bg-orange-50/50 p-1 font-medium text-amber-900">
-                      {new Date(date + "Z").toLocaleDateString("en-GB", {
+                {weekDates.map((date, rowIndex) => (
+                  <tr
+                    key={date}
+                    className={rowIndex % 2 === 1 ? "bg-stone-50/30" : undefined}
+                  >
+                    <th
+                      scope="row"
+                      className={`sticky left-0 z-10 min-w-[5rem] border-b border-r border-stone-200 px-3 py-2 text-left text-xs font-medium text-stone-800 ${
+                        rowIndex % 2 === 1 ? "bg-stone-50/50" : "bg-white"
+                      }`}
+                    >
+                      {new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
                         weekday: "short",
-                        day: "numeric"
+                        day: "numeric",
+                        month: "short"
                       })}
-                    </td>
+                    </th>
                     {SLOTS.map((slot) => (
                       <DroppableSlot
                         key={`${date}:${slot}`}
@@ -388,19 +441,18 @@ export default function PlanPage() {
           </div>
         </div>
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeDish ? (
-            <div className="rounded bg-white px-3 py-2 text-sm shadow-lg">
+            <div className="rounded-full border border-orange-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 shadow-lg">
               {activeDish.name}
             </div>
           ) : null}
         </DragOverlay>
       </DndContext>
 
-      <p className="text-[11px] text-amber-700">
-        Tip: drag a dish from the list and drop it on a meal slot. Use × to
-        clear. Generate a{" "}
-        <Link href="/shopping-list" className="underline">
+      <p className="text-center text-xs text-stone-500">
+        Build a{" "}
+        <Link href="/shopping-list" className="font-medium text-orange-600 underline hover:text-orange-700">
           shopping list
         </Link>{" "}
         from your planned dishes.

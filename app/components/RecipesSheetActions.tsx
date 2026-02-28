@@ -62,7 +62,7 @@ export function RecipesSheetActions() {
         type="button"
         onClick={handleDownload}
         disabled={importing}
-        className="shrink-0 rounded-full border border-amber-700/40 bg-transparent px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 dark:border-amber-400/40 dark:text-amber-200 dark:hover:bg-amber-900/50 disabled:opacity-50"
+        className="shrink-0 rounded-full border border-amber-700/40 bg-transparent px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 disabled:opacity-50"
       >
         Download recipes
       </button>
@@ -80,14 +80,14 @@ export function RecipesSheetActions() {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={importing}
-          className="shrink-0 rounded-full border border-amber-700/40 bg-transparent px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 dark:border-amber-400/40 dark:text-amber-200 dark:hover:bg-amber-900/50 disabled:opacity-50"
+          className="shrink-0 rounded-full border border-amber-700/40 bg-transparent px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100 disabled:opacity-50"
         >
           {importing ? "Importing…" : "Import from sheet"}
         </button>
       </div>
       {message && (
         <p
-          className={`text-sm ${message.type === "err" ? "text-red-500 dark:text-red-400" : "text-amber-700 dark:text-amber-300"}`}
+          className={`text-sm ${message.type === "err" ? "text-red-500" : "text-amber-700"}`}
         >
           {message.text}
         </p>

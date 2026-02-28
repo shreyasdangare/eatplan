@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { getConnectionId } from "@/lib/todoistAuth";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 type AggregatedLine = {
   ingredient_id: string;
@@ -15,12 +16,14 @@ type ShoppingListItem = AggregatedLine & {
 };
 
 async function getDishIdsFromDateRange(
+  userId: string,
   from: string,
   to: string
 ): Promise<string[]> {
   const { data, error } = await supabaseServer
     .from("meal_plans")
     .select("dish_id")
+    .eq("user_id", userId)
     .gte("date", from)
     .lte("date", to)
     .not("dish_id", "is", null);
@@ -184,6 +187,9 @@ function splitByPantry(
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { searchParams } = new URL(req.url);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
@@ -195,10 +201,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const dishIds = await getDishIdsFromDateRange(from, to);
+  const dishIds = await getDishIdsFromDateRange(auth.user.id, from, to);
   const lines = await aggregateIngredients(dishIds);
 
-  const connectionId = await getConnectionId();
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json({
       to_buy: lines,
@@ -222,6 +228,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const body = (await req.json()) as {
     dish_ids?: string[];
     from?: string;
@@ -230,12 +239,12 @@ export async function POST(req: NextRequest) {
 
   let dishIds = body.dish_ids ?? [];
   if (dishIds.length === 0 && body.from && body.to) {
-    dishIds = await getDishIdsFromDateRange(body.from, body.to);
+    dishIds = await getDishIdsFromDateRange(auth.user.id, body.from, body.to);
   }
 
   const lines = await aggregateIngredients(dishIds);
 
-  const connectionId = await getConnectionId();
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json({
       to_buy: lines,

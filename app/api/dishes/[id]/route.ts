@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 export async function GET(
   _req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { id } = await context.params;
 
   const { data: dish, error } = await supabaseServer
@@ -13,6 +17,7 @@ export async function GET(
       "id, name, description, meal_type, prep_time_minutes, tags, servings, image_url, instructions, dish_ingredients(id, ingredient_id, quantity, amount, unit, is_optional, ingredients(id, name))"
     )
     .eq("id", id)
+    .eq("user_id", auth.user.id)
     .single();
 
   if (error) {
@@ -68,10 +73,14 @@ export async function PATCH(
   if (servings !== undefined) updatePayload.servings = servings;
   if (instructions !== undefined) updatePayload.instructions = instructions;
 
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { data, error } = await supabaseServer
     .from("dishes")
     .update(updatePayload)
     .eq("id", id)
+    .eq("user_id", auth.user.id)
     .select("id")
     .single();
 
@@ -128,9 +137,16 @@ export async function DELETE(
   _req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { id } = await context.params;
 
-  const { error } = await supabaseServer.from("dishes").delete().eq("id", id);
+  const { error } = await supabaseServer
+    .from("dishes")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", auth.user.id);
 
   if (error) {
     console.error("Error deleting dish", error);

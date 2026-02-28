@@ -261,10 +261,10 @@ export default function EditDishPage() {
   if (error && !dish) {
     return (
       <section className="space-y-4">
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-sm text-red-600">{error}</p>
         <Link
           href="/recipes"
-          className="text-sm text-amber-600 hover:underline dark:text-amber-400"
+          className="text-sm text-amber-600 hover:underline"
         >
           Back to recipes
         </Link>
@@ -275,12 +275,12 @@ export default function EditDishPage() {
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
+        <h2 className="text-base font-semibold tracking-tight text-amber-900">
           Edit recipe
         </h2>
         <Link
           href={`/dishes/${id}`}
-          className="text-sm font-medium text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+          className="text-sm font-medium text-stone-600 hover:text-stone-900"
         >
           Cancel
         </Link>
@@ -288,22 +288,22 @@ export default function EditDishPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4 text-sm">
         <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+          <label className="text-xs font-medium text-amber-800">
             Name
           </label>
           <input
             required
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+          <label className="text-xs font-medium text-amber-800">
             Description
           </label>
           <textarea
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             rows={2}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -311,11 +311,11 @@ export default function EditDishPage() {
         </div>
         <div className="flex gap-3">
           <div className="space-y-1 flex-1">
-            <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+            <label className="text-xs font-medium text-amber-800">
               Meal type
             </label>
             <select
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
               value={mealType}
               onChange={(e) => setMealType(e.target.value)}
             >
@@ -325,25 +325,25 @@ export default function EditDishPage() {
             </select>
           </div>
           <div className="space-y-1 w-28">
-            <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+            <label className="text-xs font-medium text-amber-800">
               Prep time (min)
             </label>
             <input
               type="number"
               min={0}
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
               value={prepTime}
               onChange={(e) => setPrepTime(e.target.value)}
             />
           </div>
           <div className="space-y-1 w-24">
-            <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+            <label className="text-xs font-medium text-amber-800">
               Servings
             </label>
             <input
               type="number"
               min={1}
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
               value={servings}
               onChange={(e) => setServings(e.target.value)}
               placeholder="e.g. 2"
@@ -351,21 +351,21 @@ export default function EditDishPage() {
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+          <label className="text-xs font-medium text-amber-800">
             Tags (comma separated)
           </label>
           <input
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
+          <label className="text-xs font-medium text-amber-800">
             Steps
           </label>
           <textarea
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm"
             rows={6}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
@@ -399,7 +399,7 @@ export default function EditDishPage() {
                   className={`rounded-full px-3 py-1 text-xs ${
                     selected
                       ? "bg-lime-400 text-lime-950 shadow-sm"
-                      : "bg-orange-100 text-orange-900 dark:bg-stone-700 dark:text-stone-300"
+                      : "bg-orange-100 text-orange-900"
                   }`}
                 >
                   {ing.name}
@@ -408,7 +408,7 @@ export default function EditDishPage() {
             })}
           </div>
           {selectedIngredients.length > 0 && (
-            <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800/80">
+            <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-2">
               {selectedIngredients.map((sel) => {
                 const ing = ingredients.find((i) => i.id === sel.ingredient_id);
                 if (!ing) return null;
@@ -420,7 +420,7 @@ export default function EditDishPage() {
                     <span className="w-28 truncate">{ing.name}</span>
                     <input
                       placeholder="Qty (e.g. 2 cups)"
-                      className="min-w-[80px] flex-1 rounded border border-orange-200 bg-white px-2 py-1 text-xs dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                      className="min-w-[80px] flex-1 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
                       value={sel.quantity}
                       onChange={(e) =>
                         updateIngredient(
@@ -435,7 +435,7 @@ export default function EditDishPage() {
                       min={0}
                       step="any"
                       placeholder="Amt"
-                      className="w-16 rounded border border-orange-200 bg-white px-2 py-1 text-xs dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                      className="w-16 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
                       value={sel.amount ?? ""}
                       onChange={(e) =>
                         updateIngredient(
@@ -449,13 +449,13 @@ export default function EditDishPage() {
                     />
                     <input
                       placeholder="Unit"
-                      className="w-14 rounded border border-orange-200 bg-white px-2 py-1 text-xs dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                      className="w-14 rounded border border-orange-200 bg-white px-2 py-1 text-xs"
                       value={sel.unit}
                       onChange={(e) =>
                         updateIngredient(sel.ingredient_id, "unit", e.target.value)
                       }
                     />
-                    <label className="flex items-center gap-1 text-[11px] text-amber-800 dark:text-amber-200">
+                    <label className="flex items-center gap-1 text-[11px] text-amber-800">
                       <input
                         type="checkbox"
                         checked={sel.is_optional}
@@ -476,7 +476,7 @@ export default function EditDishPage() {
           )}
         </div>
         {error && (
-          <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-xs text-red-600">{error}</p>
         )}
         <button
           type="submit"

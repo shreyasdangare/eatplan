@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { data, error } = await supabaseServer
     .from("dishes")
     .select("id, name, description, meal_type, prep_time_minutes, tags, image_url")
+    .eq("user_id", auth.user.id)
     .order("name", { ascending: true });
 
   if (error) {
@@ -48,9 +53,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { data: dish, error } = await supabaseServer
     .from("dishes")
     .insert({
+      user_id: auth.user.id,
       name,
       description,
       meal_type,

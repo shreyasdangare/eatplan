@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getConnectionId, getConnectionToken } from "@/lib/todoistAuth";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { matchContentToIngredientId } from "@/lib/ingredientMatch";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 // API v1 (unified): completed tasks - use /api/v1/ prefix per deprecation notice
 const TODOIST_COMPLETED_URL =
@@ -10,7 +11,10 @@ const TODOIST_COMPLETED_URL =
 type TodoistCompletedItem = { content: string };
 
 export async function POST(req: NextRequest) {
-  const connectionId = await getConnectionId();
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const connectionId = await getConnectionId(auth.user.id);
   if (!connectionId) {
     return NextResponse.json(
       { error: "Connect Todoist first" },
@@ -27,7 +31,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const token = await getConnectionToken();
+  const token = await getConnectionToken(auth.user.id);
   if (!token) {
     return NextResponse.json(
       { error: "Todoist connection not found" },

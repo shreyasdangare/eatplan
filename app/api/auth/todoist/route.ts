@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStateCookieName, stateCookieOptions } from "@/lib/todoistAuth";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 const TODOIST_AUTH_URL = "https://api.todoist.com/oauth/authorize";
 const SCOPES = "data:read_write";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const clientId = process.env.TODOIST_CLIENT_ID;
   if (!clientId) {
     return NextResponse.json(

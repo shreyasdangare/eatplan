@@ -70,8 +70,8 @@ export function DishImageUpload({
         <label
           className={
             isHero
-              ? "flex h-full min-h-[200px] w-full cursor-pointer flex-col items-center justify-center bg-stone-100 p-6 text-center text-sm text-stone-500 dark:bg-stone-700 dark:text-stone-400"
-              : "flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-200 bg-stone-50/80 p-4 text-center text-sm text-stone-500 hover:border-stone-300 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-800/50 dark:hover:bg-stone-800"
+              ? "flex h-full min-h-[200px] w-full cursor-pointer flex-col items-center justify-center bg-stone-100 p-6 text-center text-sm text-stone-500"
+              : "flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-200 bg-stone-50/80 p-4 text-center text-sm text-stone-500 hover:border-stone-300 hover:bg-stone-50"
           }
         >
           {uploading ? (
@@ -91,7 +91,7 @@ export function DishImageUpload({
         </label>
       )}
       {error && (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-xs text-red-600">{error}</p>
       )}
     </div>
   );

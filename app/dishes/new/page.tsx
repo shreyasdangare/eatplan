@@ -202,25 +202,25 @@ export default function NewDishPage() {
 
   return (
     <section className="space-y-4">
-      <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
+      <h2 className="text-base font-semibold tracking-tight text-amber-900">
         Add dish
       </h2>
 
-      <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
-        <h3 className="mb-2 text-xs font-semibold text-amber-800 dark:text-amber-200">
+      <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3">
+        <h3 className="mb-2 text-xs font-semibold text-amber-800">
           Import from recipe URL or YouTube
         </h3>
         <form onSubmit={handleImport} className="space-y-2">
           <input
             type="url"
             placeholder="https://example.com/recipe or https://youtube.com/watch?v=..."
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm"
             value={importUrl}
             onChange={(e) => setImportUrl(e.target.value)}
             disabled={importing}
           />
           {importError && (
-            <p className="text-xs text-red-600 dark:text-red-400">{importError}</p>
+            <p className="text-xs text-red-600">{importError}</p>
           )}
           <button
             type="submit"
@@ -231,19 +231,19 @@ export default function NewDishPage() {
           </button>
         </form>
 
-        <h3 className="mb-2 mt-4 text-xs font-semibold text-amber-800 dark:text-amber-200">
+        <h3 className="mb-2 mt-4 text-xs font-semibold text-amber-800">
           Import from screenshot
         </h3>
         <form onSubmit={handleImportScreenshot} className="space-y-2">
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
-            className="w-full text-sm text-stone-600 file:mr-2 file:rounded-full file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-950 file:hover:bg-amber-400 dark:text-stone-300"
+            className="w-full text-sm text-stone-600 file:mr-2 file:rounded-full file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-950 file:hover:bg-amber-400"
             onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
             disabled={importing}
           />
           {importError && (
-            <p className="text-xs text-red-600 dark:text-red-400">{importError}</p>
+            <p className="text-xs text-red-600">{importError}</p>
           )}
           <button
             type="submit"

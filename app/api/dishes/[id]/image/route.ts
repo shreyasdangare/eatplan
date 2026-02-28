@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 const BUCKET = "dish-images";
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -9,6 +10,9 @@ export async function POST(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { id: dishId } = await context.params;
 
   const formData = await req.formData();
@@ -69,7 +73,8 @@ export async function POST(
   const { error: updateError } = await supabaseServer
     .from("dishes")
     .update({ image_url: imageUrl })
-    .eq("id", dishId);
+    .eq("id", dishId)
+    .eq("user_id", auth.user.id);
 
   if (updateError) {
     console.error("Error updating dish image_url", updateError);

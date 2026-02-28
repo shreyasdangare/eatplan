@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { searchParams } = new URL(req.url);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
@@ -16,6 +20,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabaseServer
     .from("meal_plans")
     .select("id, date, slot_type, dish_id, prepared_at, dishes(id, name)")
+    .eq("user_id", auth.user.id)
     .gte("date", from)
     .lte("date", to)
     .order("date", { ascending: true });
@@ -53,9 +58,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { data: existing } = await supabaseServer
     .from("meal_plans")
     .select("id")
+    .eq("user_id", auth.user.id)
     .eq("date", date)
     .eq("slot_type", slot_type)
     .maybeSingle();
@@ -81,6 +90,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { error: insertError } = await supabaseServer.from("meal_plans").insert({
+    user_id: auth.user.id,
     date,
     slot_type,
     dish_id
