@@ -12,7 +12,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/recipes";
+  const next = searchParams.get("next") ?? "/";
   const errorParam = searchParams.get("error");
 
   const handleSubmit = async (e: React.FormEvent) => {

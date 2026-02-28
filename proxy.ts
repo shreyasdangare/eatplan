@@ -9,8 +9,6 @@ const PROTECTED_PATHS = [
   "/what-can-i-cook",
   "/dishes",
 ];
-const PUBLIC_PATHS = ["/", "/login", "/signup"];
-
 function isProtected(pathname: string): boolean {
   return PROTECTED_PATHS.some(
     (p) => pathname === p || pathname.startsWith(p + "/")
@@ -40,10 +38,15 @@ export async function proxy(request: NextRequest) {
   });
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (isProtected(request.nextUrl.pathname) && !session?.user) {
+  if (userError || !user) {
+    await supabase.auth.signOut();
+  }
+
+  if (isProtected(request.nextUrl.pathname) && !user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -52,9 +55,9 @@ export async function proxy(request: NextRequest) {
   if (
     (request.nextUrl.pathname === "/login" ||
       request.nextUrl.pathname === "/signup") &&
-    session?.user
+    user
   ) {
-    const next = request.nextUrl.searchParams.get("next") ?? "/recipes";
+    const next = request.nextUrl.searchParams.get("next") ?? "/";
     return NextResponse.redirect(new URL(next, request.url));
   }
 

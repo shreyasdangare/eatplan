@@ -26,7 +26,11 @@ export async function createClient() {
   });
 }
 
-export type SessionUser = { id: string; email?: string };
+export type SessionUser = {
+  id: string;
+  email?: string;
+  preferred_name?: string;
+};
 
 export async function getSession(): Promise<{
   user: SessionUser | null;
@@ -34,14 +38,20 @@ export async function getSession(): Promise<{
 }> {
   const supabase = await createClient();
   const {
-    data: { session },
+    data: { user: raw },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
   if (error) {
     return { user: null, error };
   }
-  const user = session?.user
-    ? { id: session.user.id, email: session.user.email ?? undefined }
+  const user = raw
+    ? {
+        id: raw.id,
+        email: raw.email ?? undefined,
+        preferred_name:
+          (raw.user_metadata as { preferred_name?: string } | undefined)
+            ?.preferred_name ?? undefined,
+      }
     : null;
   return { user, error: null };
 }

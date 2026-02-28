@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { getSession } from "@/lib/supabaseServerClient";
+import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
 
 const features = [
   {
@@ -38,9 +41,41 @@ const features = [
   },
 ];
 
-export default function HomePage() {
+type HomePageProps = {
+  searchParams: Promise<{ error?: string; error_code?: string }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const { user } = await getSession();
+  const params = await searchParams;
+  const expiredLink =
+    params?.error === "access_denied" && params?.error_code === "otp_expired";
+  const displayName =
+    user?.preferred_name?.trim() || user?.email?.split("@")[0] || "there";
+
   return (
     <div className="flex flex-col gap-12 lg:gap-16">
+      <Suspense fallback={null}>
+        <ClearAuthErrorUrl />
+      </Suspense>
+      {expiredLink && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          That confirmation link has expired. Please{" "}
+          <Link href="/login" className="font-medium text-amber-800 underline hover:no-underline">
+            log in
+          </Link>{" "}
+          or{" "}
+          <Link href="/signup" className="font-medium text-amber-800 underline hover:no-underline">
+            sign up
+          </Link>{" "}
+          again to get a new link.
+        </div>
+      )}
+      {user && (
+        <p className="rounded-xl bg-orange-100/90 px-4 py-2 text-center text-sm font-medium text-orange-900">
+          Welcome, {displayName}
+        </p>
+      )}
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl border border-orange-200/80 bg-gradient-to-br from-orange-100/90 via-amber-50/95 to-rose-100/80 px-6 py-10 shadow-lg">
         <div className="relative z-10">

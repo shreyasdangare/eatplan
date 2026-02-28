@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
 
 export function AuthLinks() {
-  const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [user, setUser] = useState<{
+    email?: string;
+    user_metadata?: { preferred_name?: string };
+  } | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
@@ -16,8 +19,14 @@ export function AuthLinks() {
     getSupabaseClient()
       .then((supabase) => {
         if (cancelled) return;
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (!cancelled) setUser(session?.user ?? null);
+        supabase.auth.getUser().then(({ data: { user: u }, error }) => {
+          if (cancelled) return;
+          if (error) {
+            supabase.auth.signOut();
+            setUser(null);
+            return;
+          }
+          setUser(u ?? null);
         });
         const {
           data: { subscription },
@@ -52,7 +61,7 @@ export function AuthLinks() {
     return (
       <div className="flex items-center gap-2">
         <span className="max-w-[120px] truncate text-sm text-stone-600 sm:max-w-[180px]">
-          {user.email}
+          {user.user_metadata?.preferred_name?.trim() || user.email}
         </span>
         <button
           type="button"
