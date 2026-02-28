@@ -77,7 +77,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </p>
       )}
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl border border-orange-200/80 bg-gradient-to-br from-orange-100/90 via-amber-50/95 to-rose-100/80 px-6 py-10 shadow-lg">
+      <section className="relative overflow-hidden rounded-2xl border border-orange-200/80 bg-gradient-to-br from-orange-100/90 via-amber-50/95 to-rose-100/80 px-4 py-8 shadow-lg sm:px-6 sm:py-10">
         <div className="relative z-10">
           <h2 className="text-3xl font-bold tracking-tight text-orange-900 sm:text-4xl lg:text-5xl">
             काय खायचं?
@@ -90,7 +90,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </p>
           <Link
             href="/recipes"
-            className="mt-6 inline-block rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-orange-600"
+            className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-orange-600 active:opacity-90"
           >
             Go to my recipes →
           </Link>

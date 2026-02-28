@@ -65,7 +65,7 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
           <button
             type="button"
             onClick={() => setShowFavoritesOnly((v) => !v)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+            className={`min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium transition sm:py-1.5 ${
               showFavoritesOnly
                 ? "bg-stone-900 text-white"
                 : "bg-stone-100 text-stone-700 hover:bg-stone-200"
@@ -78,7 +78,7 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
               key={tag}
               type="button"
               onClick={() => toggleTag(tag)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+              className={`min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium transition sm:py-1.5 ${
                 selectedTags.has(tag)
                   ? "bg-stone-900 text-white"
                   : "bg-stone-100 text-stone-700 hover:bg-stone-200"
@@ -94,7 +94,7 @@ export function DishesListWithFilter({ dishes }: { dishes: Dish[] }) {
                 setSelectedTags(new Set());
                 setShowFavoritesOnly(false);
               }}
-              className="rounded-lg px-3 py-1.5 text-xs font-medium text-stone-500 hover:text-stone-700"
+              className="min-h-[40px] min-w-[44px] flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium text-stone-500 hover:text-stone-700 sm:py-1.5"
             >
               Clear
             </button>

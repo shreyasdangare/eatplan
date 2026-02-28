@@ -2,7 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   @apply min-h-screen;
+  overflow-x: hidden;
+}
+
+/* Improve tap highlight on mobile */
+@media (hover: none) {
+  a, button {
+    -webkit-tap-highlight-color: rgba(249, 115, 22, 0.15);
+  }
+}
+
+/* Prevent iOS zoom on input focus (font-size >= 16px) and improve touch targets */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea {
+  font-size: 16px;
+}
+@media (min-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  textarea {
+    font-size: 0.875rem;
+  }
 }
 

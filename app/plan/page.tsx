@@ -323,12 +323,12 @@ export default function PlanPage() {
             <button
               type="button"
               onClick={prevWeek}
-              className="rounded-l-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-l-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 active:opacity-80"
               aria-label="Previous week"
             >
               ←
             </button>
-            <span className="border-x border-stone-200 px-4 py-2 text-sm font-medium text-stone-800">
+            <span className="flex min-h-[44px] items-center border-x border-stone-200 px-3 py-2 text-sm font-medium text-stone-800 sm:px-4">
               {weekStart.toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "short"
@@ -341,7 +341,7 @@ export default function PlanPage() {
             <button
               type="button"
               onClick={nextWeek}
-              className="rounded-r-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-r-xl px-3 py-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900 active:opacity-80"
               aria-label="Next week"
             >
               →
