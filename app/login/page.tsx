@@ -10,6 +10,9 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+  const [showResendHint, setShowResendHint] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
@@ -18,6 +21,8 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setShowResendHint(false);
+    setResendSuccess(false);
     setLoading(true);
     try {
       const supabase = await getSupabaseClient();
@@ -26,7 +31,11 @@ function LoginForm() {
         password,
       });
       if (err) {
-        setError(err.message ?? "Sign in failed");
+        const msg = err.message ?? "Sign in failed";
+        setError(msg);
+        if (msg.toLowerCase().includes("email not confirmed") || msg.toLowerCase().includes("email_not_confirmed")) {
+          setShowResendHint(true);
+        }
         return;
       }
       router.push(next);
@@ -35,6 +44,30 @@ function LoginForm() {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    const trimmed = email.trim();
+    if (!trimmed) return;
+    setResendSuccess(false);
+    setResendLoading(true);
+    try {
+      const supabase = await getSupabaseClient();
+      const { error: err } = await supabase.auth.resend({
+        type: "signup",
+        email: trimmed,
+      });
+      if (err) {
+        setError(err.message ?? "Failed to resend email");
+        return;
+      }
+      setResendSuccess(true);
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to resend confirmation email");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -79,6 +112,26 @@ function LoginForm() {
         </div>
         {error && (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        )}
+        {showResendHint && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2 dark:border-amber-800 dark:bg-amber-950/50">
+            <p className="text-sm text-amber-900 dark:text-amber-200">
+              Your email isn&apos;t confirmed yet. Check your inbox for the confirmation link, or we can send a new one.
+            </p>
+            <button
+              type="button"
+              onClick={handleResendConfirmation}
+              disabled={resendLoading}
+              className="min-h-[44px] w-full rounded-xl border border-amber-600 bg-transparent px-4 py-2.5 text-sm font-medium text-amber-800 transition hover:bg-amber-100 active:opacity-90 disabled:opacity-50 dark:border-amber-500 dark:text-amber-200 dark:hover:bg-amber-900/50"
+            >
+              {resendLoading ? "Sending…" : "Resend confirmation email"}
+            </button>
+            {resendSuccess && (
+              <p className="text-sm text-green-700 dark:text-green-400">
+                Check your inbox — we sent a new confirmation link.
+              </p>
+            )}
+          </div>
         )}
         <button
           type="submit"
