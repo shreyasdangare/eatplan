@@ -21,6 +21,10 @@ If the email still shows “You're receiving this email because you signed up fo
 - In the Dashboard go to **Authentication → Email Templates** (or **Project Settings → Auth**).
 - Look for an option such as **“Customize email footer”** or **“Disable Supabase branding in emails”** and turn it off or replace the footer text if your plan allows it.
 
+## Logo in the email
+
+The template body includes an app logo image from `https://eatplan.app/logo.png`. If your app is hosted on a different domain, edit [confirm-signup-body.html](./confirm-signup-body.html) and replace that URL in the `src` of the header `<img>` so the logo loads in emails.
+
 ## Template variables
 
 - `{{ .ConfirmationURL }}` — replaced by Supabase with the real confirmation link.

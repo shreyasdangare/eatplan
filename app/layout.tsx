@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { HeaderTitle } from "./components/HeaderTitle";
 import { AuthLinks } from "./components/AuthLinks";
 import { DarkModeToggle } from "./components/DarkModeToggle";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { AuthCodeExchange } from "./components/AuthCodeExchange";
 
 export const metadata: Metadata = {
   title: "काय खायचं? – Meal Planner",
@@ -33,6 +35,9 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
+          <Suspense fallback={null}>
+            <AuthCodeExchange />
+          </Suspense>
           <div className="mx-auto flex min-h-screen min-w-0 max-w-3xl flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 px-4 py-4 text-stone-900 dark:from-stone-900 dark:via-stone-900 dark:to-stone-800 dark:text-stone-100 sm:px-6 lg:max-w-5xl lg:px-10 lg:py-6">
             <header className="mb-4 border-b border-orange-200/70 pb-4 dark:border-stone-700 sm:mb-6 lg:mb-8 lg:pb-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

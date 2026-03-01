@@ -82,6 +82,7 @@ Create `.env.local` in the project root (see [DEPLOYMENT.md](DEPLOYMENT.md) for 
 | `GOOGLE_GEMINI_API_KEY` | For recipe import | Google AI Studio key (URL/screenshot/YouTube import) |
 | `UNSPLASH_ACCESS_KEY` | Optional | Auto dish image when importing recipe |
 | `TODOIST_CLIENT_ID` / `TODOIST_CLIENT_SECRET` | Optional | Todoist OAuth for shopping-list sync |
+| `NEXT_PUBLIC_APP_URL` | Optional (production) | Canonical app URL (e.g. `https://eatplan.app`) so favicon and PWA icons load the logo correctly |
 
 `.env.local` is gitignored; do not commit secrets.
 

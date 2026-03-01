@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
 import { getSession } from "@/lib/supabaseServerClient";
 import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
@@ -78,7 +79,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       )}
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl border border-orange-200/80 bg-gradient-to-br from-orange-100/90 via-amber-50/95 to-rose-100/80 px-4 py-8 shadow-lg dark:border-stone-600 dark:from-stone-800 dark:via-stone-800 dark:to-stone-700 sm:px-6 sm:py-10">
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col items-start sm:flex-row sm:items-center sm:gap-6">
+          <Image
+            src="/logo.png"
+            alt="Jevan Meal Planner"
+            width={80}
+            height={80}
+            className="h-20 w-20 shrink-0 rounded-xl object-contain"
+          />
+          <div>
           <h2 className="text-3xl font-bold tracking-tight text-orange-900 dark:text-orange-200 sm:text-4xl lg:text-5xl">
             काय खायचं?
           </h2>
@@ -94,6 +103,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           >
             Go to my recipes →
           </Link>
+          </div>
         </div>
         <div
           className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-orange-300/30 dark:bg-orange-600/20"
