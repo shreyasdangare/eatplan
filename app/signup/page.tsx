@@ -1,11 +1,16 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
 
 function SignupForm() {
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/";
+  const hintNoAccount = searchParams.get("hint") === "no_account";
+  const emailFromUrl = searchParams.get("email") ?? "";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,8 +19,10 @@ function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/";
+
+  useEffect(() => {
+    if (emailFromUrl) setEmail(decodeURIComponent(emailFromUrl));
+  }, [emailFromUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +77,11 @@ function SignupForm() {
       <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
         Sign up
       </h1>
+      {hintNoAccount && (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
+          We couldn&apos;t find an account with that email. Create one below to get started.
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">

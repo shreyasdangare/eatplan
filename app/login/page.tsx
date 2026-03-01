@@ -32,6 +32,12 @@ function LoginForm() {
       });
       if (err) {
         const msg = err.message ?? "Sign in failed";
+        if (msg === "Invalid login credentials") {
+          router.push(
+            `/signup?next=${encodeURIComponent(next)}&hint=no_account&email=${encodeURIComponent(email.trim())}`
+          );
+          return;
+        }
         setError(msg);
         if (msg.toLowerCase().includes("email not confirmed") || msg.toLowerCase().includes("email_not_confirmed")) {
           setShowResendHint(true);
