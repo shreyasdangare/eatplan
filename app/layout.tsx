@@ -7,6 +7,7 @@ import { AuthLinks } from "./components/AuthLinks";
 import { DarkModeToggle } from "./components/DarkModeToggle";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "EatPlan – काय खायचं?",
@@ -92,6 +93,7 @@ export default function RootLayout({
             <main className="flex-1 pb-8 min-h-0 lg:pb-12">{children}</main>
           </div>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
