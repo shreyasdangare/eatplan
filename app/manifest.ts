@@ -2,12 +2,12 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "काय खायचं? – Meal Planner",
-    short_name: "काय खायचं?",
+    name: "EatPlan – काय खायचं?",
+    short_name: "EatPlan",
     description: "Simple ingredient-based meal planning app",
     start_url: "/",
     display: "standalone",
-    background_color: "#fff7ed",
+    background_color: "#1c1917",
     theme_color: "#ea580c",
     icons: [
       {

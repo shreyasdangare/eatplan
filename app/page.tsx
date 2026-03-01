@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { getSession } from "@/lib/supabaseServerClient";
 import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
+import { MarkHomeVisited } from "./components/MarkHomeVisited";
 
 const features = [
   {
@@ -51,8 +52,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const expiredLink =
     params?.error === "access_denied" && params?.error_code === "otp_expired";
-  const displayName =
-    user?.preferred_name?.trim() || user?.email?.split("@")[0] || "there";
+  const chefName =
+    user?.preferred_name?.trim() || user?.email?.split("@")[0] || "Chef";
+  const isFirstVisit = user && !user.has_visited_home;
+  const welcomePrefix = isFirstVisit ? "Welcome," : "Welcome back,";
 
   return (
     <div className="flex flex-col gap-12 lg:gap-16">
@@ -73,26 +76,29 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       )}
       {user && (
-        <p className="rounded-xl bg-orange-100/90 px-4 py-2 text-center text-sm font-medium text-orange-900 dark:bg-stone-700/80 dark:text-orange-200">
-          Welcome, {displayName}
-        </p>
+        <>
+          {isFirstVisit && <MarkHomeVisited />}
+          <p className="rounded-xl bg-orange-100/90 px-4 py-2 text-center text-sm font-medium text-orange-900 dark:bg-stone-700/80 dark:text-orange-200">
+            {welcomePrefix} Chef {chefName}
+          </p>
+        </>
       )}
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl border border-orange-200/80 bg-gradient-to-br from-orange-100/90 via-amber-50/95 to-rose-100/80 px-4 py-8 shadow-lg dark:border-stone-600 dark:from-stone-800 dark:via-stone-800 dark:to-stone-700 sm:px-6 sm:py-10">
         <div className="relative z-10 flex flex-col items-start sm:flex-row sm:items-center sm:gap-6">
           <Image
             src="/logo.png"
-            alt="Jevan Meal Planner"
+            alt="EatPlan"
             width={80}
             height={80}
             className="h-20 w-20 shrink-0 rounded-xl object-contain"
           />
           <div>
           <h2 className="text-3xl font-bold tracking-tight text-orange-900 dark:text-orange-200 sm:text-4xl lg:text-5xl">
-            काय खायचं?
+            EatPlan
           </h2>
           <p className="mt-1 text-base text-amber-800 dark:text-amber-200 sm:text-lg">
-            What to eat?
+            काय खायचं?
           </p>
           <p className="mt-3 max-w-md text-sm text-stone-600 dark:text-stone-400">
             Plan your meals. Shop once. Cook with what you have.
@@ -149,7 +155,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       {/* Footer line */}
       <p className="text-center text-xs text-stone-500 dark:text-stone-400">
-        Meal planner by PP
+        A MEAL PLANNER BY PP 🇮🇳
       </p>
     </div>
   );

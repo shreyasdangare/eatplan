@@ -1,0 +1,33 @@
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
+
+/** POST: set order of to_buy items by providing ordered array of ids */
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const body = (await req.json()) as { ordered_ids?: string[] };
+  const orderedIds = body.ordered_ids;
+  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+    return NextResponse.json(
+      { error: "ordered_ids array required" },
+      { status: 400 }
+    );
+  }
+
+  for (let i = 0; i < orderedIds.length; i++) {
+    const { error } = await supabaseServer
+      .from("shopping_list_items")
+      .update({ position: i })
+      .eq("id", orderedIds[i])
+      .eq("user_id", auth.user.id)
+      .eq("status", "to_buy");
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
+
+  return NextResponse.json({ ok: true });
+}

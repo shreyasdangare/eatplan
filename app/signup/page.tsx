@@ -31,6 +31,11 @@ function SignupForm() {
       setError("Passwords don't match");
       return;
     }
+    const name = preferredName.trim();
+    if (!name) {
+      setError("Please enter what we should call you.");
+      return;
+    }
     setLoading(true);
     try {
       const supabase = await getSupabaseClient();
@@ -38,7 +43,7 @@ function SignupForm() {
         email: email.trim(),
         password,
         options: {
-          data: { preferred_name: preferredName.trim() || undefined },
+          data: { preferred_name: name },
         },
       });
       if (err) {
@@ -130,7 +135,7 @@ function SignupForm() {
         </div>
         <div>
           <label htmlFor="preferred_name" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-            What should we call you?
+            What should we call you? <span className="text-amber-600 dark:text-amber-400">Required</span>
           </label>
           <input
             id="preferred_name"
@@ -139,6 +144,8 @@ function SignupForm() {
             placeholder="e.g. Shreyas"
             value={preferredName}
             onChange={(e) => setPreferredName(e.target.value)}
+            required
+            minLength={1}
             className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>

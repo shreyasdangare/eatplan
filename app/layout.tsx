@@ -9,7 +9,7 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 
 export const metadata: Metadata = {
-  title: "काय खायचं? – Meal Planner",
+  title: "EatPlan – काय खायचं?",
   description: "Simple ingredient-based meal planning app"
 };
 

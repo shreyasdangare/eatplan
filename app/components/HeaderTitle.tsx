@@ -19,17 +19,17 @@ export function HeaderTitle() {
     >
       <Image
         src="/logo.png"
-        alt="Jevan Meal Planner"
+        alt="EatPlan"
         width={40}
         height={40}
         className="h-10 w-10 rounded-lg object-contain"
       />
       <div className="flex flex-col">
         <h1 className="text-xl font-semibold tracking-tight text-orange-900 dark:text-orange-200 sm:text-2xl leading-tight">
-          काय खायचं?
+          EatPlan
         </h1>
         <span className="text-xs text-amber-700 dark:text-amber-300">
-          Meal planner by PP
+          काय खायचं?
         </span>
       </div>
     </Link>

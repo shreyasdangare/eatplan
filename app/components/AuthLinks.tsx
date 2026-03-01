@@ -60,9 +60,6 @@ export function AuthLinks() {
   if (user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="max-w-[100px] truncate text-sm text-stone-600 dark:text-stone-400 sm:max-w-[180px]">
-          {user.user_metadata?.preferred_name?.trim() || user.email}
-        </span>
         <button
           type="button"
           onClick={handleLogout}
