@@ -9,8 +9,7 @@
  *    This script deletes those explicitly before Auth delete.
  *
  * 2. Database (via ON DELETE CASCADE when auth.users row is removed):
- *    - dishes, dish_ingredients (via dishes), meal_plans, favorites,
- *      todoist_connections, pantry (via todoist_connections).
+ *    - dishes, dish_ingredients (via dishes), meal_plans, favorites, pantry.
  *
  * If you add more Storage buckets or other user-owned data later, extend
  * deleteUserStorageFiles() or add similar cleanup before deleteUser().

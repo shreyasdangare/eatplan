@@ -20,7 +20,7 @@ Run the migration **once** in Supabase so the app has the right tables and colum
 3. Copy the **entire** contents of `db/migrations/009_multi_user.sql` from your project.
 4. Paste into the SQL Editor and click **Run**.
 
-You should see “Success. No rows returned.” That’s expected. The migration adds `user_id` to `dishes`, `meal_plans`, and `todoist_connections`, and creates the `favorites` table.
+You should see “Success. No rows returned.” That’s expected. The migration adds `user_id` to `dishes` and `meal_plans`, and creates the `favorites` table.
 
 ---
 

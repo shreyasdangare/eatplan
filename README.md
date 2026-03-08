@@ -1,4 +1,4 @@
-# Jevan – Meal planner web app
+# EatPlan
 
 **Live:** [https://eatplan.app/](https://eatplan.app/)
 
@@ -10,7 +10,7 @@
 
 - **Recipes** — Add dishes with ingredients, photos, servings, and tags. Filter by tag or favorites. Import from URL, screenshot, or YouTube (Gemini).
 - **This week** — Drag recipes onto breakfast, lunch, and dinner for each day.
-- **Shopping list** — Pick recipes and get one combined grocery list. Optional sync with Todoist.
+- **Shopping list** — Pick recipes and get one combined grocery list.
 - **Pantry** — Ingredients you always have; used when searching “What can I cook?”.
 - **What can I cook?** — Enter what you have; see matching recipes.
 - **Auth** — Email sign-up/sign-in via Supabase. Multi-user: each user has their own recipes, plans, and list.
@@ -25,7 +25,7 @@
 | UI         | React 18, Tailwind CSS, mobile-first layout |
 | Backend    | Next.js Route Handlers under `app/api` |
 | Database   | Supabase (Postgres) — dishes, ingredients, meal plans, pantry, auth |
-| Optional   | Google AI (Gemini) for recipe import; Todoist OAuth for list sync; Unsplash for auto dish images |
+| Optional   | Google AI (Gemini) for recipe import; Unsplash for auto dish images |
 
 ---
 
@@ -49,11 +49,10 @@
 │   ├── supabaseServer.ts     # Server-only Supabase (service role)
 │   ├── supabaseServerClient.ts
 │   ├── supabaseBrowser.ts    # Client Supabase (anon key)
-│   ├── todoistAuth.ts
 │   └── ingredientMatch.ts
 ├── db/
 │   ├── schema.sql        # Base tables (dishes, ingredients, meal_plans, pantry, …)
-│   └── migrations/       # Numbered migrations (todoist, multi-user, etc.)
+│   └── migrations/       # Numbered migrations (multi-user, shopping list, etc.)
 ├── scripts/              # Utilities (e.g. delete-user-by-email)
 ├── docs/                  # Email templates, multi-user setup
 ├── DEPLOYMENT.md          # Full deployment and env configuration
@@ -81,7 +80,6 @@ Create `.env.local` in the project root (see [DEPLOYMENT.md](DEPLOYMENT.md) for 
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (multi-user) | Supabase anon key (client auth) |
 | `GOOGLE_GEMINI_API_KEY` | For recipe import | Google AI Studio key (URL/screenshot/YouTube import) |
 | `UNSPLASH_ACCESS_KEY` | Optional | Auto dish image when importing recipe |
-| `TODOIST_CLIENT_ID` / `TODOIST_CLIENT_SECRET` | Optional | Todoist OAuth for shopping-list sync |
 | `NEXT_PUBLIC_APP_URL` | Optional (production) | Canonical app URL (e.g. `https://eatplan.app`) so favicon and PWA icons load the logo correctly |
 
 `.env.local` is gitignored; do not commit secrets.
@@ -111,8 +109,8 @@ For **multi-user (email auth)** see [docs/MULTI_USER_SETUP.md](docs/MULTI_USER_S
 
 ## Database
 
-- **Schema:** [db/schema.sql](db/schema.sql) — base tables for dishes, ingredients, dish_ingredients, meal_plans, todoist_connections, pantry.
-- **Migrations:** [db/migrations/](db/migrations/) — apply in order when upgrading an existing DB (e.g. Todoist, multi-user, favorites, instructions).
+- **Schema:** [db/schema.sql](db/schema.sql) — base tables for dishes, ingredients, dish_ingredients, meal_plans, pantry.
+- **Migrations:** [db/migrations/](db/migrations/) — apply in order when upgrading an existing DB (e.g. multi-user, favorites, shopping list).
 
 ---
 
@@ -123,7 +121,7 @@ The app is built for **Vercel** and **Supabase**:
 1. **Supabase** — Create project, run schema + migrations, create `dish-images` bucket, configure Auth (e.g. Email provider for multi-user).
 2. **Vercel** — Import repo, set environment variables (same as above), deploy. Custom domain (e.g. eatplan.app) can be added in Vercel.
 
-Full steps, API key restrictions, and optional integrations (Gemini, Todoist, Unsplash) are in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+Full steps, API key restrictions, and optional integrations (Gemini, Unsplash) are in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ---
 
@@ -131,7 +129,7 @@ Full steps, API key restrictions, and optional integrations (Gemini, Todoist, Un
 
 | Doc | Purpose |
 |-----|--------|
-| [DEPLOYMENT.md](DEPLOYMENT.md) | Hosting, env vars, Supabase, Vercel, Gemini, Todoist |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Hosting, env vars, Supabase, Vercel, Gemini |
 | [docs/MULTI_USER_SETUP.md](docs/MULTI_USER_SETUP.md) | Email auth and multi-user setup |
 | [docs/email-templates/](docs/email-templates/) | Email copy (e.g. confirm signup) |
 

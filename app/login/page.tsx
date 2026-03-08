@@ -16,7 +16,6 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
-  const errorParam = searchParams.get("error");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,11 +81,6 @@ function LoginForm() {
       <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
         Log in
       </h1>
-      {errorParam === "todoist" && (
-        <p className="rounded-lg bg-amber-100 p-3 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
-          Log in first to connect Todoist.
-        </p>
-      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">

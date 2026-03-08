@@ -6,7 +6,7 @@ import {
   IngredientOption
 } from "../components/IngredientAutocompleteInput";
 
-const PANTRY_STORAGE_KEY = "jevan-pantry";
+const PANTRY_STORAGE_KEY = "eatplan-pantry";
 
 function loadPantryIdsLocal(): string[] {
   if (typeof window === "undefined") return [];
@@ -48,7 +48,6 @@ export function WhatCanICookClient() {
     others: SuggestionBucket[];
   } | null>(null);
   const [searchInput, setSearchInput] = useState("");
-  const [todoistConnected, setTodoistConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -61,23 +60,16 @@ export function WhatCanICookClient() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/auth/todoist/status")
-      .then((r) => r.json())
-      .then((d: { connected: boolean }) => setTodoistConnected(d.connected));
+    fetch("/api/pantry")
+      .then((r) => {
+        if (!r.ok) throw new Error("not authenticated");
+        return r.json();
+      })
+      .then((d: { ingredient_ids?: string[] }) => {
+        setPantryIds(Array.isArray(d?.ingredient_ids) ? d.ingredient_ids : []);
+      })
+      .catch(() => setPantryIds(loadPantryIdsLocal()));
   }, []);
-
-  useEffect(() => {
-    if (todoistConnected === true) {
-      fetch("/api/pantry")
-        .then((r) => r.json())
-        .then((d: { ingredient_ids?: string[] }) => {
-          setPantryIds(Array.isArray(d?.ingredient_ids) ? d.ingredient_ids : []);
-        })
-        .catch(() => setPantryIds([]));
-    } else if (todoistConnected === false) {
-      setPantryIds(loadPantryIdsLocal());
-    }
-  }, [todoistConnected]);
 
   const toggle = (id: string) => {
     setSelected((prev) =>

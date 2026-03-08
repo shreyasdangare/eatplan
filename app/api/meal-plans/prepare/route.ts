@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getConnectionId } from "@/lib/todoistAuth";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
-
-  const connectionId = await getConnectionId(auth.user.id);
-  if (!connectionId) {
-    return NextResponse.json(
-      { error: "Connect Todoist first" },
-      { status: 401 }
-    );
-  }
 
   const body = (await req.json()) as { date?: string; slot_type?: string };
   const { date, slot_type } = body;
@@ -90,7 +81,7 @@ export async function POST(req: NextRequest) {
     const { data: pantryRow } = await supabaseServer
       .from("pantry")
       .select("amount, unit")
-      .eq("connection_id", connectionId)
+      .eq("user_id", auth.user.id)
       .eq("ingredient_id", ing.ingredient_id)
       .maybeSingle();
 
@@ -108,13 +99,13 @@ export async function POST(req: NextRequest) {
         await supabaseServer
           .from("pantry")
           .delete()
-          .eq("connection_id", connectionId)
+          .eq("user_id", auth.user.id)
           .eq("ingredient_id", ing.ingredient_id);
       } else {
         await supabaseServer
           .from("pantry")
           .update({ amount: newAmount })
-          .eq("connection_id", connectionId)
+          .eq("user_id", auth.user.id)
           .eq("ingredient_id", ing.ingredient_id);
       }
       continue;
@@ -124,7 +115,7 @@ export async function POST(req: NextRequest) {
       await supabaseServer
         .from("pantry")
         .delete()
-        .eq("connection_id", connectionId)
+        .eq("user_id", auth.user.id)
         .eq("ingredient_id", ing.ingredient_id);
     }
   }

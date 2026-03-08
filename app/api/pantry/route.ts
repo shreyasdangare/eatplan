@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getConnectionId } from "@/lib/todoistAuth";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
 
@@ -7,15 +6,10 @@ export async function GET() {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
-  const connectionId = await getConnectionId(auth.user.id);
-  if (!connectionId) {
-    return NextResponse.json({ items: [] });
-  }
-
   const { data, error } = await supabaseServer
     .from("pantry")
     .select("ingredient_id, amount, unit")
-    .eq("connection_id", connectionId);
+    .eq("user_id", auth.user.id);
 
   if (error) {
     console.error("Error fetching pantry", error);
@@ -38,14 +32,6 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
-  const connectionId = await getConnectionId(auth.user.id);
-  if (!connectionId) {
-    return NextResponse.json(
-      { error: "Connect Todoist first" },
-      { status: 401 }
-    );
-  }
-
   const body = (await req.json()) as {
     ingredient_id?: string;
     amount?: number | null;
@@ -61,12 +47,12 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabaseServer.from("pantry").upsert(
     {
-      connection_id: connectionId,
+      user_id: auth.user.id,
       ingredient_id: ingredientId,
       amount: body.amount ?? null,
       unit: body.unit ?? null,
     },
-    { onConflict: "connection_id,ingredient_id" }
+    { onConflict: "user_id,ingredient_id" }
   );
 
   if (error) {
@@ -84,14 +70,6 @@ export async function DELETE(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
-  const connectionId = await getConnectionId(auth.user.id);
-  if (!connectionId) {
-    return NextResponse.json(
-      { error: "Connect Todoist first" },
-      { status: 401 }
-    );
-  }
-
   const { searchParams } = new URL(req.url);
   const ingredientId = searchParams.get("ingredient_id");
   if (!ingredientId) {
@@ -104,7 +82,7 @@ export async function DELETE(req: NextRequest) {
   const { error } = await supabaseServer
     .from("pantry")
     .delete()
-    .eq("connection_id", connectionId)
+    .eq("user_id", auth.user.id)
     .eq("ingredient_id", ingredientId);
 
   if (error) {

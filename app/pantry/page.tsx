@@ -7,7 +7,7 @@ import {
   IngredientOption
 } from "../components/IngredientAutocompleteInput";
 
-const PANTRY_STORAGE_KEY = "jevan-pantry";
+const PANTRY_STORAGE_KEY = "eatplan-pantry";
 
 function loadPantryIdsLocal(): string[] {
   if (typeof window === "undefined") return [];
@@ -49,14 +49,6 @@ export default function PantryPage() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/auth/todoist/status");
-      const data = (await res.json()) as { connected: boolean };
-      setConnected(data.connected);
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
       const res = await fetch("/api/ingredients");
       if (res.ok) {
         const data = (await res.json()) as Ingredient[];
@@ -67,24 +59,27 @@ export default function PantryPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    if (connected === true) {
-      fetch("/api/pantry")
-        .then((res) => res.json())
-        .then((data: { items?: PantryItem[]; ingredient_ids?: string[] }) => {
-          const items = data?.items ?? [];
-          if (items.length > 0) {
-            setPantryItems(items);
-          } else {
-            const ids = Array.isArray(data?.ingredient_ids) ? data.ingredient_ids : [];
-            setPantryItems(ids.map((ingredient_id) => ({ ingredient_id, amount: null, unit: null })));
-          }
-        })
-        .catch(() => setPantryItems([]));
-    } else if (connected === false) {
-      const ids = loadPantryIdsLocal();
-      setPantryItems(ids.map((ingredient_id) => ({ ingredient_id, amount: null, unit: null })));
-    }
-  }, [mounted, connected]);
+    fetch("/api/pantry")
+      .then((res) => {
+        if (!res.ok) throw new Error("not authenticated");
+        return res.json();
+      })
+      .then((data: { items?: PantryItem[]; ingredient_ids?: string[] }) => {
+        setConnected(true);
+        const items = data?.items ?? [];
+        if (items.length > 0) {
+          setPantryItems(items);
+        } else {
+          const ids = Array.isArray(data?.ingredient_ids) ? data.ingredient_ids : [];
+          setPantryItems(ids.map((ingredient_id) => ({ ingredient_id, amount: null, unit: null })));
+        }
+      })
+      .catch(() => {
+        setConnected(false);
+        const ids = loadPantryIdsLocal();
+        setPantryItems(ids.map((ingredient_id) => ({ ingredient_id, amount: null, unit: null })));
+      });
+  }, [mounted]);
 
   const pantryIds = pantryItems.map((p) => p.ingredient_id);
 
@@ -188,8 +183,8 @@ export default function PantryPage() {
           </h2>
           <p className="text-xs text-amber-700 dark:text-amber-300">
             {connected
-              ? "What you have (synced from Todoist or added here). Add amount and unit for deduction when you mark meals prepared."
-              : "Ingredients you have. Connect Todoist in Shopping list to sync checked-off items."}
+              ? "What you have on hand. Add amount and unit for deduction when you mark meals prepared."
+              : "Ingredients you have on hand. Log in to sync across devices."}
           </p>
         </div>
         <Link

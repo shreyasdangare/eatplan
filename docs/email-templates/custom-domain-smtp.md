@@ -47,7 +47,7 @@ In the provider’s dashboard:
    | Field | Example | Notes |
    |-------|--------|--------|
    | **Sender email** | `noreply@yourdomain.com` | Must be an address on your verified domain. |
-   | **Sender name** | `काय खायचं?` or your app name | Shown as “From” name in inbox. |
+   | **Sender name** | `काय खायचं?` or "EatPlan" | Shown as “From” name in inbox. |
    | **Host** | `smtp.resend.com` (Resend) | From your provider’s SMTP docs. |
    | **Port** | `587` (TLS) or `465` (SSL) | Use the value your provider gives. |
    | **Username** | Your SMTP user / API key | Often an API key for Resend/SendGrid. |
@@ -135,7 +135,7 @@ If it stays “Pending”, wait a bit longer and try again. Double-check that ea
    | Field | Value to enter |
    |-------|----------------|
    | **Sender email** | `noreply@yourdomain.com` (must use the domain you verified in Resend) |
-   | **Sender name** | `काय खायचं?` or any name you want (e.g. “Meal planner”) |
+   | **Sender name** | `काय खायचं?` or any name you want (e.g. “EatPlan”) |
    | **Host** | `smtp.resend.com` |
    | **Port** | `465` |
    | **Username** | `resend` (literally the word “resend”) |

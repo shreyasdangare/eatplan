@@ -22,7 +22,7 @@ async function fetchPageText(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; JevanRecipeBot/1.0)"
+        "Mozilla/5.0 (compatible; EatPlanRecipeBot/1.0)"
     },
     signal: AbortSignal.timeout(15000)
   });

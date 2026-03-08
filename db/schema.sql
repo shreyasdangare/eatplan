@@ -1,4 +1,4 @@
--- Supabase / Postgres schema for Jevan
+-- Supabase / Postgres schema for EatPlan
 
 create table if not exists dishes (
   id uuid primary key default gen_random_uuid(),
@@ -47,20 +47,15 @@ create table if not exists meal_plans (
 
 create index if not exists idx_meal_plans_date on meal_plans (date);
 
--- Todoist connections and pantry (see migrations/005_todoist_pantry.sql)
-create table if not exists todoist_connections (
-  id uuid primary key default gen_random_uuid(),
-  access_token text not null unique,
-  project_id text,
-  created_at timestamptz not null default now()
-);
-
 create table if not exists pantry (
-  connection_id uuid not null references todoist_connections (id) on delete cascade,
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
   ingredient_id uuid not null references ingredients (id) on delete cascade,
   amount numeric,
-  unit text,
-  primary key (connection_id, ingredient_id)
+  unit text
 );
 
-create index if not exists idx_pantry_connection_id on pantry (connection_id);
+create unique index if not exists idx_pantry_user_ingredient
+  on pantry (user_id, ingredient_id);
+
+create index if not exists idx_pantry_user_id on pantry (user_id);

@@ -79,14 +79,6 @@ export default function ShoppingListPage() {
   const [showMealPlanModal, setShowMealPlanModal] = useState(false);
   const [mealPlanFrom, setMealPlanFrom] = useState("");
   const [mealPlanTo, setMealPlanTo] = useState("");
-  const [todoistOpen, setTodoistOpen] = useState(false);
-  const [todoistConnected, setTodoistConnected] = useState<boolean | null>(null);
-  const [todoistProjects, setTodoistProjects] = useState<{ id: string; name: string }[]>([]);
-  const [syncProjectId, setSyncProjectId] = useState("");
-  const [syncing, setSyncing] = useState(false);
-  const [pushing, setPushing] = useState(false);
-  const [pushResult, setPushResult] = useState<{ created: number; failed: number } | null>(null);
-  const [syncResult, setSyncResult] = useState<{ added: number; skipped: number } | null>(null);
 
   const loadList = useCallback(async () => {
     setLoading(true);
@@ -127,24 +119,6 @@ export default function ShoppingListPage() {
       .catch(() => setIngredients([]));
   }, []);
 
-  useEffect(() => {
-    fetch("/api/auth/todoist/status")
-      .then((r) => r.json())
-      .then(async (d: { connected: boolean; project_id?: string | null }) => {
-        setTodoistConnected(d.connected);
-        if (!d.connected) return;
-        const projRes = await fetch("/api/todoist/projects");
-        const projData = projRes.ok ? await projRes.json() : { projects: [] };
-        const projects = projData.projects ?? [];
-        if (projects.length) {
-          setTodoistProjects(projects);
-          const saved = d.project_id && projects.some((p: { id: string }) => p.id === d.project_id) ? d.project_id : null;
-          const shopping = projects.find((p: { name: string }) => /shopping|list|grocery/i.test(p.name));
-          setSyncProjectId((prev) => prev || saved || shopping?.id || projects[0].id);
-        }
-      })
-      .catch(() => setTodoistConnected(false));
-  }, []);
 
   const handleTap = useCallback(
     (item: ShoppingTileItem) => {
@@ -264,55 +238,6 @@ export default function ShoppingListPage() {
       .join("\n");
     if (text) void navigator.clipboard.writeText(text);
   }, [toBuy]);
-
-  const pushToTodoist = async () => {
-    if (toBuy.length === 0 || !syncProjectId) return;
-    setPushing(true);
-    setPushResult(null);
-    try {
-      const res = await fetch("/api/todoist/push", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to_buy: toBuy.map((i) => ({
-            ingredient_name: i.ingredient_name ?? i.custom_name ?? "Unknown",
-            quantity_display: i.quantity ?? "",
-          })),
-          project_id: syncProjectId,
-        }),
-      });
-      const data = res.ok ? await res.json() : null;
-      if (data) setPushResult({ created: data.created ?? 0, failed: data.failed ?? 0 });
-    } finally {
-      setPushing(false);
-    }
-  };
-
-  const syncFromTodoist = async () => {
-    if (!syncProjectId) return;
-    setSyncing(true);
-    setSyncResult(null);
-    try {
-      const res = await fetch("/api/pantry/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project_id: syncProjectId }),
-      });
-      const data = res.ok ? await res.json() : null;
-      if (data?.ok) setSyncResult({ added: data.added ?? 0, skipped: data.skipped ?? 0 });
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  const disconnectTodoist = async () => {
-    await fetch("/api/auth/todoist/disconnect", { method: "POST" });
-    setTodoistConnected(false);
-    setTodoistProjects([]);
-    setSyncProjectId("");
-    setSyncResult(null);
-    setPushResult(null);
-  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -465,89 +390,6 @@ export default function ShoppingListPage() {
         onDelete={handleDeleteItem}
       />
 
-      {/* Todoist: legacy / integrations (collapsible) */}
-      <div className="rounded-lg border border-stone-200 bg-stone-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/50">
-        <button
-          type="button"
-          onClick={() => setTodoistOpen((p) => !p)}
-          className="flex w-full items-center justify-between text-left text-xs font-semibold text-stone-600 dark:text-stone-400"
-        >
-          <span>Integrations (Todoist)</span>
-          <svg
-            className={`h-4 w-4 transition-transform ${todoistOpen ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {todoistOpen && (
-          <div className="mt-2 space-y-2 border-t border-stone-200 pt-2 dark:border-stone-600">
-            {todoistConnected === null ? (
-              <p className="text-xs text-stone-500">Checking…</p>
-            ) : todoistConnected ? (
-              <>
-                <p className="text-xs text-stone-600 dark:text-stone-400">
-                  Push list to Todoist or sync completed tasks into pantry.
-                </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    value={syncProjectId}
-                    onChange={(e) => setSyncProjectId(e.target.value)}
-                    className="rounded border border-stone-300 bg-white px-2 py-1.5 text-xs dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100"
-                  >
-                    {todoistProjects.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    disabled={pushing || toBuy.length === 0 || !syncProjectId}
-                    onClick={pushToTodoist}
-                    className="rounded-full bg-lime-500 px-3 py-1.5 text-xs font-medium text-lime-950 disabled:opacity-50 hover:bg-lime-400"
-                  >
-                    {pushing ? "Pushing…" : "Push to Todoist"}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={syncing || !syncProjectId}
-                    onClick={syncFromTodoist}
-                    className="rounded-full bg-amber-200 px-3 py-1.5 text-xs font-medium text-amber-900 disabled:opacity-50 hover:bg-amber-300"
-                  >
-                    {syncing ? "Syncing…" : "Sync from Todoist"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={disconnectTodoist}
-                    className="rounded-full border border-stone-300 px-3 py-1.5 text-xs text-stone-700 dark:border-stone-600 dark:text-stone-300"
-                  >
-                    Disconnect
-                  </button>
-                </div>
-                {syncResult !== null && (
-                  <p className="text-[11px] text-stone-600 dark:text-stone-400">
-                    Added {syncResult.added} to pantry, {syncResult.skipped} not matched.
-                  </p>
-                )}
-                {pushResult !== null && (
-                  <p className="text-[11px] text-stone-600 dark:text-stone-400">
-                    {pushResult.created > 0 && `${pushResult.created} item(s) added to Todoist. `}
-                    {pushResult.failed > 0 && `${pushResult.failed} failed.`}
-                  </p>
-                )}
-              </>
-            ) : (
-              <a
-                href="/api/auth/todoist"
-                className="inline-block rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-400 dark:bg-orange-600"
-              >
-                Sign in with Todoist
-              </a>
-            )}
-          </div>
-        )}
-      </div>
     </section>
   );
 }

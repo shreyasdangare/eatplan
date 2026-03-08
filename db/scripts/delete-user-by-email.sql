@@ -11,7 +11,7 @@
 -- dish-images bucket use: npm run delete-user -- user@example.com
 --
 -- This script removes the user from auth; your public tables (dishes, meal_plans,
--- favorites, todoist_connections, pantry) cascade automatically. If the user has
+-- favorites, pantry) cascade automatically. If the user has
 -- objects in Storage, auth delete may fail—use the npm script to clear storage first.
 
 do $$
