@@ -2,23 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  @apply min-h-screen;
-  overflow-x: hidden;
-}
-
-/* Improve tap highlight on mobile */
-@media (hover: none) {
-  a, button {
-    -webkit-tap-highlight-color: rgba(249, 115, 22, 0.15);
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased selection:bg-orange-200 selection:text-orange-900 transition-colors duration-300;
+  }
+  
+  .dark body {
+     @apply bg-stone-950 text-stone-100 selection:bg-orange-900 selection:text-orange-100;
   }
 }
 
-/* Prevent iOS zoom on input focus (font-size >= 16px) and improve touch targets */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+/* The original body styles are replaced by the @layer base block */
+/* The original .dark body styles are replaced by the @layer base block */
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
+  }
+
+  /* Custom Premium Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-stone-300/80 rounded-full border-[2px] border-solid border-transparent bg-clip-padding hover:bg-stone-400 dark:bg-stone-700/80 dark:hover:bg-stone-500;
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+     @apply bg-stone-700/80 border-transparent bg-clip-padding hover:bg-stone-600;
+  }
+
+  /* Remove arrows from number inputs */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+/* Improve tap highlight on mobile & prevent unneeded outlines on touch */
+@media (hover: none) {
+  a, button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Prevent iOS zoom on input focus */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -26,6 +66,7 @@ input[type="number"],
 input[type="search"],
 textarea {
   font-size: 16px;
+  @apply transition-colors duration-200;
 }
 @media (min-width: 640px) {
   input[type="text"],

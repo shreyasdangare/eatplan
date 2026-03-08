@@ -1,6 +1,7 @@
- "use client";
+"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Search } from "lucide-react";
 
 export type IngredientOption = {
   id: string;
@@ -32,7 +33,7 @@ type LocalSuggestion = {
 
 export function IngredientAutocompleteInput({
   label = "Ingredients",
-  placeholder = "Add new ingredient (e.g., tomato)",
+  placeholder = "Search or add ingredient...",
   ingredients,
   value,
   onChange,
@@ -104,8 +105,7 @@ export function IngredientAutocompleteInput({
       .map((m) => ({
         type: "existing" as const,
         ingredient: { id: m.id, name: m.name },
-        label:
-          m.score >= 0.9 ? `Did you mean: ${m.name}?` : m.name
+        label: m.score >= 0.9 ? `Did you mean: ${m.name}?` : m.name
       }));
 
     const matches = [...localMatches, ...remoteSuggestions];
@@ -119,12 +119,12 @@ export function IngredientAutocompleteInput({
     if (!exactMatch) {
       items.push({
         type: "create",
-        label: `Create new ingredient: "${value.trim()}"`
+        label: `Create new: "${value.trim()}"`
       });
     }
 
     return items;
-  }, [ingredients, value]);
+  }, [ingredients, value, remoteMatches]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -196,37 +196,42 @@ export function IngredientAutocompleteInput({
   };
 
   return (
-    <div className="space-y-2" ref={containerRef}>
-      <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-amber-800 dark:text-amber-200">{label}</label>
-      </div>
+    <div className="space-y-1.5" ref={containerRef}>
+      {label && (
+        <label className="text-sm font-bold text-stone-700 dark:text-stone-300">
+          {label}
+        </label>
+      )}
       <div className="relative">
-        <input
-          className="w-full rounded-lg border border-orange-300 bg-white px-3 py-2 text-xs shadow-sm placeholder:text-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-500"
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => {
-            onChange(e.target.value);
-            setIsOpen(true);
-            setActiveIndex(null);
-          }}
-          onFocus={() => {
-            if (value.trim()) {
+        <div className="relative flex items-center">
+          <Search className="absolute left-3.5 h-4 w-4 text-stone-400" />
+          <input
+            className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 pl-10 pr-4 py-3 text-sm text-stone-900 shadow-sm transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800 disabled:opacity-60"
+            placeholder={placeholder}
+            value={value}
+            onChange={(e) => {
+              onChange(e.target.value);
               setIsOpen(true);
-            }
-          }}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-controls={listboxId}
-          aria-autocomplete="list"
-        />
+              setActiveIndex(null);
+            }}
+            onFocus={() => {
+              if (value.trim()) {
+                setIsOpen(true);
+              }
+            }}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            role="combobox"
+            aria-expanded={isOpen}
+            aria-controls={listboxId}
+            aria-autocomplete="list"
+          />
+        </div>
         {isOpen && suggestions.length > 0 && (
           <ul
             id={listboxId}
             role="listbox"
-            className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-orange-200 bg-white text-xs shadow-lg dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            className="absolute z-10 mt-2 max-h-56 w-full overflow-auto rounded-xl border border-stone-200 bg-white p-1.5 text-sm shadow-xl dark:border-stone-700 dark:bg-stone-800"
           >
             {suggestions.map((item, index) => {
               const isActive = index === activeIndex;
@@ -235,10 +240,10 @@ export function IngredientAutocompleteInput({
                   key={`${item.type}-${item.ingredient?.id ?? "create"}`}
                   role="option"
                   aria-selected={isActive}
-                  className={`cursor-pointer px-3 py-1.5 ${
+                  className={`cursor-pointer rounded-lg px-3 py-2 transition-colors ${
                     isActive
-                      ? "bg-orange-100 text-orange-900 dark:bg-stone-600 dark:text-stone-100"
-                      : "text-stone-800 hover:bg-orange-50 dark:text-stone-200 dark:hover:bg-stone-700"
+                      ? "bg-orange-50 font-medium text-orange-900 dark:bg-stone-700 dark:text-stone-100"
+                      : "text-stone-700 hover:bg-stone-50 dark:text-stone-300 dark:hover:bg-stone-700/50"
                   }`}
                   onMouseDown={(e) => {
                     e.preventDefault();

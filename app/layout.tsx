@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { HeaderTitle } from "./components/HeaderTitle";
@@ -8,6 +9,8 @@ import { DarkModeToggle } from "./components/DarkModeToggle";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+
+const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "EatPlan – काय खायचं?",
@@ -29,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={outfit.className}>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -39,53 +42,55 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <AuthCodeExchange />
           </Suspense>
-          <div className="mx-auto flex min-h-screen min-w-0 max-w-3xl flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 px-4 py-4 text-stone-900 dark:from-stone-900 dark:via-stone-900 dark:to-stone-800 dark:text-stone-100 sm:px-6 lg:max-w-5xl lg:px-10 lg:py-6">
-            <header className="mb-4 border-b border-orange-200/70 pb-4 dark:border-stone-700 sm:mb-6 lg:mb-8 lg:pb-6">
+          <div className="mx-auto flex min-h-screen min-w-0 max-w-4xl flex-col px-4 py-4 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
+            <header className="sticky top-2 z-50 mb-6 rounded-2xl glass-panel px-4 py-3 sm:mb-8 lg:mb-10 transition-all duration-300">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <HeaderTitle />
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <nav
-                    className="flex flex-wrap gap-1 sm:gap-2 text-sm"
+                    className="flex flex-wrap gap-1 sm:gap-1.5 text-sm"
                     aria-label="Main navigation"
                   >
                     <a
                       href="/recipes"
                       title="Browse and manage your recipe collection"
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
+                      className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-orange-500/10 hover:text-orange-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-orange-500/20 dark:hover:text-orange-300"
                     >
                       Recipes
                     </a>
                     <a
                       href="/plan"
                       title="Assign recipes to days and meals (breakfast, lunch, dinner)"
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
+                      className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-amber-500/10 hover:text-amber-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-amber-500/20 dark:hover:text-amber-300"
                     >
                       This week
                     </a>
                     <a
                       href="/shopping-list"
                       title="Pick recipes and get one combined grocery list"
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
+                      className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-rose-500/10 hover:text-rose-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-rose-500/20 dark:hover:text-rose-300"
                     >
                       Shopping list
                     </a>
                     <a
                       href="/pantry"
                       title="Ingredients you always have at home"
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
+                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-lime-500/10 hover:text-lime-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-lime-500/20 dark:hover:text-lime-300"
                     >
                       Pantry
                     </a>
                     <a
                       href="/what-can-i-cook"
                       title="Enter what you have and see matching recipes"
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
+                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-emerald-500/10 hover:text-emerald-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-300"
                     >
-                      What can I cook?
+                      Cook?
                     </a>
                   </nav>
-                  <DarkModeToggle />
-                  <AuthLinks />
+                  <div className="flex shrink-0 items-center justify-center border-l pl-2 border-stone-200 dark:border-stone-700">
+                    <DarkModeToggle />
+                    <AuthLinks />
+                  </div>
                 </div>
               </div>
             </header>

@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,6 +6,7 @@ import {
   IngredientAutocompleteInput,
   IngredientOption
 } from "../../components/IngredientAutocompleteInput";
+import { Link as LinkIcon, Camera, Plus, Save, ChefHat, Clock, Users, Tags } from "lucide-react";
 
 type Ingredient = {
   id: string;
@@ -200,89 +201,153 @@ export default function NewDishPage() {
     }
   };
 
+  const inputClasses = "w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 shadow-sm transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800";
+  const labelClasses = "mb-1.5 block text-sm font-bold text-stone-700 dark:text-stone-300";
+
   return (
-    <section className="space-y-4">
-      <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
-        Add dish
-      </h2>
-
-      <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
-        <h3 className="mb-2 text-xs font-semibold text-amber-800 dark:text-amber-200">
-          Import from recipe URL or YouTube
-        </h3>
-        <form onSubmit={handleImport} className="space-y-2">
-          <input
-            type="url"
-            placeholder="https://example.com/recipe or https://youtube.com/watch?v=..."
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-            value={importUrl}
-            onChange={(e) => setImportUrl(e.target.value)}
-            disabled={importing}
-          />
-          {importError && (
-            <p className="text-xs text-red-600 dark:text-red-400">{importError}</p>
-          )}
-          <button
-            type="submit"
-            disabled={importing || !importUrl.trim()}
-            className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm disabled:opacity-50 hover:bg-amber-400 dark:bg-amber-600 dark:hover:bg-amber-500"
-          >
-            {importing ? "Importing…" : "Import recipe"}
-          </button>
-        </form>
-
-        <h3 className="mb-2 mt-4 text-xs font-semibold text-amber-800 dark:text-amber-200">
-          Import from screenshot
-        </h3>
-        <form onSubmit={handleImportScreenshot} className="space-y-2">
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="w-full text-sm text-stone-600 file:mr-2 file:rounded-full file:border-0 file:bg-amber-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-950 file:hover:bg-amber-400 dark:text-stone-300 dark:file:bg-amber-600 dark:file:hover:bg-amber-500"
-            onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
-            disabled={importing}
-          />
-          {importError && (
-            <p className="text-xs text-red-600 dark:text-red-400">{importError}</p>
-          )}
-          <button
-            type="submit"
-            disabled={importing || !importScreenshotFile}
-            className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm disabled:opacity-50 hover:bg-amber-400 dark:bg-amber-600 dark:hover:bg-amber-500"
-          >
-            {importing ? "Importing…" : "Import from screenshot"}
-          </button>
-        </form>
+    <section className="mx-auto max-w-3xl space-y-8 pb-12">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+          <Plus className="h-6 w-6" strokeWidth={2.5} />
+        </div>
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-3xl">
+            Add a new recipe
+          </h1>
+          <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">
+            Import from anywhere or enter details manually.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">Name</label>
-          <input
-            required
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+      {/* Import Section */}
+      <div className="rounded-[2rem] glass-panel p-6 sm:p-8">
+        <div className="mb-6 flex items-center gap-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+            Auto-Import Magic
+          </h2>
+          <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-700" />
         </div>
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
-            Description
-          </label>
-          <textarea
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-            rows={2}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+        
+        <div className="grid gap-6 sm:grid-cols-2">
+          {/* URL Import */}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
+                <LinkIcon className="h-4 w-4 text-stone-400" />
+                From URL or YouTube
+              </h3>
+              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                Paste a link and we'll extract the recipe.
+              </p>
+            </div>
+            <form onSubmit={handleImport} className="space-y-3">
+              <input
+                type="url"
+                placeholder="https://..."
+                className={inputClasses}
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                disabled={importing}
+              />
+              <button
+                type="submit"
+                disabled={importing || !importUrl.trim()}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+              >
+                 {importing ? "Importing…" : "Extract Recipe"}
+              </button>
+            </form>
+          </div>
+
+          {/* Screenshot Import */}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
+                <Camera className="h-4 w-4 text-stone-400" />
+                From Screenshot
+              </h3>
+              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                Upload an image of a recipe page or cookbook.
+              </p>
+            </div>
+            <form onSubmit={handleImportScreenshot} className="space-y-3">
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="w-full rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-200 file:px-4 file:py-1.5 file:font-semibold file:text-stone-700 hover:file:bg-stone-300 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-400 dark:file:bg-stone-700 dark:file:text-stone-300 dark:hover:file:bg-stone-600"
+                onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
+                disabled={importing}
+              />
+              <button
+                type="submit"
+                disabled={importing || !importScreenshotFile}
+                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+              >
+                {importing ? "Importing…" : "Scan Image"}
+              </button>
+            </form>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <div className="space-y-1 flex-1">
-            <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
-              Meal type
+        
+        {importError && (
+          <div className="mt-4 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-800 dark:bg-red-950/30 dark:text-red-400 flex items-start gap-3 border border-red-100 dark:border-red-900/50">
+             <div className="mt-0.5 rounded-full bg-red-100 p-1 dark:bg-red-900/50">
+                 <svg className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+             </div>
+             <div>
+                <p className="font-bold">Import failed</p>
+                <p className="mt-1 opacity-90">{importError}</p>
+             </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-700" />
+        <span className="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500">
+          Or Enter Manually
+        </span>
+        <div className="h-px flex-1 bg-gradient-to-l from-stone-200 to-transparent dark:from-stone-700" />
+      </div>
+
+      {/* Manual Form */}
+      <form onSubmit={handleSubmit} className="space-y-8 rounded-[2rem] glass-panel p-6 sm:p-8">
+        
+        {/* Basic Info */}
+        <div className="space-y-5">
+          <div>
+            <label className={labelClasses}>Recipe Name</label>
+            <input
+              required
+              placeholder="e.g. Nonna's Spaghetti Bolognese"
+              className={inputClasses}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelClasses}>
+              Description <span className="text-stone-400 font-normal">(Optional)</span>
+            </label>
+            <textarea
+              placeholder="A brief summary of this delicious dish..."
+              className={`${inputClasses} resize-none`}
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Metadata Grid */}
+        <div className="grid gap-5 sm:grid-cols-3">
+          <div>
+            <label className={`${labelClasses} flex items-center gap-2`}>
+              <ChefHat className="h-4 w-4 text-stone-400" /> Meal Type
             </label>
             <select
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              className={inputClasses}
               value={mealType}
               onChange={(e) => setMealType(e.target.value)}
             >
@@ -291,158 +356,183 @@ export default function NewDishPage() {
               <option value="both">Both</option>
             </select>
           </div>
-          <div className="space-y-1 w-28">
-            <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
-              Prep time (min)
+          <div>
+            <label className={`${labelClasses} flex items-center gap-2`}>
+              <Clock className="h-4 w-4 text-stone-400" /> Prep Time
             </label>
-            <input
-              type="number"
-              min={0}
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-              value={prepTime}
-              onChange={(e) => setPrepTime(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                type="number"
+                min={0}
+                placeholder="45"
+                className={inputClasses}
+                value={prepTime}
+                onChange={(e) => setPrepTime(e.target.value)}
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-400">min</span>
+            </div>
           </div>
-          <div className="space-y-1 w-24">
-            <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
-              Servings
+          <div>
+            <label className={`${labelClasses} flex items-center gap-2`}>
+              <Users className="h-4 w-4 text-stone-400" /> Servings
             </label>
             <input
               type="number"
               min={1}
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              placeholder="4"
+              className={inputClasses}
               value={servings}
               onChange={(e) => setServings(e.target.value)}
-              placeholder="e.g. 2"
             />
           </div>
         </div>
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-amber-800 dark:text-amber-200">
-            Tags (comma separated)
+
+        <div>
+          <label className={`${labelClasses} flex items-center gap-2`}>
+            <Tags className="h-4 w-4 text-stone-400" /> Tags
           </label>
           <input
-            className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm shadow-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            placeholder="e.g. spicy, vegan, quick (comma separated)"
+            className={inputClasses}
             value={tags}
             onChange={(e) => setTags(e.target.value)}
           />
         </div>
-        <div className="space-y-2">
-          <IngredientAutocompleteInput
-            label="Ingredients"
-            ingredients={ingredientOptions}
-            value={newIngredientName}
-            onChange={setNewIngredientName}
-            onSelectExisting={(ingredient) => {
-              addIngredientToSelection(ingredient.id);
-            }}
-            onCreateNew={(name) => {
-              if (!addingIngredient) {
-                handleAddIngredient(name);
-              }
-            }}
-            disabled={addingIngredient}
-          />
-          <div className="flex flex-wrap gap-1.5">
-            {ingredients.map((ing) => {
-              const selected = selectedIngredients.some(
-                (s) => s.ingredient_id === ing.id
-              );
-              return (
-                <button
-                  type="button"
-                  key={ing.id}
-                  onClick={() => toggleIngredient(ing.id)}
-                  className={`rounded-full px-3 py-1 text-xs ${
-                    selected
-                      ? "bg-lime-400 text-lime-950 shadow-sm dark:bg-lime-600 dark:text-lime-100"
-                      : "bg-orange-100 text-orange-900 dark:bg-stone-700 dark:text-stone-200"
-                  }`}
-                >
-                  {ing.name}
-                </button>
-              );
-            })}
-          </div>
-          {selectedIngredients.length > 0 && (
-            <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800/80">
-              {selectedIngredients.map((sel) => {
-                const ing = ingredients.find(
-                  (i) => i.id === sel.ingredient_id
+
+        <div className="h-px w-full bg-stone-200 dark:bg-stone-700" />
+
+        {/* Ingredients Builder */}
+        <div className="space-y-6">
+          <div className="space-y-4 rounded-2xl bg-stone-50/50 p-5 dark:bg-stone-900/50 border border-stone-200/50 dark:border-stone-700/50">
+            <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">
+               Build Ingredient List
+            </h3>
+            <div className="max-w-md">
+              <IngredientAutocompleteInput
+                label=""
+                ingredients={ingredientOptions}
+                value={newIngredientName}
+                onChange={setNewIngredientName}
+                onSelectExisting={(ingredient) => {
+                  addIngredientToSelection(ingredient.id);
+                }}
+                onCreateNew={(name) => {
+                  if (!addingIngredient) {
+                    handleAddIngredient(name);
+                  }
+                }}
+                disabled={addingIngredient}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              {ingredients.map((ing) => {
+                const selected = selectedIngredients.some(
+                  (s) => s.ingredient_id === ing.id
                 );
-                if (!ing) return null;
                 return (
-                  <div
-                    key={sel.ingredient_id}
-                    className="flex flex-wrap items-center gap-2 text-xs"
+                  <button
+                    type="button"
+                    key={ing.id}
+                    onClick={() => toggleIngredient(ing.id)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 border ${
+                      selected
+                        ? "bg-emerald-500 text-white border-emerald-600 shadow-sm dark:bg-emerald-600 dark:border-emerald-500"
+                        : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
+                    }`}
                   >
-                    <span className="w-28 truncate">{ing.name}</span>
-                    <input
-                      placeholder="Qty (e.g. 2 cups)"
-                      className="min-w-[80px] flex-1 rounded border border-orange-200 bg-white px-2 py-1 text-xs dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-                      value={sel.quantity}
-                      onChange={(e) =>
-                        updateIngredient(
-                          sel.ingredient_id,
-                          "quantity",
-                          e.target.value
-                        )
-                      }
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      step="any"
-                      placeholder="Amt"
-                      className="w-16 rounded border border-orange-200 bg-white px-2 py-1 text-xs dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-                      value={sel.amount ?? ""}
-                      onChange={(e) =>
-                        updateIngredient(
-                          sel.ingredient_id,
-                          "amount",
-                          e.target.value === "" ? null : Number(e.target.value)
-                        )
-                      }
-                    />
-                    <input
-                      placeholder="Unit"
-                      className="w-14 rounded border border-orange-200 bg-white px-2 py-1 text-xs dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-                      value={sel.unit}
-                      onChange={(e) =>
-                        updateIngredient(
-                          sel.ingredient_id,
-                          "unit",
-                          e.target.value
-                        )
-                      }
-                    />
-                    <label className="flex items-center gap-1 text-[11px] text-amber-800 dark:text-amber-200">
-                      <input
-                        type="checkbox"
-                        checked={sel.is_optional}
-                        onChange={(e) =>
-                          updateIngredient(
-                            sel.ingredient_id,
-                            "is_optional",
-                            e.target.checked
-                          )
-                        }
-                      />
-                      Optional
-                    </label>
-                  </div>
+                    {ing.name}
+                  </button>
                 );
               })}
             </div>
+          </div>
+
+          {selectedIngredients.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 mb-2">
+                Selected Ingredients Details
+              </h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {selectedIngredients.map((sel) => {
+                  const ing = ingredients.find((i) => i.id === sel.ingredient_id);
+                  if (!ing) return null;
+                  return (
+                    <div
+                      key={sel.ingredient_id}
+                      className="group flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800 dark:hover:border-orange-500"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
+                          {ing.name}
+                        </span>
+                        <label className="flex items-center gap-2 text-xs font-medium text-stone-500 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
+                          <input
+                            type="checkbox"
+                            checked={sel.is_optional}
+                            onChange={(e) =>
+                              updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
+                            }
+                            className="rounded border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                          />
+                          Optional
+                        </label>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                         <input
+                          placeholder="Display Text (e.g. '2 cups diced')"
+                          className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                          value={sel.quantity}
+                          onChange={(e) =>
+                            updateIngredient(sel.ingredient_id, "quantity", e.target.value)
+                          }
+                        />
+                         <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <input
+                              type="number"
+                              min={0}
+                              step="any"
+                              placeholder="Amt"
+                              className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                              value={sel.amount ?? ""}
+                              onChange={(e) =>
+                                updateIngredient(
+                                  sel.ingredient_id,
+                                  "amount",
+                                  e.target.value === "" ? null : Number(e.target.value)
+                                )
+                              }
+                            />
+                            <input
+                              placeholder="Unit"
+                              className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                              value={sel.unit}
+                              onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
+                            />
+                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm disabled:opacity-60 hover:bg-lime-400 dark:bg-lime-600 dark:hover:bg-lime-500"
-        >
-          {loading ? "Saving…" : "Save dish"}
-        </button>
+        
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-500 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+          >
+            {loading ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+            ) : (
+              <Save className="h-5 w-5 transition-transform group-hover:scale-110" />
+            )}
+            <span>{loading ? "Saving Dish…" : "Save Dish"}</span>
+          </button>
+        </div>
       </form>
     </section>
   );
