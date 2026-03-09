@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { getSession } from "@/lib/supabaseServerClient";
 import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
 import { MarkHomeVisited } from "./components/MarkHomeVisited";
+import { WeeklyPlanOverview } from "./components/WeeklyPlanOverview";
 import { BookOpen, CalendarHeart, ShoppingCart, Archive, Sparkles } from "lucide-react";
 
 const features = [
@@ -77,12 +78,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       )}
       {user && (
-        <>
+        <div className="flex flex-col gap-8">
           {isFirstVisit && <MarkHomeVisited />}
           <p className="rounded-xl glass-panel px-4 py-3 text-center text-sm font-medium text-orange-900 dark:text-orange-200">
             👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
           </p>
-        </>
+          
+          <Suspense fallback={<div className="h-64 rounded-[2rem] glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
+            <WeeklyPlanOverview />
+          </Suspense>
+        </div>
       )}
       
       {/* Hero */}
