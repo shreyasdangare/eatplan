@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Download, X } from "lucide-react";
 
 const DISMISS_KEY = "pwa-install-dismissed";
+const VISITS_KEY = "pwa-install-visits";
 
 function isIOS(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -19,9 +21,10 @@ function isStandalone(): boolean {
 
 export function InstallPrompt() {
   const [mounted, setMounted] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(true); // default true to prevent hydration mismatch flash
   const [deferredPrompt, setDeferredPrompt] = useState<{ prompt: () => Promise<{ outcome: string }> } | null>(null);
   const [showAndroidInstall, setShowAndroidInstall] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -29,8 +32,25 @@ export function InstallPrompt() {
 
   useEffect(() => {
     if (!mounted) return;
-    const wasDismissed = sessionStorage.getItem(DISMISS_KEY) === "1";
+    const wasDismissed = localStorage.getItem(DISMISS_KEY) === "1";
+    
+    // Track visits to "ease off" if they just ignore it
+    const visitsString = localStorage.getItem(VISITS_KEY) || "0";
+    const visits = parseInt(visitsString, 10);
+    localStorage.setItem(VISITS_KEY, (visits + 1).toString());
+
     setDismissed(wasDismissed);
+
+    // If it's not dismissed, maybe they've seen it 3+ times? We can ease off by not showing it.
+    // For now, if they haven't explicitly dismissed it, we'll show it but with a delay.
+    if (!wasDismissed) {
+      // Delay prompt to not be too aggressive immediately on load
+      const delay = visits === 0 ? 2500 : 5000; // 2.5s on first visit, 5s on subsequent visits
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, delay);
+      return () => clearTimeout(timer);
+    }
   }, [mounted]);
 
   useEffect(() => {
@@ -46,8 +66,11 @@ export function InstallPrompt() {
   }, [mounted, dismissed]);
 
   const handleDismiss = () => {
-    setDismissed(true);
-    sessionStorage.setItem(DISMISS_KEY, "1");
+    setIsVisible(false);
+    setTimeout(() => {
+      setDismissed(true);
+      localStorage.setItem(DISMISS_KEY, "1");
+    }, 300); // Wait for transition
   };
 
   const handleAndroidInstall = async () => {
@@ -55,6 +78,7 @@ export function InstallPrompt() {
       await deferredPrompt.prompt();
       setShowAndroidInstall(false);
       setDeferredPrompt(null);
+      handleDismiss();
     }
   };
 
@@ -67,46 +91,61 @@ export function InstallPrompt() {
     <div
       role="status"
       aria-label="Install app hint"
-      className="mx-auto mb-4 flex max-w-3xl items-start gap-3 rounded-xl border border-orange-200/80 bg-orange-50/90 px-4 py-3 shadow-sm dark:border-stone-600 dark:bg-stone-800/90 sm:px-4 lg:max-w-5xl"
+      className={`fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-sm transition-all duration-500 ease-out sm:bottom-6 sm:left-auto sm:right-6 ${
+        isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"
+      }`}
     >
-      <div className="flex-1 min-w-0">
-        {ios ? (
-          <p className="text-sm text-orange-900 dark:text-orange-200">
-            Install this app: tap the Share button{" "}
-            <span aria-hidden className="inline-block font-bold">
-              ⎋
-            </span>{" "}
-            then &quot;Add to Home Screen&quot;{" "}
-            <span aria-hidden className="inline-block font-bold">
-              ➕
-            </span>
-            .
-          </p>
-        ) : showAndroidInstall ? (
-          <p className="text-sm text-orange-900">
-            Add this app to your home screen for quick access.
-          </p>
-        ) : null}
+      <div className="glass-panel relative flex flex-col gap-3 rounded-2xl p-5 shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
+        <button
+          type="button"
+          onClick={handleDismiss}
+          aria-label="Dismiss install hint"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-stone-400 opacity-70 transition-all hover:bg-stone-100 hover:text-stone-700 hover:opacity-100 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="flex items-start gap-4 pr-6">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-500/20">
+            <Download className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Get the App
+            </h3>
+            {ios ? (
+              <p className="text-xs leading-relaxed text-stone-600 dark:text-stone-400">
+                Install EatPlan for quick access. Tap the Share button{" "}
+                <span aria-hidden className="inline-block font-bold">⎋</span>{" "}
+                then &quot;Add to Home Screen&quot;.
+              </p>
+            ) : showAndroidInstall ? (
+              <p className="text-xs leading-relaxed text-stone-600 dark:text-stone-400">
+                Install EatPlan on your device for the best meal planning experience.
+              </p>
+            ) : null}
+          </div>
+        </div>
+
         {showAndroidInstall && (
-          <div className="mt-2">
+          <div className="mt-1 flex gap-2">
             <button
               type="button"
               onClick={handleAndroidInstall}
-              className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 active:opacity-90 dark:bg-orange-500 dark:hover:bg-orange-600"
+              className="flex-1 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-500"
             >
-              Install app
+              Install App
+            </button>
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="px-4 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:text-stone-800 dark:hover:text-stone-200"
+            >
+              Later
             </button>
           </div>
         )}
       </div>
-      <button
-        type="button"
-        onClick={handleDismiss}
-        aria-label="Dismiss install hint"
-        className="shrink-0 rounded-full p-1.5 text-orange-600 hover:bg-orange-100 active:opacity-80 dark:text-orange-400 dark:hover:bg-stone-700"
-      >
-        <span aria-hidden>×</span>
-      </button>
     </div>
   );
 }
