@@ -15,6 +15,7 @@ function SignupForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [preferredName, setPreferredName] = useState("");
+  const [nativeLanguage, setNativeLanguage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
@@ -36,6 +37,7 @@ function SignupForm() {
       setError("Please enter what we should call you.");
       return;
     }
+    const lang = nativeLanguage.trim();
     setLoading(true);
     try {
       const supabase = await getSupabaseClient();
@@ -43,7 +45,7 @@ function SignupForm() {
         email: email.trim(),
         password,
         options: {
-          data: { preferred_name: name },
+          data: { preferred_name: name, native_language: lang || undefined },
         },
       });
       if (err) {
@@ -146,6 +148,19 @@ function SignupForm() {
             onChange={(e) => setPreferredName(e.target.value)}
             required
             minLength={1}
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="native_language" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+            Native Language (for translations) <span className="text-stone-400 dark:text-stone-500 font-normal">Optional</span>
+          </label>
+          <input
+            id="native_language"
+            type="text"
+            placeholder="e.g. Marathi, Hindi, Spanish"
+            value={nativeLanguage}
+            onChange={(e) => setNativeLanguage(e.target.value)}
             className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>

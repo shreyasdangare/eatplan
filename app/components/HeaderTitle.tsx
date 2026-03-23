@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 
 export function HeaderTitle() {
@@ -17,13 +17,7 @@ export function HeaderTitle() {
       href="/"
       className="flex items-center gap-2 shrink-0 hover:opacity-90"
     >
-      <Image
-        src="/logo.png"
-        alt="EatPlan"
-        width={40}
-        height={40}
-        className="h-10 w-10 rounded-lg object-contain"
-      />
+      <Logo className="h-10 w-10 shrink-0 drop-shadow-sm transition-transform group-hover:scale-105" />
       <div className="flex flex-col">
         <h1 className="text-xl font-semibold tracking-tight text-orange-900 dark:text-orange-200 sm:text-2xl leading-tight">
           EatPlan

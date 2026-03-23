@@ -25,7 +25,7 @@
 | UI         | React 18, Tailwind CSS, mobile-first layout |
 | Backend    | Next.js Route Handlers under `app/api` |
 | Database   | Supabase (Postgres) — dishes, ingredients, meal plans, pantry, auth |
-| Optional   | Google AI (Gemini) for recipe import; Unsplash for auto dish images |
+| Optional   | Google AI (Gemini) for recipe import; Spoonacular for auto dish images |
 
 ---
 
@@ -79,7 +79,7 @@ Create `.env.local` in the project root (see [DEPLOYMENT.md](DEPLOYMENT.md) for 
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes (multi-user) | Same as `SUPABASE_URL` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (multi-user) | Supabase anon key (client auth) |
 | `GOOGLE_GEMINI_API_KEY` | For recipe import | Google AI Studio key (URL/screenshot/YouTube import) |
-| `UNSPLASH_ACCESS_KEY` | Optional | Auto dish image when importing recipe |
+| `SPOONACULAR_API_KEY` | Optional | Auto dish image when importing recipe |
 | `NEXT_PUBLIC_APP_URL` | Optional (production) | Canonical app URL (e.g. `https://eatplan.app`) so favicon and PWA icons load the logo correctly |
 
 `.env.local` is gitignored; do not commit secrets.
@@ -121,7 +121,7 @@ The app is built for **Vercel** and **Supabase**:
 1. **Supabase** — Create project, run schema + migrations, create `dish-images` bucket, configure Auth (e.g. Email provider for multi-user).
 2. **Vercel** — Import repo, set environment variables (same as above), deploy. Custom domain (e.g. eatplan.app) can be added in Vercel.
 
-Full steps, API key restrictions, and optional integrations (Gemini, Unsplash) are in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+Full steps, API key restrictions, and optional integrations (Gemini, Spoonacular) are in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ---
 

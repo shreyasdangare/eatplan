@@ -6,14 +6,7 @@ export const size = {
 };
 export const contentType = "image/png";
 
-function getBaseUrl() {
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
-}
-
 export default function Icon() {
-  const base = getBaseUrl();
   return new ImageResponse(
     (
       <div
@@ -24,16 +17,31 @@ export default function Icon() {
           alignItems: "center",
           justifyContent: "center",
           background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%)",
-          borderRadius: "24%",
         }}
       >
-        <img
-          src={`${base}/logo.png`}
-          width={512}
-          height={512}
-          style={{ objectFit: "contain", borderRadius: "24%" }}
-          alt=""
-        />
+        <svg viewBox="0 0 120 120" width="75%" height="75%" fill="none">
+          <path
+            d="M20 85 C20 45, 45 25, 60 25 C75 25, 100 45, 100 85 Z"
+            fill="#f97316"
+          />
+          <path
+            d="M10 88 C10 85, 12 83, 15 83 L105 83 C108 83, 110 85, 110 88 C110 91.3, 107.5 94, 104 94 L16 94 C12.5 94, 10 91.3, 10 88 Z"
+            fill="#292524"
+          />
+          <circle cx="60" cy="18" r="8" fill="#292524" />
+          <path
+            d="M26 80 C26 50, 42 33, 60 28 C41 33, 31 52, 31 80 Z"
+            fill="white"
+            fillOpacity="0.35"
+          />
+          <path
+            d="M26 80 A 34 34 0 0 1 60 40 A 34 34 0 0 1 94 80"
+            stroke="white"
+            strokeOpacity="0.15"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
       </div>
     ),
     { ...size }

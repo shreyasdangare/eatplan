@@ -30,10 +30,11 @@ export type SessionUser = {
   id: string;
   email?: string;
   preferred_name?: string;
+  native_language?: string;
   has_visited_home?: boolean;
 };
 
-type UserMetadata = { preferred_name?: string; has_visited_home?: boolean };
+type UserMetadata = { preferred_name?: string; native_language?: string; has_visited_home?: boolean };
 
 export async function getSession(): Promise<{
   user: SessionUser | null;
@@ -53,6 +54,7 @@ export async function getSession(): Promise<{
         id: raw.id,
         email: raw.email ?? undefined,
         preferred_name: meta.preferred_name ?? undefined,
+        native_language: meta.native_language ?? undefined,
         has_visited_home: meta.has_visited_home === true,
       }
     : null;

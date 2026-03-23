@@ -1,4 +1,4 @@
-import { supabaseServer } from "@/lib/supabaseServer";
+import { createClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { Sun, Utensils, Moon, Plus, CheckCircle2, ChefHat, CalendarPlus } from "lucide-react";
 
@@ -37,7 +37,7 @@ function getWeekDates(weekStart: Date) {
 }
 
 export async function WeeklyPlanOverview() {
-  const supabase = supabaseServer;
+  const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return null;
 

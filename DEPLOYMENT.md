@@ -46,7 +46,7 @@ Recipe import (from URL, screenshot, or YouTube) requires `GOOGLE_GEMINI_API_KEY
 
 Screenshot import uses the same key; users can upload an image (PNG, JPEG, or WebP) to extract a recipe via Gemini vision (OCR). **YouTube links** are supported natively: paste a YouTube video URL (e.g. a cooking reel) and Gemini will extract the recipe from the video.
 
-**Auto recipe image (optional):** Set `UNSPLASH_ACCESS_KEY` to automatically attach a food photo from [Unsplash](https://unsplash.com/developers) when importing a recipe (URL or screenshot). Get an Access Key by creating an application at [Unsplash Developers](https://unsplash.com/developers). If unset, import still works; dishes simply have no auto image. Unsplash API [guidelines](https://unsplash.com/api-terms) require attribution; you can optionally show “Photo by [name] on Unsplash” near the dish image later.
+**Auto recipe image (optional):** Set `SPOONACULAR_API_KEY` to automatically fetch a verified culinary photo from [Spoonacular](https://spoonacular.com/food-api) when importing a recipe (by name, URL or screenshot). Get an API Key by creating a free account. If unset, import still works; dishes simply have no auto image unless a URL `og:image` is available.
 
 #### Restricting your Google AI Studio API key
 

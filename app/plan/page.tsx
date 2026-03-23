@@ -195,13 +195,10 @@ export default function PlanPage() {
 
   const setSlot = useCallback(
     async (date: string, slot_type: string, dish_id: string | null) => {
-      const res = await fetch("/api/meal-plans", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, slot_type, dish_id })
-      });
-      if (!res.ok) return;
+      let previousPlans: PlanEntry[] = [];
+
       setPlans((prev) => {
+        previousPlans = prev;
         const rest = prev.filter(
           (p) => !(p.date === date && p.slot_type === slot_type)
         );
@@ -221,6 +218,20 @@ export default function PlanPage() {
         }
         return rest;
       });
+
+      try {
+        const res = await fetch("/api/meal-plans", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, slot_type, dish_id })
+        });
+        if (!res.ok) {
+          throw new Error("Failed to update slot");
+        }
+      } catch (err) {
+        console.error("Optimistic update failed, rolling back:", err);
+        setPlans(previousPlans);
+      }
     },
     [dishes]
   );

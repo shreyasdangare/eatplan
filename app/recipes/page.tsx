@@ -5,7 +5,7 @@ import { supabaseServer } from "@/lib/supabaseServer";
 import { getSession } from "@/lib/supabaseServerClient";
 import { DishesListWithFilter } from "../components/DishesListWithFilter";
 import { RecipesSheetActions } from "../components/RecipesSheetActions";
-import { Plus } from "lucide-react";
+import { AddRecipeDropdown } from "../components/AddRecipeDropdown";
 
 async function DishesList() {
   const { user } = await getSession();
@@ -49,13 +49,7 @@ export default function RecipesPage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <RecipesSheetActions />
-          <Link
-            href="/dishes/new"
-            className="group inline-flex shrink-0 min-h-[48px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl hover:-translate-y-0.5 active:scale-95 dark:bg-orange-500 dark:hover:bg-orange-400"
-          >
-            <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" aria-hidden />
-            <span>Add recipe</span>
-          </Link>
+          <AddRecipeDropdown />
         </div>
       </div>
       

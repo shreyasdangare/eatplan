@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "./components/Logo";
 import { Suspense } from "react";
 import { getSession } from "@/lib/supabaseServerClient";
 import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
@@ -80,28 +80,37 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {user && (
         <div className="flex flex-col gap-8">
           {isFirstVisit && <MarkHomeVisited />}
-          <p className="rounded-xl glass-panel px-4 py-3 text-center text-sm font-medium text-orange-900 dark:text-orange-200">
-            👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
-          </p>
           
+          <section className="relative overflow-hidden rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-8 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
+            <div className="relative z-10 flex flex-col items-center text-center mx-auto">
+              <Logo className="mb-4 h-24 w-24 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
+              <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+                EatPlan
+              </h2>
+              <p className="mt-2 text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
+                काय खायचं?
+              </p>
+              <div className="mt-8 rounded-full bg-white/60 px-6 py-2.5 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
+                👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
+              </div>
+            </div>
+            
+            <div className="absolute right-[-10%] top-[-50%] h-[300px] w-[300px] rounded-full bg-orange-400/20 mix-blend-multiply blur-3xl transition-transform duration-1000 ease-in-out group-hover:scale-110 dark:bg-orange-500/10 dark:mix-blend-screen" aria-hidden />
+            <div className="absolute bottom-[-50%] left-[-10%] h-[200px] w-[200px] rounded-full bg-rose-400/20 mix-blend-multiply blur-3xl transition-transform duration-1000 ease-in-out delay-75 group-hover:scale-110 dark:bg-rose-500/10 dark:mix-blend-screen" aria-hidden />
+          </section>
+
           <Suspense fallback={<div className="h-64 rounded-[2rem] glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
             <WeeklyPlanOverview />
           </Suspense>
         </div>
       )}
       
-      {/* Hero */}
+      {!user && (
+        <>
+          {/* Hero */}
       <section className="relative overflow-hidden rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-6 py-12 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
         <div className="relative z-10 flex flex-col items-center sm:items-start max-w-2xl text-center sm:text-left mx-auto sm:mx-0">
-          <div className="mb-6 inline-flex h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-white/50 p-3 shadow-sm ring-1 ring-black/5 dark:bg-black/20 dark:ring-white/10 sm:h-28 sm:w-28 transition-transform duration-500 group-hover:scale-[1.02]">
-            <Image
-              src="/logo.png"
-              alt="EatPlan"
-              width={112}
-              height={112}
-              className="h-full w-full object-contain"
-            />
-          </div>
+          <Logo className="mb-6 h-32 w-32 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2 sm:h-40 sm:w-40" />
           <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-6xl lg:text-7xl">
             EatPlan
           </h2>
@@ -176,6 +185,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           })}
         </ul>
       </section>
+        </>
+      )}
 
       {/* Footer line */}
       <div className="mt-8 pb-4 flex justify-center">

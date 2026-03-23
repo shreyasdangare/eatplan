@@ -18,7 +18,7 @@ type ExtractedRecipe = {
   instructions?: string;
 };
 
-async function fetchPageText(url: string): Promise<string> {
+async function fetchPageText(url: string): Promise<{ text: string; imageUrl: string | null }> {
   const res = await fetch(url, {
     headers: {
       "User-Agent":
@@ -29,15 +29,20 @@ async function fetchPageText(url: string): Promise<string> {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const html = await res.text();
   const $ = cheerio.load(html);
+  
+  const ogImage = $('meta[property="og:image"]').attr("content") ||
+                  $('meta[name="twitter:image"]').attr("content") ||
+                  null;
+
   $("script, style, nav, footer, header").remove();
   const text = $("body").text().replace(/\s+/g, " ").trim();
-  return text.slice(0, 15000);
+  return { text: text.slice(0, 15000), imageUrl: ogImage || null };
 }
 
 const RECIPE_SYSTEM_PROMPT = `You extract recipe data from web page text. Reply with ONLY a valid JSON object, no markdown or explanation.
 Use this shape:
 {
-  "name": "Recipe title",
+  "name": "Normalized Recipe Title (strip all adjectives like 'Authentic', 'Best', 'Easy', 'Dilli Vali' to just the core dish name, e.g. 'Dal Makhni')",
   "description": "Short description or leave empty",
   "servings": number or null,
   "ingredients": [
@@ -56,28 +61,34 @@ const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 
 async function fetchImageUrlForRecipe(recipeName: string): Promise<string | null> {
-  const key = process.env.UNSPLASH_ACCESS_KEY?.trim();
+  const key = process.env.SPOONACULAR_API_KEY?.trim();
   if (!key) return null;
-  const query = `${recipeName.trim()} food`;
+  const query = recipeName.trim();
   try {
     const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1`,
-      {
-        headers: { Authorization: `Client-ID ${key}` },
-        signal: AbortSignal.timeout(5000)
-      }
+      `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=1&apiKey=${key}`,
+      { signal: AbortSignal.timeout(5000) }
     );
     if (!res.ok) {
-      console.error("Unsplash search error", res.status);
+      console.error("Spoonacular Search error", res.status);
       return null;
     }
     const data = (await res.json()) as {
-      results?: { urls?: { regular?: string; small?: string } }[];
+      results?: { image?: string }[];
     };
-    const url = data.results?.[0]?.urls?.regular ?? data.results?.[0]?.urls?.small ?? null;
-    return url;
+    if (!data.results || data.results.length === 0) {
+      console.warn("Spoonacular returned 0 images for query:", query);
+      return null;
+    }
+    
+    // Spoonacular returns 312x231 by default. We can request a larger size by replacing the dimensions in the URL.
+    const smallUrl = data.results[0].image;
+    if (smallUrl) {
+      return smallUrl.replace("-312x231.jpg", "-636x393.jpg");
+    }
+    return null;
   } catch (e) {
-    console.error("Unsplash fetch error", e);
+    console.error("Spoonacular fetch error", e);
     return null;
   }
 }
@@ -158,6 +169,42 @@ async function extractWithGemini(text: string, apiKey: string): Promise<Extracte
   };
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
   const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
+  return JSON.parse(jsonStr) as ExtractedRecipe;
+}
+
+async function generateWithGeminiByName(recipeName: string, apiKey: string): Promise<ExtractedRecipe> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: {
+        parts: [{ text: "You are an expert chef. Generate recipe data to a JSON object. No markdown. Use this shape:\n{\n  \"name\": \"Normalized Recipe Title (strip all adjectives like 'Authentic', 'Best', 'Easy', 'Dilli Vali' to just the core dish name, e.g. 'Dal Makhni')\",\n  \"description\": \"Short description\",\n  \"servings\": number,\n  \"ingredients\": [\n    { \"name\": \"ingredient name\", \"quantity\": \"2 cups\", \"amount\": 2, \"unit\": \"cups\" }\n  ],\n  \"instructions\": \"Full cooking steps as a single string. Use numbered steps (1. ... 2. ...).\"\n}\nAlways include instructions." }]
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `Generate a highly-rated, authentic, and detailed recipe for "${recipeName}". The ingredient quantities MUST be scaled perfectly for exactly 2 people. Set servings to 2. Reply with ONLY a valid JSON object matching the system instructions shape.` }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 4000,
+        responseMimeType: "application/json"
+      }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
+  }
+
+  const data = (await res.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
+  const jsonStr = raw.replace(/^[\`\s]*json?/i, "").replace(/[\s\`]*$/i, "").trim();
   return JSON.parse(jsonStr) as ExtractedRecipe;
 }
 
@@ -368,6 +415,7 @@ export async function POST(req: NextRequest) {
   const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
 
   let recipe: ExtractedRecipe;
+  let pageImageUrl: string | null = null;
 
   if (contentType.includes("multipart/form-data")) {
     if (!geminiKey) {
@@ -413,15 +461,24 @@ export async function POST(req: NextRequest) {
       );
     }
   } else {
-    const body = (await req.json()) as { url: string };
-    const { url } = body;
+    const body = (await req.json().catch(() => ({}))) as { url?: string; recipeName?: string };
+    const { url, recipeName } = body;
 
-    if (!url || typeof url !== "string") {
-      return NextResponse.json(
-        { error: "url is required" },
-        { status: 400 }
-      );
-    }
+    if (recipeName && typeof recipeName === "string") {
+      if (!geminiKey) return NextResponse.json({ error: "Requires GOOGLE_GEMINI_API_KEY." }, { status: 400 });
+      try {
+        recipe = await generateWithGeminiByName(recipeName.trim(), geminiKey);
+      } catch (e) {
+        console.error("Recipe generation error", e);
+        return NextResponse.json({ error: e instanceof Error ? e.message : "Failed to generate recipe" }, { status: 502 });
+      }
+    } else {
+      if (!url || typeof url !== "string") {
+        return NextResponse.json(
+          { error: "url or recipeName is required" },
+          { status: 400 }
+        );
+      }
 
     let targetUrl: URL;
     try {
@@ -463,7 +520,9 @@ export async function POST(req: NextRequest) {
     } else {
       let text: string;
       try {
-        text = await fetchPageText(targetUrl.href);
+        const pageData = await fetchPageText(targetUrl.href);
+        text = pageData.text;
+        pageImageUrl = pageData.imageUrl;
       } catch (e) {
         console.error("Fetch error", e);
         return NextResponse.json(
@@ -492,6 +551,7 @@ export async function POST(req: NextRequest) {
         );
       }
     }
+    }
   }
 
   if (!recipe.name?.trim()) {
@@ -512,7 +572,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const imageUrl = await fetchImageUrlForRecipe(recipe.name);
+  const imageUrl = pageImageUrl || await fetchImageUrlForRecipe(recipe.name);
 
   try {
     const result = await saveExtractedRecipe(recipe, auth.user.id, imageUrl);

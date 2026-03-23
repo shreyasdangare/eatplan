@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Scale } from "lucide-react";
+import { TranslatedIngredient } from "@/app/components/TranslatedIngredient";
 
 type IngredientRow = {
   id: string;
@@ -104,8 +105,8 @@ function IngredientList({
                 key={di.id}
                 className="group flex flex-wrap items-center justify-between gap-4 rounded-2xl glass-panel px-5 py-3.5 transition-all hover:bg-stone-50/80 dark:hover:bg-stone-800/80"
               >
-                <span className="text-base font-medium text-stone-800 dark:text-stone-200 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
-                  {di.ingredients?.name ?? "Unknown ingredient"}
+                <span className="text-base font-medium text-stone-800 dark:text-stone-200 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors flex items-center">
+                  <TranslatedIngredient name={di.ingredients?.name ?? "Unknown ingredient"} />
                 </span>
                 <span className="shrink-0 rounded-lg bg-stone-100/50 px-3 py-1 font-mono text-sm font-semibold text-stone-600 dark:bg-stone-800/50 dark:text-stone-400">
                   {renderQty(di)}
@@ -130,8 +131,8 @@ function IngredientList({
                 key={di.id}
                 className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-dashed border-stone-200/80 bg-stone-50/30 px-5 py-3.5 dark:border-stone-700/50 dark:bg-stone-800/20"
               >
-                <span className="text-base font-medium text-stone-600 dark:text-stone-400">
-                  {di.ingredients?.name ?? "Unknown ingredient"}
+                <span className="text-base font-medium text-stone-600 dark:text-stone-400 flex items-center">
+                  <TranslatedIngredient name={di.ingredients?.name ?? "Unknown ingredient"} />
                 </span>
                 <span className="shrink-0 rounded-lg bg-stone-100/30 px-3 py-1 font-mono text-sm font-medium text-stone-500 dark:bg-stone-800/30 dark:text-stone-500">
                   {renderQty(di)}

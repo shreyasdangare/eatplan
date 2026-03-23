@@ -23,7 +23,19 @@ function LoginForm() {
     setShowResendHint(false);
     setResendSuccess(false);
     setLoading(true);
+
+    const isBypass = email.trim() === "test@eatplan.com" && password === "tester";
+
     try {
+      if (isBypass) {
+        // Auto-provision test user in dev
+        await fetch("/api/dev-setup-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim(), password })
+        });
+      }
+
       const supabase = await getSupabaseClient();
       const { error: err } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -140,6 +152,19 @@ function LoginForm() {
         >
           {loading ? "Signing in…" : "Log in"}
         </button>
+
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            type="button"
+            onClick={() => {
+              setEmail("test@eatplan.com");
+              setPassword("tester");
+            }}
+            className="w-full min-h-[44px] rounded-xl bg-orange-100 px-4 py-3 text-sm font-medium text-orange-900 shadow-sm transition hover:bg-orange-200 active:opacity-90 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/60 mt-2"
+          >
+            Bypass Login (Test User)
+          </button>
+        )}
       </form>
       <p className="text-center text-sm text-stone-600 dark:text-stone-400">
         Don&apos;t have an account?{" "}

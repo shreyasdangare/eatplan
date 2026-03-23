@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { TranslatedIngredient } from "@/app/components/TranslatedIngredient";
 
 type DishData = {
   id: string;
@@ -108,7 +109,7 @@ export default function CookModePage() {
               key={di.id}
               className="flex justify-between gap-4 border-b border-stone-200 pb-2 dark:border-stone-600"
             >
-              <span>{di.ingredients?.name ?? "—"}</span>
+              <TranslatedIngredient name={di.ingredients?.name ?? "—"} />
               <span className="text-amber-700 dark:text-amber-300">{qty(di)}</span>
             </li>
           ))}
@@ -122,7 +123,7 @@ export default function CookModePage() {
                   key={di.id}
                   className="flex justify-between gap-4 border-b border-stone-200 pb-2 text-stone-600 dark:border-stone-600 dark:text-stone-400"
                 >
-                  <span>{di.ingredients?.name ?? "—"}</span>
+                  <TranslatedIngredient name={di.ingredients?.name ?? "—"} />
                   <span>{qty(di)}</span>
                 </li>
               ))}
