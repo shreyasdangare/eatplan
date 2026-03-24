@@ -91,11 +91,11 @@ export function InstallPrompt() {
     <div
       role="status"
       aria-label="Install app hint"
-      className={`fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-sm transition-all duration-500 ease-out sm:bottom-6 sm:left-auto sm:right-6 ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"
+      className={`fixed top-4 left-4 right-4 z-[60] mx-auto max-w-sm transition-all duration-500 ease-out sm:top-auto sm:bottom-6 sm:left-auto sm:right-6 ${
+        isVisible ? "translate-y-0 opacity-100" : "-translate-y-10 sm:translate-y-10 opacity-0 pointer-events-none"
       }`}
     >
-      <div className="glass-panel relative flex flex-col gap-3 rounded-2xl p-5 shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
+      <div className="glass-panel relative flex flex-row items-center sm:flex-col sm:items-start gap-3 rounded-2xl p-3 sm:p-5 shadow-xl sm:shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
         <button
           type="button"
           onClick={handleDismiss}
@@ -105,11 +105,11 @@ export function InstallPrompt() {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="flex items-start gap-4 pr-6">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-500/20">
+        <div className="flex flex-1 items-center sm:items-start gap-4 pr-6 sm:pr-6">
+          <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-500/20">
             <Download className="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5 sm:gap-1">
             <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">
               Get the App
             </h3>
@@ -128,18 +128,18 @@ export function InstallPrompt() {
         </div>
 
         {showAndroidInstall && (
-          <div className="mt-1 flex gap-2">
+          <div className="mt-0 sm:mt-1 flex gap-2 shrink-0 flex-col sm:flex-row">
             <button
               type="button"
               onClick={handleAndroidInstall}
-              className="flex-1 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-500"
+              className="flex-1 rounded-xl bg-orange-500 px-3 py-1.5 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-500"
             >
-              Install App
+              Install
             </button>
             <button
               type="button"
               onClick={handleDismiss}
-              className="px-4 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:text-stone-800 dark:hover:text-stone-200"
+              className="hidden sm:block px-4 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:text-stone-800 dark:hover:text-stone-200"
             >
               Later
             </button>

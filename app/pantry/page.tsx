@@ -211,25 +211,29 @@ export default function PantryPage() {
           }}
           onCreateNew={() => {}}
         />
-        <div className="flex gap-2 items-center text-xs">
-          <label className="text-amber-800 dark:text-amber-200">Amount (optional)</label>
-          <input
-            type="number"
-            step="any"
-            min="0"
-            placeholder="e.g. 2"
-            value={addAmount}
-            onChange={(e) => setAddAmount(e.target.value)}
-            className="w-20 rounded border border-orange-200 px-2 py-1 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-          />
-          <label className="text-amber-800 dark:text-amber-200">Unit (optional)</label>
-          <input
-            type="text"
-            placeholder="e.g. kg"
-            value={addUnit}
-            onChange={(e) => setAddUnit(e.target.value)}
-            className="w-20 rounded border border-orange-200 px-2 py-1 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:items-center text-xs w-full">
+          <div className="flex items-center gap-2 flex-1 relative group">
+            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-[3.5rem] sm:min-w-0">Amount</label>
+            <input
+              type="number"
+              step="any"
+              min="0"
+              placeholder="e.g. 2"
+              value={addAmount}
+              onChange={(e) => setAddAmount(e.target.value)}
+              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-none transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-sm"
+            />
+          </div>
+          <div className="flex items-center gap-2 flex-1 relative group">
+            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-[3.5rem] sm:min-w-0">Unit</label>
+            <input
+              type="text"
+              placeholder="e.g. kg"
+              value={addUnit}
+              onChange={(e) => setAddUnit(e.target.value)}
+              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-none transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-sm"
+            />
+          </div>
         </div>
       </div>
 

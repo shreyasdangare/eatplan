@@ -9,6 +9,7 @@ import { DarkModeToggle } from "./components/DarkModeToggle";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { MobileNav } from "./components/MobileNav";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
@@ -42,13 +43,13 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <AuthCodeExchange />
           </Suspense>
-          <div className="mx-auto flex min-h-screen min-w-0 max-w-4xl flex-col px-4 py-4 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
-            <header className="relative z-50 mb-6 rounded-2xl glass-panel px-4 py-3 sm:sticky sm:top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex min-h-[100dvh] min-w-0 max-w-4xl flex-col px-4 py-3 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
+            <header className="relative z-50 mb-4 sm:mb-6 rounded-2xl glass-panel px-3 py-2 sm:px-4 sm:py-3 sticky top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
+              <div className="flex items-center justify-between">
                 <HeaderTitle />
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
                   <nav
-                    className="flex flex-wrap gap-1 sm:gap-1.5 text-sm"
+                    className="hidden sm:flex flex-wrap gap-1 sm:gap-1.5 text-sm"
                     aria-label="Main navigation"
                   >
                     <a
@@ -87,7 +88,7 @@ export default function RootLayout({
                       Cook?
                     </a>
                   </nav>
-                  <div className="flex shrink-0 items-center justify-center border-l pl-2 border-stone-200 dark:border-stone-700">
+                  <div className="flex shrink-0 items-center justify-center sm:border-l sm:pl-2 border-stone-200 dark:border-stone-700">
                     <DarkModeToggle />
                     <AuthLinks />
                   </div>
@@ -95,7 +96,8 @@ export default function RootLayout({
               </div>
             </header>
             <InstallPrompt />
-            <main className="flex-1 pb-8 min-h-0 lg:pb-12">{children}</main>
+            <main className="flex-1 pb-24 sm:pb-8 min-h-0 lg:pb-12">{children}</main>
+            <MobileNav />
           </div>
         </ThemeProvider>
         <SpeedInsights />

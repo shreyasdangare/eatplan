@@ -57,7 +57,7 @@ export function RecipesSheetActions() {
   };
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+    <div className="hidden sm:flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
       <button
         type="button"
         onClick={handleDownload}

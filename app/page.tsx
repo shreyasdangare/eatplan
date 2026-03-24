@@ -81,13 +81,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div className="flex flex-col gap-8">
           {isFirstVisit && <MarkHomeVisited />}
           
-          <section className="relative overflow-hidden rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-8 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
+          <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-6 sm:p-8 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto">
-              <Logo className="mb-4 h-24 w-24 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
-              <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+              <Logo className="mb-3 sm:mb-4 h-16 w-16 sm:h-24 sm:w-24 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
+              <h2 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
                 EatPlan
               </h2>
-              <p className="mt-2 text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
+              <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
                 काय खायचं?
               </p>
               <div className="mt-8 rounded-full bg-white/60 px-6 py-2.5 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
@@ -108,9 +108,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {!user && (
         <>
           {/* Hero */}
-      <section className="relative overflow-hidden rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-6 py-12 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
+      <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-5 py-10 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
         <div className="relative z-10 flex flex-col items-center sm:items-start max-w-2xl text-center sm:text-left mx-auto sm:mx-0">
-          <Logo className="mb-6 h-32 w-32 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2 sm:h-40 sm:w-40" />
+          <Logo className="mb-4 sm:mb-6 h-20 w-20 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2 sm:h-40 sm:w-40" />
           <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-6xl lg:text-7xl">
             EatPlan
           </h2>

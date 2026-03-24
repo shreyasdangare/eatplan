@@ -99,7 +99,8 @@ export async function WeeklyPlanOverview() {
       </div>
 
       {/* Horizontal scrollable container for the 2 days */}
-      <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-6 pt-2 scrollbar-hide -mx-6 px-6 sm:mx-0 sm:px-0">
+      {/* Responsive Grid for Today and Tomorrow */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-2">
         {upcomingDates.map((dayData) => {
           const dayPlan = planByDate[dayData.dateStr] || {};
           const slots = ["breakfast", "lunch", "dinner"] as const;
@@ -108,68 +109,74 @@ export async function WeeklyPlanOverview() {
           return (
             <div
               key={dayData.dateStr}
-              className={`relative flex min-w-[260px] max-w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.5rem] glass-panel transition-all hover:-translate-y-1 hover:shadow-lg ${
+              className={`relative flex flex-col overflow-hidden rounded-[2rem] glass-panel transition-all duration-300 hover:shadow-xl ${
                 dayData.isToday
-                  ? "ring-2 ring-orange-400/60 shadow-[0_8px_30px_rgba(234,88,12,0.15)] dark:ring-orange-500/50 dark:shadow-[0_8px_30px_rgba(234,88,12,0.2)]"
-                  : "border border-stone-200/50 dark:border-stone-700/50"
+                  ? "bg-white/80 dark:bg-stone-800/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] ring-1 ring-orange-500/30 dark:ring-orange-500/40"
+                  : "bg-white/40 dark:bg-stone-800/40 shadow-sm border border-stone-200/50 dark:border-stone-700/50 opacity-95 hover:opacity-100"
               }`}
             >
-              {dayData.isToday && (
-                <div className="absolute top-0 w-full bg-gradient-to-r from-orange-400 to-amber-500 px-4 py-1 text-center text-xs font-bold tracking-wider text-white shadow-sm">
-                  TODAY
-                </div>
-              )}
-              
-              <div className={`border-b border-stone-200/50 px-5 pb-3 pt-5 dark:border-stone-700/50 ${dayData.isToday ? 'mt-4' : ''}`}>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-extrabold text-stone-900 dark:text-stone-50">
+              {/* Card Header */}
+              <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+                <div>
+                  <h4 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
                     {dayData.dayName}
-                  </span>
-                  <span className="text-sm font-medium text-stone-500 dark:text-stone-400">
+                  </h4>
+                  <p className={`text-sm font-medium mt-0.5 ${dayData.isToday ? "text-orange-600 dark:text-orange-400" : "text-stone-500 dark:text-stone-400"}`}>
                     {dayData.monthDay}
-                  </span>
+                  </p>
                 </div>
+                {dayData.isToday && (
+                  <div className="flex h-2.5 w-2.5 rounded-full bg-orange-500 ring-4 ring-orange-500/20 dark:bg-orange-400 dark:ring-orange-400/20" />
+                )}
               </div>
 
-              <div className="flex flex-1 flex-col gap-3 p-5">
-                {slots.map((slot) => {
-                  const entry = dayPlan[slot];
-                  const Icon = SLOT_ICONS[slot];
-                  const dishName = entry?.dishes?.name;
-                  const isPrepared = !!entry?.prepared_at;
+              {/* Card Body */}
+              <div className="flex-1 px-5 pb-5 flex flex-col">
+                {hasAnyMeals ? (
+                  <div className="flex flex-col overflow-hidden rounded-[1.5rem] bg-stone-50/80 dark:bg-stone-900/50 ring-1 ring-stone-200/60 dark:ring-stone-700/60 divide-y divide-stone-200/60 dark:divide-stone-700/60 shadow-inner">
+                    {slots.map((slot) => {
+                      const entry = dayPlan[slot];
+                      if (!entry?.dishes?.name) return null;
+                      
+                      const Icon = SLOT_ICONS[slot];
+                      const dishName = entry.dishes.name;
+                      const isPrepared = !!entry.prepared_at;
 
-                  if (!dishName) return null;
-
-                  return (
-                    <div key={slot} className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
-                        <Icon className="h-3.5 w-3.5" />
-                        {slot}
-                      </div>
-                      <div className={`flex items-start gap-2 rounded-xl border px-3 py-2.5 shadow-sm transition-colors ${
-                        isPrepared 
-                          ? "border-emerald-200/50 bg-emerald-50/50 dark:border-emerald-800/30 dark:bg-emerald-950/20" 
-                          : "border-stone-200/80 bg-white/60 dark:border-stone-700/80 dark:bg-stone-800/60"
-                      }`}>
-                        <div className="flex-1 text-sm font-medium leading-tight text-stone-800 dark:text-stone-200">
-                          {dishName}
+                      return (
+                        <div key={slot} className="group relative flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+                          {/* Left Icon Container */}
+                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-white shadow-sm ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50 ${isPrepared ? 'text-emerald-500 dark:text-emerald-400' : 'text-stone-500 dark:text-stone-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors'}`}>
+                            <Icon className="h-5 w-5" strokeWidth={2.5} />
+                          </div>
+                          
+                          {/* Dish Name & Slot */}
+                          <div className="flex min-w-0 flex-1 flex-col pb-0.5">
+                            <span className={`truncate text-[15px] font-semibold tracking-tight ${isPrepared ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-900 dark:text-stone-100'}`}>
+                              {dishName}
+                            </span>
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 mt-0.5">
+                              {slot}
+                            </span>
+                          </div>
+                          
+                          {/* Right Indicator */}
+                          {isPrepared ? (
+                            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400 shadow-sm rounded-full bg-white dark:bg-stone-900" />
+                          ) : (
+                            <div className="h-5 w-5 shrink-0 rounded-full border-2 border-stone-200 dark:border-stone-700 transition-colors group-hover:border-stone-300 dark:group-hover:border-stone-600" />
+                          )}
                         </div>
-                        {isPrepared && (
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {!hasAnyMeals && (
-                  <div className="flex flex-1 flex-col items-center justify-center gap-3 py-6 text-center opacity-70 transition-opacity hover:opacity-100">
-                    <div className="rounded-full bg-stone-100 p-3 dark:bg-stone-800">
-                      <CalendarPlus className="h-6 w-6 text-stone-400 dark:text-stone-500" />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-1 min-h-[140px] flex-col items-center justify-center gap-3 rounded-[1.5rem] bg-stone-50/50 dark:bg-stone-900/30 border border-dashed border-stone-200/80 dark:border-stone-700/80 text-center opacity-80 hover:opacity-100 transition-opacity">
+                    <div className="rounded-[1rem] bg-white p-3 shadow-sm ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50">
+                      <CalendarPlus className="h-5 w-5 text-stone-400 dark:text-stone-500" strokeWidth={2.5} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-stone-600 dark:text-stone-300">Nothing planned</p>
-                      <a href={`/plan?date=${dayData.dateStr}`} className="mt-1 inline-block text-xs font-bold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
+                      <p className="text-[13px] font-semibold text-stone-600 dark:text-stone-300">Nothing planned</p>
+                      <a href={`/plan?date=${dayData.dateStr}`} className="mt-1 inline-block text-[11px] font-bold uppercase tracking-wider text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 active:scale-95 transition-transform">
                         Add a meal →
                       </a>
                     </div>
