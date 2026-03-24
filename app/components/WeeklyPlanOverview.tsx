@@ -2,13 +2,14 @@ import { createClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { Sun, Utensils, Moon, Plus, CheckCircle2, ChefHat, CalendarPlus } from "lucide-react";
 
+import { isMealPast } from "@/lib/isMealPast";
+
 export const dynamic = "force-dynamic";
 
 type PlanEntry = {
   id: string;
   date: string;
   slot_type: "breakfast" | "lunch" | "dinner";
-  prepared_at: string | null;
   dishes?: { id: string; name: string } | null;
 };
 
@@ -48,7 +49,7 @@ export async function WeeklyPlanOverview() {
   const { data: rawData, error } = await supabase
     .from("meal_plans")
     .select(`
-      id, date, slot_type, prepared_at, dish_id,
+      id, date, slot_type, dish_id,
       dishes ( id, name )
     `)
     .gte("date", startStr)
@@ -140,7 +141,7 @@ export async function WeeklyPlanOverview() {
                       
                       const Icon = SLOT_ICONS[slot];
                       const dishName = entry.dishes.name;
-                      const isPrepared = !!entry.prepared_at;
+                      const isPrepared = isMealPast(dayData.dateStr, slot);
 
                       return (
                         <div key={slot} className="group relative flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-stone-100/80 dark:hover:bg-stone-800/80">

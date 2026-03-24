@@ -14,7 +14,8 @@ import {
 } from "@dnd-kit/core";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Sun, Utensils, Moon, CheckCircle2, Circle, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { isMealPast } from "@/lib/isMealPast";
 
 const SLOT_LABELS: Record<string, string> = {
   breakfast: "Breakfast",
@@ -54,17 +55,13 @@ function DroppableSlot({
   slot,
   current,
   prepared,
-  onClear,
-  onMarkPrepared,
-  preparing
+  onClear
 }: {
   date: string;
   slot: string;
   current: string | null;
   prepared: boolean;
   onClear: () => void;
-  onMarkPrepared: () => void;
-  preparing: boolean;
 }) {
   const slotId = `${date}:${slot}`;
   const { setNodeRef, isOver } = useDroppable({ id: slotId });
@@ -92,33 +89,27 @@ function DroppableSlot({
               >
                 {current}
               </span>
-              <button
-                type="button"
-                onClick={onClear}
-                className="shrink-0 -mr-1 -mt-1 rounded-full p-1.5 text-stone-400 opacity-0 transition-all hover:bg-red-100 hover:text-red-600 focus:opacity-100 group-hover/slot:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
-                aria-label="Clear slot"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <div className="mt-auto pt-3">
-              {!prepared ? (
+              {prepared ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
+              ) : (
                 <button
                   type="button"
-                  disabled={preparing}
-                  onClick={onMarkPrepared}
-                  className="group/btn flex items-center gap-1.5 text-xs font-semibold text-stone-500 transition-colors hover:text-emerald-600 disabled:opacity-50 dark:text-stone-400 dark:hover:text-emerald-400"
+                  onClick={onClear}
+                  className="shrink-0 -mr-1 -mt-1 rounded-full p-1.5 text-stone-400 opacity-0 transition-all hover:bg-red-100 hover:text-red-600 focus:opacity-100 group-hover/slot:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+                  aria-label="Clear slot"
                 >
-                  <Circle className="h-3.5 w-3.5 transition-colors group-hover/btn:fill-emerald-100 dark:group-hover/btn:fill-emerald-900" />
-                  {preparing ? "Saving…" : "Mark done"}
+                  <X className="h-4 w-4" />
                 </button>
-              ) : (
-                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-3.5 w-3.5 fill-emerald-100 dark:fill-emerald-900" />
-                  Done
-                </span>
               )}
             </div>
+            {prepared && (
+              <div className="mt-auto pt-2">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-3 w-3 fill-emerald-100 dark:fill-emerald-900" />
+                  Done
+                </span>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex h-full items-center justify-center opacity-0 transition-opacity group-hover/slot:opacity-100">
@@ -138,7 +129,6 @@ type PlanEntry = {
   date: string;
   slot_type: string;
   dish_id: string | null;
-  prepared_at: string | null;
   dishes?: { id: string; name: string } | null;
 };
 
@@ -176,7 +166,9 @@ export default function PlanPage() {
   const [plans, setPlans] = useState<PlanEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeDish, setActiveDish] = useState<Dish | null>(null);
-  const [preparingSlot, setPreparingSlot] = useState<string | null>(null);
+  
+  // State for mobile tappable slots
+  const [mobileSlotOpen, setMobileSlotOpen] = useState<{date: string, slot: string} | null>(null);
 
   const weekDates = getWeekDates(weekStart);
   const from = weekDates[0];
@@ -212,7 +204,6 @@ export default function PlanPage() {
               date,
               slot_type,
               dish_id,
-              prepared_at: null,
               dishes: dish ? { id: dish.id, name: dish.name } : null
             }
           ];
@@ -242,9 +233,9 @@ export default function PlanPage() {
       const p = plans.find(
         (x) => x.date === date && x.slot_type === slot_type
       );
-      return p?.dishes?.name ?? p?.dish_id
+      return p?.dishes?.name ?? (p?.dish_id
         ? dishes.find((d) => d.id === p.dish_id)?.name
-        : null;
+        : null);
     },
     [plans, dishes]
   );
@@ -254,34 +245,10 @@ export default function PlanPage() {
       const p = plans.find(
         (x) => x.date === date && x.slot_type === slot_type
       );
-      return !!p?.prepared_at;
+      if (!p || (!p.dish_id && !p.dishes?.name)) return false;
+      return isMealPast(date, slot_type);
     },
     [plans]
-  );
-
-  const handleMarkPrepared = useCallback(
-    async (date: string, slot_type: string) => {
-      setPreparingSlot(`${date}:${slot_type}`);
-      try {
-        const res = await fetch("/api/meal-plans/prepare", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date, slot_type })
-        });
-        if (res.ok) {
-          setPlans((prev) =>
-            prev.map((p) =>
-              p.date === date && p.slot_type === slot_type
-                ? { ...p, prepared_at: new Date().toISOString() }
-                : p
-            )
-          );
-        }
-      } finally {
-        setPreparingSlot(null);
-      }
-    },
-    []
   );
 
   const sensors = useSensors(
@@ -344,7 +311,7 @@ export default function PlanPage() {
             This week
           </h1>
           <p className="mt-2 text-base font-medium text-stone-500 dark:text-stone-400">
-            Drag recipes into days. Build your <Link href="/shopping-list" className="text-orange-600 underline hover:no-underline dark:text-orange-400">grocery list.</Link>
+            Plan your recipes. Build your <Link href="/shopping-list" className="text-orange-600 underline hover:no-underline dark:text-orange-400">grocery list.</Link>
           </p>
         </div>
         
@@ -385,8 +352,8 @@ export default function PlanPage() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        {/* Recipe strip */}
-        <div className="sticky top-24 z-40 rounded-3xl glass-panel p-4 pb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+        {/* Desktop Only: Recipe strip */}
+        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl glass-panel p-4 pb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
               Your Recipes
@@ -411,8 +378,8 @@ export default function PlanPage() {
           </div>
         </div>
 
-        {/* Calendar Grid */}
-        <div className="overflow-hidden rounded-[2.5rem] glass-panel shadow-sm">
+        {/* Desktop Only: Calendar Grid */}
+        <div className="hidden sm:block overflow-hidden rounded-[2.5rem] glass-panel shadow-sm mt-4">
           <div className="overflow-x-auto pb-2 scrollbar-thin">
             <table className="w-full min-w-[40rem] border-collapse text-left">
               <thead>
@@ -437,7 +404,7 @@ export default function PlanPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200/50 dark:divide-stone-700/50">
-                  {weekDates.map((date, rowIndex) => (
+                  {weekDates.map((date) => (
                   <tr
                     key={date}
                     className="group"
@@ -468,8 +435,6 @@ export default function PlanPage() {
                         current={getSlotDish(date, slot) ?? null}
                         prepared={getSlotPrepared(date, slot)}
                         onClear={() => setSlot(date, slot, null)}
-                        onMarkPrepared={() => handleMarkPrepared(date, slot)}
-                        preparing={preparingSlot === `${date}:${slot}`}
                       />
                     ))}
                   </tr>
@@ -490,6 +455,117 @@ export default function PlanPage() {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Mobile Only: Vertical Stacked Designer List */}
+      <div className="sm:hidden flex flex-col gap-5 mt-2">
+        {weekDates.map((date) => (
+          <div key={date} className="flex flex-col overflow-hidden rounded-[2rem] glass-panel bg-white/60 dark:bg-stone-900/40 outline outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all">
+            <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-stone-200/40 dark:border-stone-700/40">
+              <div className="flex items-end gap-2 text-stone-900 dark:text-stone-50">
+                <h4 className="text-2xl font-extrabold tracking-tight">
+                  {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long" })}
+                </h4>
+                <p className="text-[13px] font-semibold text-stone-400 dark:text-stone-500 mb-1">
+                  {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
+                </p>
+              </div>
+            </div>
+            <div className="px-4 py-4 pb-5 space-y-3">
+              {SLOTS.map((slot) => {
+                 const Icon = SLOT_ICONS[slot];
+                 const dishName = getSlotDish(date, slot);
+                 const isPrepared = getSlotPrepared(date, slot);
+
+                 return (
+                   <div key={slot} className="relative flex items-center gap-3">
+                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${isPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-400 dark:text-stone-500 ring-stone-200/80 dark:ring-stone-700/80'} shadow-sm`}>
+                       <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
+                     </div>
+                     
+                     <div className="flex-1 min-w-0">
+                       {!dishName ? (
+                         <button 
+                           type="button" 
+                           onClick={() => setMobileSlotOpen({ date, slot })}
+                           className="w-full h-[46px] flex items-center justify-center gap-2 rounded-xl bg-stone-100/50 hover:bg-orange-50 dark:bg-stone-800/50 dark:hover:bg-orange-900/30 text-stone-500 transition-colors border border-dashed border-stone-300 dark:border-stone-700/60 font-semibold text-[13px] active:scale-[0.98]"
+                         >
+                           <Plus className="h-4 w-4" strokeWidth={3} /> Add {SLOT_LABELS[slot]}
+                         </button>
+                       ) : (
+                         <div className={`flex h-[46px] items-center justify-between gap-2 rounded-xl border px-3.5 transition-colors ${isPrepared ? 'bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30' : 'bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm'}`}>
+                           <span className={`truncate text-[14px] font-bold tracking-tight ${isPrepared ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-800 dark:text-stone-200'}`}>
+                             {dishName}
+                           </span>
+                           {isPrepared ? (
+                             <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />
+                           ) : (
+                             <button
+                               type="button"
+                               onClick={() => setSlot(date, slot, null)}
+                               className="shrink-0 -mr-1.5 rounded-full p-1.5 text-stone-400 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
+                               aria-label="Remove recipe"
+                             >
+                               <X className="h-4 w-4" strokeWidth={2.5} />
+                             </button>
+                           )}
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile Recipe Selection Bottom Sheet/Modal */}
+      {mobileSlotOpen && (
+        <div className="sm:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-stone-900/40 backdrop-blur-sm dark:bg-black/80 transition-opacity outline-none animate-in fade-in duration-200 pb-[env(safe-area-inset-bottom)]">
+          {/* Close backdrop hit area */}
+          <div className="absolute inset-0 z-0" onClick={() => setMobileSlotOpen(null)} />
+          
+          <div className="relative z-10 flex max-h-[85vh] min-h-[50vh] flex-col rounded-t-[2.5rem] bg-white pt-6 shadow-2xl dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 animate-in slide-in-from-bottom-8 duration-300">
+            <div className="px-6 flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
+                  Select a Recipe
+                </h3>
+                <p className="text-sm font-medium text-stone-500 dark:text-stone-400 empty:hidden">
+                  For {SLOT_LABELS[mobileSlotOpen.slot]} on {new Date(mobileSlotOpen.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
+                </p>
+              </div>
+              <button onClick={() => setMobileSlotOpen(null)} className="rounded-full bg-stone-100 p-2.5 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors">
+                <X className="h-5 w-5" strokeWidth={2.5} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto px-6 py-2 pb-12 space-y-2.5 scrollbar-hide">
+              {dishes.length === 0 ? (
+                 <div className="flex flex-col items-center justify-center py-10 opacity-70">
+                    <Utensils className="h-10 w-10 text-stone-300 dark:text-stone-600 mb-3" />
+                    <p className="text-[15px] font-semibold text-stone-500 dark:text-stone-400">No recipes available.</p>
+                 </div>
+              ) : (
+                 dishes.map((dish) => (
+                   <button
+                     key={dish.id}
+                     type="button"
+                     onClick={() => {
+                        setSlot(mobileSlotOpen.date, mobileSlotOpen.slot, dish.id);
+                        setMobileSlotOpen(null);
+                     }}
+                     className="group flex w-full items-center justify-between gap-3 rounded-[1.25rem] border border-stone-200/60 bg-white px-4 py-4 text-left shadow-sm active:scale-[0.98] active:bg-orange-50 active:border-orange-500/30 transition-all dark:border-stone-800 dark:bg-stone-900/50 dark:active:bg-orange-950/40"
+                   >
+                     <span className="truncate text-[16px] font-bold text-stone-800 dark:text-stone-200 group-active:text-orange-700 dark:group-active:text-orange-400">{dish.name}</span>
+                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-4 w-4" strokeWidth={3} /></div>
+                   </button>
+                 ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

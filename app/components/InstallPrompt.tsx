@@ -95,17 +95,17 @@ export function InstallPrompt() {
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-10 sm:translate-y-10 opacity-0 pointer-events-none"
       }`}
     >
-      <div className="glass-panel relative flex flex-row items-center sm:flex-col sm:items-start gap-3 rounded-2xl p-3 sm:p-5 shadow-xl sm:shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
+      <div className="glass-panel relative flex flex-row items-center sm:flex-col sm:items-start gap-3 rounded-2xl border-stone-200 py-3 pl-3 pr-11 sm:p-5 shadow-xl sm:shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
         <button
           type="button"
           onClick={handleDismiss}
           aria-label="Dismiss install hint"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-stone-400 opacity-70 transition-all hover:bg-stone-100 hover:text-stone-700 hover:opacity-100 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="absolute right-2 top-1/2 -translate-y-1/2 sm:top-3 sm:right-3 sm:-translate-y-0 rounded-full p-1.5 text-stone-400 opacity-70 transition-all hover:bg-stone-100 hover:text-stone-700 hover:opacity-100 dark:hover:bg-stone-800 dark:hover:text-stone-200"
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="flex flex-1 items-center sm:items-start gap-4 pr-6 sm:pr-6">
+        <div className="flex flex-1 items-center sm:items-start gap-4 sm:pr-4">
           <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-500/20">
             <Download className="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
