@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 type ExtractedIngredient = {
   name: string;
@@ -328,7 +329,7 @@ function isErrorLikeRecipe(recipe: ExtractedRecipe): boolean {
 
 async function saveExtractedRecipe(
   recipe: ExtractedRecipe,
-  userId: string,
+  householdId: string,
   imageUrl?: string | null
 ): Promise<{ id: string; name: string }> {
   const ingredients = recipe.ingredients ?? [];
@@ -364,7 +365,7 @@ async function saveExtractedRecipe(
   const { data: dish, error: dishError } = await supabaseServer
     .from("dishes")
     .insert({
-      user_id: userId,
+      household_id: householdId,
       name: recipe.name.trim(),
       description: recipe.description?.trim() || null,
       meal_type: "both",
@@ -410,6 +411,11 @@ async function saveExtractedRecipe(
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const contentType = req.headers.get("content-type") ?? "";
   const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
@@ -575,7 +581,7 @@ export async function POST(req: NextRequest) {
   const imageUrl = pageImageUrl || await fetchImageUrlForRecipe(recipe.name);
 
   try {
-    const result = await saveExtractedRecipe(recipe, auth.user.id, imageUrl);
+    const result = await saveExtractedRecipe(recipe, householdId, imageUrl);
     return NextResponse.json(result, { status: 201 });
   } catch (e) {
     console.error("Save recipe error", e);

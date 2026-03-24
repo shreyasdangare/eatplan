@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 export async function GET() {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data, error } = await supabaseServer
     .from("dishes")
     .select("id, name, description, meal_type, prep_time_minutes, tags, image_url")
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .order("name", { ascending: true });
 
   if (error) {
@@ -56,10 +62,15 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data: dish, error } = await supabaseServer
     .from("dishes")
     .insert({
-      user_id: auth.user.id,
+      household_id: householdId,
       name,
       description,
       meal_type,

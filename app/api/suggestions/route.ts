@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 type SuggestionRequest = {
   ingredient_ids: string[];
@@ -10,6 +11,11 @@ type SuggestionRequest = {
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const body = (await req.json()) as SuggestionRequest;
   const ingredientIds = body.ingredient_ids ?? [];
@@ -21,7 +27,7 @@ export async function POST(req: NextRequest) {
       `id, name, description, meal_type, prep_time_minutes, tags,
        dish_ingredients(id, ingredient_id, is_optional)`
     )
-    .eq("user_id", auth.user.id);
+    .eq("household_id", householdId);
 
   if (error || !dishes) {
     console.error("Error fetching dishes for suggestions", error);

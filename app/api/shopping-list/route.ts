@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 export type ShoppingListItemRow = {
   id: string;
-  user_id: string;
+  household_id: string;
   ingredient_id: string | null;
   custom_name: string | null;
   quantity: string | null;
@@ -24,12 +25,17 @@ export async function GET(_req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data: rows, error } = await supabaseServer
     .from("shopping_list_items")
     .select(
-      "id, user_id, ingredient_id, custom_name, quantity, category, status, source, urgency, notes, bought_at, created_at, position, ingredients(name)"
+      "id, household_id, ingredient_id, custom_name, quantity, category, status, source, urgency, notes, bought_at, created_at, position, ingredients(name)"
     )
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .order("position", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
 
@@ -39,7 +45,7 @@ export async function GET(_req: NextRequest) {
 
   const items = (rows ?? []).map((r: Record<string, unknown>) => ({
     id: r.id,
-    user_id: r.user_id,
+    household_id: r.household_id,
     ingredient_id: r.ingredient_id ?? null,
     custom_name: r.custom_name ?? null,
     quantity: r.quantity ?? null,
@@ -69,6 +75,11 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const body = (await req.json()) as {
     ingredient_id?: string;
     custom_name?: string;
@@ -88,7 +99,7 @@ export async function POST(req: NextRequest) {
 
   const toInsert = body.items?.length
     ? body.items.map((item) => ({
-        user_id: auth.user.id,
+        household_id: householdId,
         ingredient_id: item.ingredient_id ?? null,
         custom_name: item.custom_name ?? null,
         quantity: item.quantity ?? null,
@@ -99,7 +110,7 @@ export async function POST(req: NextRequest) {
       }))
     : [
         {
-          user_id: auth.user.id,
+          household_id: householdId,
           ingredient_id: body.ingredient_id ?? null,
           custom_name: body.custom_name ?? null,
           quantity: body.quantity ?? null,
@@ -122,7 +133,7 @@ export async function POST(req: NextRequest) {
   const inserted = (data ?? []) as Record<string, unknown>[];
   const withName = inserted.map((r) => ({
     ...r,
-    user_id: auth.user.id,
+    household_id: householdId,
     ingredient_name: (r.ingredients as { name?: string } | null)?.name ?? null,
   }));
 

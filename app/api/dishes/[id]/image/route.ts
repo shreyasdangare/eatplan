@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 const BUCKET = "dish-images";
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -12,6 +13,11 @@ export async function POST(
 ) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const { id: dishId } = await context.params;
 
@@ -74,7 +80,7 @@ export async function POST(
     .from("dishes")
     .update({ image_url: imageUrl })
     .eq("id", dishId)
-    .eq("user_id", auth.user.id);
+    .eq("household_id", householdId);
 
   if (updateError) {
     console.error("Error updating dish image_url", updateError);

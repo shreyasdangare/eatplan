@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 /** PATCH: update a shopping list item (status, quantity, urgency, notes) */
 export async function PATCH(
@@ -9,6 +10,11 @@ export async function PATCH(
 ) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const { id } = await context.params;
   const body = (await req.json()) as {
@@ -41,7 +47,7 @@ export async function PATCH(
     .from("shopping_list_items")
     .update(updates)
     .eq("id", id)
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .select("id, ingredient_id, custom_name, quantity, category, status, source, urgency, notes, bought_at, created_at, ingredients(name)")
     .single();
 
@@ -67,13 +73,18 @@ export async function DELETE(
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { id } = await context.params;
 
   const { error } = await supabaseServer
     .from("shopping_list_items")
     .delete()
     .eq("id", id)
-    .eq("user_id", auth.user.id);
+    .eq("household_id", householdId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

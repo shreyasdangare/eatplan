@@ -60,10 +60,16 @@ export function AuthLinks() {
   if (user) {
     return (
       <div className="flex items-center gap-2">
+        <Link
+          href="/settings/household"
+          className="min-h-[44px] flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold text-orange-700 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-stone-700 transition-colors"
+        >
+          Household
+        </Link>
         <button
           type="button"
           onClick={handleLogout}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-orange-900 hover:bg-orange-100 active:opacity-80 dark:text-orange-200 dark:hover:bg-stone-700"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-stone-600 hover:bg-stone-100 active:opacity-80 dark:text-stone-400 dark:hover:bg-stone-800 transition-colors"
         >
           Log out
         </button>

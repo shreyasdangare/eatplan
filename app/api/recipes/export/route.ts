@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 const COLUMNS = [
   "name",
@@ -43,12 +44,17 @@ export async function GET() {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data: dishes, error } = await supabaseServer
     .from("dishes")
     .select(
       "id, name, description, meal_type, prep_time_minutes, tags, dish_ingredients(ingredients(name))"
     )
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .order("name", { ascending: true });
 
   if (error) {

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 /** POST: set order of to_buy items by providing ordered array of ids */
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const body = (await req.json()) as { ordered_ids?: string[] };
   const orderedIds = body.ordered_ids;
@@ -21,7 +27,7 @@ export async function POST(req: NextRequest) {
       .from("shopping_list_items")
       .update({ position: i })
       .eq("id", orderedIds[i])
-      .eq("user_id", auth.user.id)
+      .eq("household_id", householdId)
       .eq("status", "to_buy");
 
     if (error) {

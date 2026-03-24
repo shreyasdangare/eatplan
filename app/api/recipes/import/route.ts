@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 const REQUIRED_COLUMNS = ["name", "ingredients"];
 
@@ -181,6 +182,11 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data: existingIngredients } = await supabaseServer
     .from("ingredients")
     .select("id, name");
@@ -205,7 +211,7 @@ export async function POST(req: NextRequest) {
     const { data: existingByName } = await supabaseServer
       .from("dishes")
       .select("id")
-      .eq("user_id", auth.user.id)
+      .eq("household_id", householdId)
       .ilike("name", nameStr)
       .limit(1)
       .maybeSingle();
@@ -229,7 +235,7 @@ export async function POST(req: NextRequest) {
       const { data: newDish, error: insertErr } = await supabaseServer
         .from("dishes")
         .insert({
-          user_id: auth.user.id,
+          household_id: householdId,
           name: nameStr,
           description: String(row.description ?? "").trim() || null,
           meal_type: mealTypeValue(row.meal_type),

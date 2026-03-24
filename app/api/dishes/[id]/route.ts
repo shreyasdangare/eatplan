@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 export async function GET(
   _req: NextRequest,
@@ -8,6 +9,11 @@ export async function GET(
 ) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const { id } = await context.params;
 
@@ -17,7 +23,7 @@ export async function GET(
       "id, name, description, meal_type, prep_time_minutes, tags, servings, image_url, instructions, dish_ingredients(id, ingredient_id, quantity, amount, unit, is_optional, ingredients(id, name))"
     )
     .eq("id", id)
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .single();
 
   if (error) {
@@ -76,11 +82,16 @@ export async function PATCH(
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data, error } = await supabaseServer
     .from("dishes")
     .update(updatePayload)
     .eq("id", id)
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .select("id")
     .single();
 
@@ -140,13 +151,18 @@ export async function DELETE(
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { id } = await context.params;
 
   const { error } = await supabaseServer
     .from("dishes")
     .delete()
     .eq("id", id)
-    .eq("user_id", auth.user.id);
+    .eq("household_id", householdId);
 
   if (error) {
     console.error("Error deleting dish", error);

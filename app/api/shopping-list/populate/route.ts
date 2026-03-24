@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 import {
   getDishIdsFromDateRange,
   aggregateIngredientsFromDishes,
@@ -10,6 +11,11 @@ import {
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const body = (await req.json()) as { from?: string; to?: string } | undefined;
   let from = body?.from;
@@ -38,7 +44,7 @@ export async function POST(req: NextRequest) {
   const { data: existing } = await supabaseServer
     .from("shopping_list_items")
     .select("ingredient_id")
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .eq("status", "to_buy");
 
   const existingIngredientIds = new Set(
@@ -50,7 +56,7 @@ export async function POST(req: NextRequest) {
   const toInsert = lines
     .filter((line) => !existingIngredientIds.has(line.ingredient_id))
     .map((line) => ({
-      user_id: auth.user.id,
+      household_id: householdId,
       ingredient_id: line.ingredient_id,
       custom_name: null,
       quantity: line.quantity_display || null,
@@ -81,7 +87,7 @@ export async function POST(req: NextRequest) {
 
   const items = (inserted ?? []).map((r: Record<string, unknown>) => ({
     ...r,
-    user_id: auth.user.id,
+    household_id: householdId,
     ingredient_name: (r.ingredients as { name?: string } | null)?.name ?? null,
   }));
 

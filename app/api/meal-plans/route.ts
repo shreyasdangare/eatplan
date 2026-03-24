@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 export async function GET(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
+
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
 
   const { searchParams } = new URL(req.url);
   const from = searchParams.get("from");
@@ -20,7 +26,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabaseServer
     .from("meal_plans")
     .select("id, date, slot_type, dish_id, prepared_at, dishes(id, name)")
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .gte("date", from)
     .lte("date", to)
     .order("date", { ascending: true });
@@ -61,10 +67,15 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data: existing } = await supabaseServer
     .from("meal_plans")
     .select("id")
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .eq("date", date)
     .eq("slot_type", slot_type)
     .maybeSingle();
@@ -90,7 +101,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { error: insertError } = await supabaseServer.from("meal_plans").insert({
-    user_id: auth.user.id,
+    household_id: householdId,
     date,
     slot_type,
     dish_id

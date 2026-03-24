@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 
 export async function GET() {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { data, error } = await supabaseServer
     .from("pantry")
     .select("ingredient_id, amount, unit")
-    .eq("user_id", auth.user.id);
+    .eq("household_id", householdId);
 
   if (error) {
     console.error("Error fetching pantry", error);
@@ -32,6 +38,11 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const body = (await req.json()) as {
     ingredient_id?: string;
     amount?: number | null;
@@ -47,12 +58,12 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabaseServer.from("pantry").upsert(
     {
-      user_id: auth.user.id,
+      household_id: householdId,
       ingredient_id: ingredientId,
       amount: body.amount ?? null,
       unit: body.unit ?? null,
     },
-    { onConflict: "user_id,ingredient_id" }
+    { onConflict: "household_id,ingredient_id" }
   );
 
   if (error) {
@@ -70,6 +81,11 @@ export async function DELETE(req: NextRequest) {
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
 
+  const householdId = await getHouseholdId(auth.user.id);
+  if (!householdId) {
+    return NextResponse.json({ error: "Household not found" }, { status: 403 });
+  }
+
   const { searchParams } = new URL(req.url);
   const ingredientId = searchParams.get("ingredient_id");
   if (!ingredientId) {
@@ -82,7 +98,7 @@ export async function DELETE(req: NextRequest) {
   const { error } = await supabaseServer
     .from("pantry")
     .delete()
-    .eq("user_id", auth.user.id)
+    .eq("household_id", householdId)
     .eq("ingredient_id", ingredientId);
 
   if (error) {
