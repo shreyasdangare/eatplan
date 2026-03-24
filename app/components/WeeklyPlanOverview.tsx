@@ -18,19 +18,19 @@ const SLOT_ICONS = {
   dinner: Moon,
 };
 
-function getWeekDates(weekStart: Date) {
+function getUpcomingDates() {
   const dates = [];
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate() + i);
+  const today = new Date();
+  for (let i = 0; i < 2; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
     dates.push({
       dateStr: d.toISOString().slice(0, 10),
-      dayName: days[d.getDay()],
+      dayName: i === 0 ? "Today" : "Tomorrow",
       monthDay: `${months[d.getMonth()]} ${d.getDate()}`,
-      isToday: d.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10)
+      isToday: i === 0
     });
   }
   return dates;
@@ -41,17 +41,9 @@ export async function WeeklyPlanOverview() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return null;
 
-  // Calculate current week (Mon-Sun)
-  const todayDate = new Date();
-  const day = todayDate.getDay();
-  const diff = todayDate.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(todayDate);
-  monday.setDate(diff);
-  monday.setHours(0, 0, 0, 0);
-
-  const weekDates = getWeekDates(monday);
-  const startStr = weekDates[0].dateStr;
-  const endStr = weekDates[6].dateStr;
+  const upcomingDates = getUpcomingDates();
+  const startStr = upcomingDates[0].dateStr;
+  const endStr = upcomingDates[1].dateStr;
 
   const { data: rawData, error } = await supabase
     .from("meal_plans")
@@ -70,9 +62,8 @@ export async function WeeklyPlanOverview() {
 
   const plans = (rawData || []) as unknown as PlanEntry[];
   
-  // Group by date
   const planByDate: Record<string, Record<string, PlanEntry>> = {};
-  weekDates.forEach((d) => {
+  upcomingDates.forEach((d) => {
     planByDate[d.dateStr] = {};
   });
 
@@ -91,10 +82,10 @@ export async function WeeklyPlanOverview() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 leading-tight">
-              This Week's Plan
+              Up Next
             </h3>
             <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-              {weekDates[0].monthDay} - {weekDates[6].monthDay}
+              {upcomingDates[0].monthDay} & {upcomingDates[1].monthDay}
             </p>
           </div>
         </div>
@@ -107,9 +98,9 @@ export async function WeeklyPlanOverview() {
         </a>
       </div>
 
-      {/* Horizontal scrollable container for the 7 days */}
+      {/* Horizontal scrollable container for the 2 days */}
       <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-6 pt-2 scrollbar-hide -mx-6 px-6 sm:mx-0 sm:px-0">
-        {weekDates.map((dayData) => {
+        {upcomingDates.map((dayData) => {
           const dayPlan = planByDate[dayData.dateStr] || {};
           const slots = ["breakfast", "lunch", "dinner"] as const;
           const hasAnyMeals = slots.some((s) => dayPlan[s]?.dishes);

@@ -43,7 +43,7 @@ export default function RootLayout({
             <AuthCodeExchange />
           </Suspense>
           <div className="mx-auto flex min-h-screen min-w-0 max-w-4xl flex-col px-4 py-4 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
-            <header className="sticky top-2 z-50 mb-6 rounded-2xl glass-panel px-4 py-3 sm:mb-8 lg:mb-10 transition-all duration-300">
+            <header className="relative z-50 mb-6 rounded-2xl glass-panel px-4 py-3 sm:sticky sm:top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <HeaderTitle />
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
