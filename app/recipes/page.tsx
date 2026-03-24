@@ -11,10 +11,16 @@ async function DishesList() {
   const { user } = await getSession();
   if (!user) redirect("/login");
 
+  const { getHouseholdId } = await import("@/lib/getHouseholdId");
+  const householdId = await getHouseholdId(user.id);
+  if (!householdId) {
+    return <div>Failed to load household context.</div>;
+  }
+
   const { data: dishes, error } = await supabaseServer
     .from("dishes")
     .select("id, name, meal_type, tags, image_url")
-    .eq("user_id", user.id)
+    .eq("household_id", householdId)
     .order("name", { ascending: true });
 
   if (error || !dishes) {

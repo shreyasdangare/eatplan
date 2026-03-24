@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabaseServerClient";
+import { getSession } from "@/lib/supabaseServerClient";
+import { supabaseServer } from "@/lib/supabaseServer";
+import { getHouseholdId } from "@/lib/getHouseholdId";
 import Link from "next/link";
 import { Sun, Utensils, Moon, Plus, CheckCircle2, ChefHat, CalendarPlus } from "lucide-react";
 
@@ -38,20 +40,23 @@ function getUpcomingDates() {
 }
 
 export async function WeeklyPlanOverview() {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData?.user) return null;
+  const { user } = await getSession();
+  if (!user) return null;
+
+  const householdId = await getHouseholdId(user.id);
+  if (!householdId) return null;
 
   const upcomingDates = getUpcomingDates();
   const startStr = upcomingDates[0].dateStr;
   const endStr = upcomingDates[1].dateStr;
 
-  const { data: rawData, error } = await supabase
+  const { data: rawData, error } = await supabaseServer
     .from("meal_plans")
     .select(`
       id, date, slot_type, dish_id,
       dishes ( id, name )
     `)
+    .eq("household_id", householdId)
     .gte("date", startStr)
     .lte("date", endStr)
     .order("date", { ascending: true });
