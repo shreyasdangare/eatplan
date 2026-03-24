@@ -9,6 +9,7 @@ import { DarkModeToggle } from "./components/DarkModeToggle";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { MobileNav } from "./components/MobileNav";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
@@ -101,8 +102,8 @@ export default function RootLayout({
           </div>
         </ThemeProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
 }
-
