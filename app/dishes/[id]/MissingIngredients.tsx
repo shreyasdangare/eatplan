@@ -120,14 +120,14 @@ export function MissingIngredients({ dishIngredients }: Props) {
             {added ? (
               <>
                 <Check className="h-4 w-4" />
-                Added to shopping list
+                Added to list
               </>
             ) : adding ? (
               "Adding…"
             ) : (
               <>
                 <ShoppingCart className="h-4 w-4" />
-                Add {missing.length} missing to shopping list
+                Add {missing.length} missing to list
               </>
             )}
           </button>

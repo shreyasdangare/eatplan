@@ -308,10 +308,10 @@ export default function PlanPage() {
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-4xl">
-            This week
+            Planner
           </h1>
           <p className="mt-2 text-base font-medium text-stone-500 dark:text-stone-400">
-            Plan your recipes. Build your <Link href="/shopping-list" className="text-orange-600 underline hover:no-underline dark:text-orange-400">grocery list.</Link>
+            Plan your recipes. Build your <Link href="/shopping-list" className="text-orange-600 underline hover:no-underline dark:text-orange-400">list.</Link>
           </p>
         </div>
         

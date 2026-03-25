@@ -387,7 +387,7 @@ export default function PantryPage() {
                                 type="button"
                                 onClick={() => addToShoppingList(item.ingredient_id)}
                                 className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-800 hover:bg-orange-200 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/40"
-                                title="Add to shopping list"
+                                title="Add to list"
                               >
                                 + List
                               </button>

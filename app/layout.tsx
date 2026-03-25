@@ -64,14 +64,14 @@ export default function RootLayout({
                       title="Assign recipes to days and meals (breakfast, lunch, dinner)"
                       className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-amber-500/10 hover:text-amber-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-amber-500/20 dark:hover:text-amber-300"
                     >
-                      This week
+                      Planner
                     </a>
                     <a
                       href="/shopping-list"
                       title="Pick recipes and get one combined grocery list"
                       className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-rose-500/10 hover:text-rose-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-rose-500/20 dark:hover:text-rose-300"
                     >
-                      Shopping list
+                      List
                     </a>
                     <a
                       href="/pantry"

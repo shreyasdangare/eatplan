@@ -9,8 +9,8 @@ export function MobileNav() {
 
   const navItems = [
     { href: "/recipes", label: "Recipes", icon: BookOpen, activeColor: "text-orange-600 dark:text-orange-400", activeBg: "bg-orange-100 dark:bg-orange-500/20" },
-    { href: "/plan", label: "Plan", icon: CalendarHeart, activeColor: "text-amber-600 dark:text-amber-400", activeBg: "bg-amber-100 dark:bg-amber-500/20" },
-    { href: "/shopping-list", label: "Shop", icon: ShoppingCart, activeColor: "text-rose-600 dark:text-rose-400", activeBg: "bg-rose-100 dark:bg-rose-500/20" },
+    { href: "/plan", label: "Planner", icon: CalendarHeart, activeColor: "text-amber-600 dark:text-amber-400", activeBg: "bg-amber-100 dark:bg-amber-500/20" },
+    { href: "/shopping-list", label: "List", icon: ShoppingCart, activeColor: "text-rose-600 dark:text-rose-400", activeBg: "bg-rose-100 dark:bg-rose-500/20" },
     { href: "/pantry", label: "Pantry", icon: Archive, activeColor: "text-lime-600 dark:text-lime-400", activeBg: "bg-lime-100 dark:bg-lime-500/20" },
     { href: "/what-can-i-cook", label: "Cook?", icon: Sparkles, activeColor: "text-emerald-600 dark:text-emerald-400", activeBg: "bg-emerald-100 dark:bg-emerald-500/20" },
   ];
