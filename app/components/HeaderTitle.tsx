@@ -8,9 +8,6 @@ export function HeaderTitle() {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
-  if (isHome) {
-    return <div className="shrink-0" />;
-  }
 
   return (
     <Link

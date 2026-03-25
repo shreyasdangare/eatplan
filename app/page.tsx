@@ -83,7 +83,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           
           <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-6 sm:p-8 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto">
-              <div className="mt-4 rounded-full bg-white/60 px-6 py-2.5 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
+              <Logo className="mb-3 sm:mb-4 h-16 w-16 sm:h-24 sm:w-24 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
+              <h2 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+                EatPlan
+              </h2>
+              <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
+                काय खायचं?
+              </p>
+              <div className="mt-8 rounded-full bg-white/60 px-6 py-2.5 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
                 👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
               </div>
             </div>
@@ -103,7 +110,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {/* Hero */}
       <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-5 py-10 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
         <div className="relative z-10 flex flex-col items-center text-center mx-auto max-w-2xl">
-          <p className="max-w-lg text-base leading-relaxed text-stone-600 dark:text-stone-300 sm:text-xl">
+          <Logo className="mb-4 sm:mb-6 h-20 w-20 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2 sm:h-40 sm:w-40" />
+          <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-6xl lg:text-7xl">
+            EatPlan
+          </h2>
+          <p className="mt-2 text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400 sm:text-2xl">
+            काय खायचं?
+          </p>
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-stone-600 dark:text-stone-300 sm:text-xl">
             Remove the pain of deciding what to eat every day. Plan meals, build shopping lists, and cook with what you have.
           </p>
           <div className="mt-8">
@@ -174,29 +188,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </>
       )}
 
-      {/* Global Branding Footer */}
-      <section className="mt-12 sm:mt-24 pb-12 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        <div className="flex flex-col items-center justify-center gap-6">
-          <div className="relative group">
-            <div className="absolute inset-0 scale-150 bg-orange-500/10 blur-3xl rounded-full transition-transform group-hover:scale-[1.8]" />
-            <Logo className="relative h-32 w-32 sm:h-48 sm:w-48 shrink-0 drop-shadow-[0_20px_50px_rgba(234,88,12,0.3)] transition-all duration-1000 ease-out group-hover:scale-110 group-hover:-rotate-3" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-5xl font-black tracking-tighter text-stone-900 dark:text-stone-50 sm:text-7xl lg:text-8xl">
-              EatPlan
-            </h2>
-            <p className="text-2xl font-bold tracking-widest text-orange-600 dark:text-orange-400 sm:text-3xl lg:text-4xl">
-              काय खायचं?
-            </p>
-          </div>
-          
-          <div className="mt-12 flex flex-col items-center gap-4">
-            <p className="rounded-full glass-panel px-6 py-3 text-sm font-black tracking-[0.2em] text-stone-500 dark:text-stone-400 shadow-sm border border-white/40 dark:border-stone-800/60 uppercase">
-              A MEAL PLANNER BY PP 🇮🇳
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Footer line */}
+      <div className="mt-8 pb-4 flex justify-center">
+        <p className="rounded-full glass-panel px-4 py-2 text-xs font-semibold tracking-wider text-stone-500 dark:text-stone-400">
+          A MEAL PLANNER BY PP 🇮🇳
+        </p>
+      </div>
     </div>
   );
 }
