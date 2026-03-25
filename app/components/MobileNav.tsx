@@ -43,11 +43,9 @@ export function MobileNav() {
                 >
                   <Icon className={`h-5 w-5 ${isActive ? "opacity-100" : "opacity-80 drop-shadow-sm"}`} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] leading-none tracking-tight">
-                    {item.label}
-                  </span>
-                  <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter mt-0.5 whitespace-nowrap">Coming Soon</span>
+                <div className="flex flex-col items-center mt-0.5">
+                  <span className="text-[7px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter leading-none">Coming</span>
+                  <span className="text-[7px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter leading-none mt-0.5">Soon</span>
                 </div>
               </li>
             );
