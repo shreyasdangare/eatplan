@@ -47,7 +47,7 @@ export function MobileNav() {
                   <span className="text-[10px] leading-none tracking-tight">
                     {item.label}
                   </span>
-                  <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter mt-0.5">Soon</span>
+                  <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter mt-0.5 whitespace-nowrap">Coming Soon</span>
                 </div>
               </li>
             );

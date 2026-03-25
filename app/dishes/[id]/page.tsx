@@ -70,13 +70,13 @@ export default async function DishDetailPage({ params }: PageProps) {
     <article className="pb-16 max-w-5xl mx-auto">
       {/* Top Nav Overlay (Back Button) */}
       <div className="absolute top-4 left-4 z-50 sm:top-6 sm:left-6">
-         <Link
-            href="/recipes"
-            className="group flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/20 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all hover:bg-black/40 hover:scale-105 active:scale-95"
-            aria-label="Back to recipes"
-          >
-            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:-translate-x-1" />
-          </Link>
+        <Link
+          href="/recipes"
+          className="group flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/20 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all hover:bg-black/40 hover:scale-105 active:scale-95"
+          aria-label="Back to recipes"
+        >
+          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:-translate-x-1" />
+        </Link>
       </div>
 
       {/* Hero – content scrolls over this */}
@@ -90,31 +90,31 @@ export default async function DishDetailPage({ params }: PageProps) {
           {/* Subtle gradient overlay for the overlapping header */}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" aria-hidden />
         </div>
-        
+
         {/* Overlapping Header Card */}
         <div className="px-4 sm:px-8 lg:px-12 relative z-10 -mt-20 sm:-mt-28">
           <div className="flex flex-col gap-6 rounded-[2rem] glass-panel p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                 {dish.meal_type && (
+                {dish.meal_type && (
                   <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
                     {dish.meal_type}
                   </span>
-                 )}
-                 {dish.tags && dish.tags.length > 0 && dish.tags.map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-stone-200/50 bg-white/50 px-3 py-1 text-xs font-semibold text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 backdrop-blur-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                )}
+                {dish.tags && dish.tags.length > 0 && dish.tags.map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-stone-200/50 bg-white/50 px-3 py-1 text-xs font-semibold text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 backdrop-blur-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
 
               <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl lg:text-6xl mb-4 leading-tight">
                 {dish.name}
               </h1>
-              
+
               <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-stone-600 dark:text-stone-400">
                 {dish.prep_time_minutes != null && (
                   <div className="flex items-center gap-2">
@@ -134,16 +134,16 @@ export default async function DishDetailPage({ params }: PageProps) {
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-3 xl:flex-col xl:items-end xl:w-[280px]">
               <FavoriteButton dishId={dish.id as string} />
-              
+
               <Link
                 href={`/dishes/${dish.id}/cook`}
                 className="group flex flex-1 xl:w-full min-h-[56px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl hover:-translate-y-0.5 active:scale-95 dark:bg-orange-500 dark:hover:bg-orange-400"
               >
                 <ChefHat className="h-5 w-5 transition-transform group-hover:scale-110" />
                 <span>Start Cooking</span>
-                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider">Soon</span>
+                <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight leading-none">Coming Soon</span>
               </Link>
-              
+
               <div className="flex w-full xl:w-auto items-center gap-3">
                 <Link
                   href={`/dishes/${dish.id}/edit`}
@@ -213,7 +213,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-700" />
                 </div>
                 <div className="prose prose-stone dark:prose-invert prose-lg max-w-none text-stone-700 dark:text-stone-300 leading-relaxed font-medium">
-                   {/* Here we might assume instructions could be markdown later, but for now we just render pre-line text nicely */}
+                  {/* Here we might assume instructions could be markdown later, but for now we just render pre-line text nicely */}
                   <div className="rounded-[2rem] glass-panel p-6 sm:p-8 shadow-sm space-y-4">
                     {instructions.split('\n').filter(line => line.trim() !== '').map((line, idx) => (
                       <p key={idx} className="text-stone-700 dark:text-stone-300">
