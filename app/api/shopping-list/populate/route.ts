@@ -53,8 +53,20 @@ export async function POST(req: NextRequest) {
       .filter(Boolean)
   );
 
+  // Also exclude ingredients already in the pantry
+  const { data: pantryData } = await supabaseServer
+    .from("pantry")
+    .select("ingredient_id")
+    .eq("household_id", householdId);
+
+  const pantryIngredientIds = new Set(
+    (pantryData ?? [])
+      .map((r: { ingredient_id: string }) => r.ingredient_id)
+      .filter(Boolean)
+  );
+
   const toInsert = lines
-    .filter((line) => !existingIngredientIds.has(line.ingredient_id))
+    .filter((line) => !existingIngredientIds.has(line.ingredient_id) && !pantryIngredientIds.has(line.ingredient_id))
     .map((line) => ({
       household_id: householdId,
       ingredient_id: line.ingredient_id,

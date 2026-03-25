@@ -2,150 +2,43 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { TranslatedIngredient } from "@/app/components/TranslatedIngredient";
-
-type DishData = {
-  id: string;
-  name: string;
-  description?: string | null;
-  prep_time_minutes?: number | null;
-  servings?: number | null;
-  instructions?: string | null;
-  dish_ingredients?: {
-    id: string;
-    quantity: string | null;
-    amount: number | null;
-    unit: string | null;
-    is_optional: boolean;
-    ingredients?: { name: string } | null;
-  }[];
-};
+import { ChefHat, ChevronLeft, Construction } from "lucide-react";
 
 export default function CookModePage() {
   const params = useParams();
   const id = params?.id as string;
-  const [dish, setDish] = useState<DishData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!id) return;
-    (async () => {
-      const res = await fetch(`/api/dishes/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setDish(data);
-      }
-      setLoading(false);
-    })();
-  }, [id]);
-
-  useEffect(() => {
-    let wakeLock: WakeLockSentinel | null = null;
-    async function requestWakeLock() {
-      if (!("wakeLock" in navigator)) return;
-      try {
-        wakeLock = await (navigator as any).wakeLock.request("screen");
-      } catch {
-        // ignore
-      }
-    }
-    void requestWakeLock();
-    return () => {
-      wakeLock?.release?.().catch(() => {});
-    };
-  }, []);
-
-  if (loading || !dish) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-lg text-amber-700 dark:text-amber-300">Loading…</p>
-      </div>
-    );
-  }
-
-  const required = (dish.dish_ingredients ?? []).filter((di) => !di.is_optional);
-  const optional = (dish.dish_ingredients ?? []).filter((di) => di.is_optional);
-
-  const qty = (di: (typeof required)[0]) =>
-    di.amount != null && di.unit
-      ? `${di.amount} ${di.unit}`
-      : di.quantity ?? "—";
 
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex items-center justify-between">
-        <Link
-          href={`/dishes/${id}`}
-          className="rounded-full bg-stone-400 px-4 py-2 text-sm font-medium text-white hover:bg-stone-500 dark:bg-stone-600 dark:hover:bg-stone-500"
-        >
-          Exit cooking mode
-        </Link>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 pb-12 text-center">
+      <div className="relative">
+        <div className="flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-orange-100 via-amber-50 to-orange-100 shadow-lg dark:from-stone-800 dark:via-stone-800 dark:to-stone-700">
+          <ChefHat className="h-12 w-12 text-orange-500 dark:text-orange-400" />
+        </div>
+        <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 shadow-md">
+          <Construction className="h-4 w-4 text-white" />
+        </div>
       </div>
 
-      <h1 className="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
-        {dish.name}
-      </h1>
-
-      {dish.prep_time_minutes != null && (
-        <p className="text-xl text-amber-700 dark:text-amber-300">
-          Prep: {dish.prep_time_minutes} min
+      <div className="space-y-3">
+        <span className="inline-block rounded-full bg-amber-100 px-4 py-1.5 text-xs font-extrabold uppercase tracking-widest text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+          Coming Soon
+        </span>
+        <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-4xl">
+          Cooking Mode
+        </h1>
+        <p className="mx-auto max-w-md text-base font-medium text-stone-500 dark:text-stone-400">
+          A hands-free, step-by-step cooking experience with wake-lock, voice
+          control, and timer integration. We're cooking this up for you.
         </p>
-      )}
+      </div>
 
-      {dish.description && (
-        <p className="text-xl leading-relaxed text-stone-700 dark:text-stone-300">
-          {dish.description}
-        </p>
-      )}
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">
-          Ingredients
-        </h2>
-        <ul className="space-y-3 text-xl dark:text-stone-200">
-          {required.map((di) => (
-            <li
-              key={di.id}
-              className="flex justify-between gap-4 border-b border-stone-200 pb-2 dark:border-stone-600"
-            >
-              <TranslatedIngredient name={di.ingredients?.name ?? "—"} />
-              <span className="text-amber-700 dark:text-amber-300">{qty(di)}</span>
-            </li>
-          ))}
-          {optional.length > 0 && (
-            <>
-              <li className="pt-2 text-lg font-medium text-stone-500 dark:text-stone-400">
-                Optional
-              </li>
-              {optional.map((di) => (
-                <li
-                  key={di.id}
-                  className="flex justify-between gap-4 border-b border-stone-200 pb-2 text-stone-600 dark:border-stone-600 dark:text-stone-400"
-                >
-                  <TranslatedIngredient name={di.ingredients?.name ?? "—"} />
-                  <span>{qty(di)}</span>
-                </li>
-              ))}
-            </>
-          )}
-        </ul>
-      </section>
-
-      {dish.instructions && (
-        <section className="space-y-4">
-          <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100">
-            Steps
-          </h2>
-          <div className="whitespace-pre-line rounded-lg border border-stone-200 bg-stone-50 p-4 text-lg leading-relaxed text-stone-800 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200">
-            {dish.instructions}
-          </div>
-        </section>
-      )}
-
-      <p className="text-sm text-stone-500 dark:text-stone-400">
-        Screen will stay on while this page is open.
-      </p>
+      <Link
+        href={`/dishes/${id}`}
+        className="group inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl active:scale-95 dark:bg-orange-500 dark:hover:bg-orange-400"
+      >
+        <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+        Back to recipe
+      </Link>
     </div>
   );
 }

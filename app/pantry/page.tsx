@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   IngredientAutocompleteInput,
   IngredientOption
 } from "../components/IngredientAutocompleteInput";
+import { SHOPPING_CATEGORIES, getCategoryEmoji, inferCategoryFromName } from "@/lib/categoryEmoji";
 
 const PANTRY_STORAGE_KEY = "eatplan-pantry";
 
@@ -28,7 +29,7 @@ function savePantryIdsLocal(ids: string[]) {
   localStorage.setItem(PANTRY_STORAGE_KEY, JSON.stringify(ids));
 }
 
-type Ingredient = { id: string; name: string };
+type Ingredient = { id: string; name: string; category?: string | null };
 type PantryItem = { ingredient_id: string; amount: number | null; unit: string | null };
 
 export default function PantryPage() {
@@ -42,6 +43,7 @@ export default function PantryPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState("");
   const [editUnit, setEditUnit] = useState("");
+  const [filterQuery, setFilterQuery] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -174,6 +176,54 @@ export default function PantryPage() {
   const getIngredientName = (id: string) =>
     ingredients.find((i) => i.id === id)?.name ?? id;
 
+  const getIngredientCategory = (id: string) => {
+    const ing = ingredients.find((i) => i.id === id);
+    return ing?.category?.trim() || inferCategoryFromName(ing?.name ?? "") || "Other";
+  };
+
+  const addToShoppingList = useCallback(
+    async (ingredientId: string) => {
+      const res = await fetch("/api/shopping-list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ingredient_id: ingredientId,
+          source: "manual",
+        }),
+      });
+      if (res.ok) {
+        // Brief visual feedback - could be enhanced later
+      }
+    },
+    []
+  );
+
+  // Filter and group pantry items
+  const filteredItems = useMemo(() => {
+    const q = filterQuery.trim().toLowerCase();
+    if (!q) return pantryItems;
+    return pantryItems.filter((item) => {
+      const name = getIngredientName(item.ingredient_id).toLowerCase();
+      return name.includes(q);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pantryItems, filterQuery, ingredients]);
+
+  const groupedItems = useMemo(() => {
+    const groups = new Map<string, PantryItem[]>();
+    for (const item of filteredItems) {
+      const cat = getIngredientCategory(item.ingredient_id);
+      if (!groups.has(cat)) groups.set(cat, []);
+      groups.get(cat)!.push(item);
+    }
+    const ordered = [...SHOPPING_CATEGORIES, "Other"].filter((c) => groups.has(c));
+    for (const c of groups.keys()) {
+      if (!ordered.includes(c)) ordered.push(c);
+    }
+    return ordered.map((cat) => ({ category: cat, items: groups.get(cat) ?? [] }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredItems, ingredients]);
+
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-2">
@@ -181,10 +231,10 @@ export default function PantryPage() {
           <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
             My pantry
           </h2>
-          <p className="text-xs text-amber-700 dark:text-amber-300">
+          <p className="text-xs text-amber-700/80 dark:text-amber-300/70">
             {connected
-              ? "What you have on hand. Add amount and unit for deduction when you mark meals prepared."
-              : "Ingredients you have on hand. Log in to sync across devices."}
+              ? "What you have on hand."
+              : "Log in to sync across devices."}
           </p>
         </div>
         <Link
@@ -238,94 +288,127 @@ export default function PantryPage() {
       </div>
 
       <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
-        <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200">
-          In pantry ({pantryItems.length})
-        </h3>
-        {pantryItems.length === 0 ? (
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200">
+            In pantry ({pantryItems.length})
+          </h3>
+          {pantryItems.length > 3 && (
+            <input
+              type="text"
+              placeholder="Filter pantry…"
+              value={filterQuery}
+              onChange={(e) => setFilterQuery(e.target.value)}
+              className="w-36 rounded-lg border border-orange-200 bg-white px-2 py-1 text-xs placeholder:text-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-500"
+            />
+          )}
+        </div>
+        {filteredItems.length === 0 ? (
           <p className="text-sm text-amber-700 dark:text-amber-300">
-            No ingredients yet. Add items above.
+            {pantryItems.length === 0 ? "No ingredients yet. Add items above." : "No items match your filter."}
           </p>
         ) : (
-          <ul className="space-y-2">
-            {pantryItems.map((item) => {
-              const name = getIngredientName(item.ingredient_id);
-              const isEditing = editingId === item.ingredient_id;
-              return (
-                <li
-                  key={item.ingredient_id}
-                  className="flex flex-wrap items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs shadow-sm dark:bg-stone-700 dark:text-stone-200"
-                >
-                  <span>{name}</span>
-                  {isEditing ? (
-                    <>
-                      <input
-                        type="number"
-                        step="any"
-                        min="0"
-                        placeholder="Amount"
-                        value={editAmount}
-                        onChange={(e) => setEditAmount(e.target.value)}
-                        className="w-16 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Unit"
-                        value={editUnit}
-                        onChange={(e) => setEditUnit(e.target.value)}
-                        className="w-14 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updatePantryQuantity(
-                            item.ingredient_id,
-                            editAmount.trim() ? parseFloat(editAmount) : null,
-                            editUnit.trim() || null
-                          )
-                        }
-                        className="text-lime-600 hover:underline"
+          <div className="space-y-3">
+            {groupedItems.map(({ category, items }) => (
+              <div key={category}>
+                <div className="mb-1 flex items-center gap-1.5">
+                  <span className="text-sm" aria-hidden>{getCategoryEmoji(category)}</span>
+                  <span className="text-[11px] font-medium text-amber-800 dark:text-amber-200">
+                    {category} ({items.length})
+                  </span>
+                </div>
+                <ul className="space-y-1.5">
+                  {items.map((item) => {
+                    const name = getIngredientName(item.ingredient_id);
+                    const isEditing = editingId === item.ingredient_id;
+                    return (
+                      <li
+                        key={item.ingredient_id}
+                        className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs shadow-sm dark:bg-stone-700 dark:text-stone-200"
                       >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingId(null)}
-                        className="text-amber-600 hover:underline"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {(item.amount != null || (item.unit && item.unit.trim())) && (
-                        <span className="text-amber-700 dark:text-amber-300">
-                          {item.amount != null ? item.amount : ""}
-                          {item.unit?.trim() ? ` ${item.unit}` : ""}
-                        </span>
-                      )}
-                      {connected && (
-                        <button
-                          type="button"
-                          onClick={() => startEdit(item)}
-                          className="text-amber-600 hover:underline dark:text-amber-400"
-                        >
-                          Edit qty
-                        </button>
-                      )}
-                    </>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => removeFromPantry(item.ingredient_id)}
-                    className="text-amber-600 hover:text-red-600 dark:text-amber-400 dark:hover:text-red-400 ml-auto"
-                    aria-label={`Remove ${name}`}
-                  >
-                    ×
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+                        <span className="font-medium">{name}</span>
+                        {isEditing ? (
+                          <>
+                            <input
+                              type="number"
+                              step="any"
+                              min="0"
+                              placeholder="Amount"
+                              value={editAmount}
+                              onChange={(e) => setEditAmount(e.target.value)}
+                              className="w-16 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Unit"
+                              value={editUnit}
+                              onChange={(e) => setEditUnit(e.target.value)}
+                              className="w-14 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updatePantryQuantity(
+                                  item.ingredient_id,
+                                  editAmount.trim() ? parseFloat(editAmount) : null,
+                                  editUnit.trim() || null
+                                )
+                              }
+                              className="text-lime-600 hover:underline"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingId(null)}
+                              className="text-amber-600 hover:underline"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {(item.amount != null || (item.unit && item.unit.trim())) && (
+                              <span className="text-amber-700 dark:text-amber-300">
+                                {item.amount != null ? item.amount : ""}
+                                {item.unit?.trim() ? ` ${item.unit}` : ""}
+                              </span>
+                            )}
+                            <div className="ml-auto flex items-center gap-1.5">
+                              {connected && (
+                                <button
+                                  type="button"
+                                  onClick={() => startEdit(item)}
+                                  className="text-amber-600 hover:underline dark:text-amber-400"
+                                >
+                                  Edit qty
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => addToShoppingList(item.ingredient_id)}
+                                className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-800 hover:bg-orange-200 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/40"
+                                title="Add to shopping list"
+                              >
+                                + List
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeFromPantry(item.ingredient_id)}
+                                className="text-amber-600 hover:text-red-600 dark:text-amber-400 dark:hover:text-red-400"
+                                aria-label={`Remove ${name}`}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </section>

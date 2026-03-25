@@ -274,17 +274,17 @@ export default function NewDishPage() {
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               
               {/* Name Import */}
-              <div className="space-y-4">
-                <div>
+              <div className="flex flex-col">
+                <div className="mb-4">
                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
                     <Search className="h-4 w-4 text-stone-400" />
                     From Name
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Type a dish to generate a highly-rated recipe for 2.
+                    Type a dish name to generate a recipe.
                   </p>
                 </div>
-                <form onSubmit={handleImportByName} className="space-y-3">
+                <form onSubmit={handleImportByName} className="mt-auto space-y-3">
                   <input
                     type="text"
                     placeholder="e.g. Pasta Carbonara"
@@ -304,17 +304,17 @@ export default function NewDishPage() {
               </div>
 
               {/* URL Import */}
-              <div className="space-y-4">
-                <div>
+              <div className="flex flex-col">
+                <div className="mb-4">
                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
                     <LinkIcon className="h-4 w-4 text-stone-400" />
                     From URL or YouTube
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Paste a link and we'll extract the recipe.
+                    Paste a link to extract the recipe.
                   </p>
                 </div>
-                <form onSubmit={handleImport} className="space-y-3">
+                <form onSubmit={handleImport} className="mt-auto space-y-3">
                   <input
                     type="url"
                     placeholder="https://..."
@@ -334,21 +334,21 @@ export default function NewDishPage() {
               </div>
 
               {/* Screenshot Import */}
-              <div className="space-y-4">
-                <div>
+              <div className="flex flex-col">
+                <div className="mb-4">
                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
                     <Camera className="h-4 w-4 text-stone-400" />
                     From Screenshot
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Upload an image of a recipe page or cookbook.
+                    Upload a photo of a recipe page.
                   </p>
                 </div>
-                <form onSubmit={handleImportScreenshot} className="space-y-3">
+                <form onSubmit={handleImportScreenshot} className="mt-auto space-y-3">
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
-                    className="w-full rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-200 file:px-4 file:py-1.5 file:font-semibold file:text-stone-700 hover:file:bg-stone-300 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-400 dark:file:bg-stone-700 dark:file:text-stone-300 dark:hover:file:bg-stone-600"
+                    className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-200 file:px-4 file:py-1.5 file:font-semibold file:text-stone-700 hover:file:bg-stone-300 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-400 dark:file:bg-stone-700 dark:file:text-stone-300 dark:hover:file:bg-stone-600"
                     onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
                     disabled={importing}
                   />

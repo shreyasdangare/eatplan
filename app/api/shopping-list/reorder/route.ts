@@ -22,17 +22,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  for (let i = 0; i < orderedIds.length; i++) {
-    const { error } = await supabaseServer
-      .from("shopping_list_items")
-      .update({ position: i })
-      .eq("id", orderedIds[i])
-      .eq("household_id", householdId)
-      .eq("status", "to_buy");
+  // Single RPC call to batch-update all positions
+  const items = orderedIds.map((id, i) => ({ id, position: i }));
+  const { error } = await supabaseServer.rpc("batch_reorder_shopping_list", {
+    p_household_id: householdId,
+    p_items: items,
+  });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

@@ -6,9 +6,9 @@
   body {
     @apply bg-stone-50 text-stone-900 antialiased selection:bg-orange-200 selection:text-orange-900 transition-colors duration-300;
   }
-  
+
   .dark body {
-     @apply bg-stone-950 text-stone-100 selection:bg-orange-900 selection:text-orange-100;
+    @apply bg-stone-950 text-stone-100 selection:bg-orange-900 selection:text-orange-100;
   }
 }
 
@@ -22,7 +22,7 @@ html {
 
 @layer utilities {
   .glass-panel {
-    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
   }
 
   /* Custom Premium Scrollbar */
@@ -38,9 +38,9 @@ html {
   ::-webkit-scrollbar-thumb {
     @apply bg-stone-300/80 rounded-full border-[2px] border-solid border-transparent bg-clip-padding hover:bg-stone-400 dark:bg-stone-700/80 dark:hover:bg-stone-500;
   }
-  
+
   .dark ::-webkit-scrollbar-thumb {
-     @apply bg-stone-700/80 border-transparent bg-clip-padding hover:bg-stone-600;
+    @apply bg-stone-700/80 border-transparent bg-clip-padding hover:bg-stone-600;
   }
 
   /* Remove arrows from number inputs */
@@ -53,7 +53,9 @@ html {
 
 /* Improve tap highlight on mobile & prevent unneeded outlines on touch */
 @media (hover: none) {
-  a, button {
+
+  a,
+  button {
     -webkit-tap-highlight-color: transparent;
   }
 }
@@ -68,7 +70,9 @@ textarea {
   font-size: 16px;
   @apply transition-colors duration-200;
 }
+
 @media (min-width: 640px) {
+
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -79,3 +83,27 @@ textarea {
   }
 }
 
+/* Shopping list buy animation */
+@keyframes buy-check {
+  0% { transform: scale(1); opacity: 1; }
+  30% { transform: scale(1.08); }
+  60% { transform: scale(0.92); opacity: 0.7; }
+  100% { transform: scale(0.85); opacity: 0; }
+}
+
+.animate-buy {
+  animation: buy-check 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes buy-checkmark {
+  0% { stroke-dashoffset: 24; opacity: 0; }
+  40% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.animate-checkmark {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: buy-checkmark 350ms ease-out 50ms forwards;
+}

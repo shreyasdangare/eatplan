@@ -5,6 +5,7 @@ import { FavoriteButton } from "../../components/FavoriteButton";
 import { DeleteDishButton } from "./DeleteDishButton";
 import { DishImageUpload } from "./DishImageUpload";
 import { PortionScaling } from "./PortionScaling";
+import { MissingIngredients } from "./MissingIngredients";
 import { ChefHat, ChevronLeft, Clock, Pencil, Trash2, Utensils } from "lucide-react";
 
 interface PageProps {
@@ -140,6 +141,7 @@ export default async function DishDetailPage({ params }: PageProps) {
               >
                 <ChefHat className="h-5 w-5 transition-transform group-hover:scale-110" />
                 <span>Start Cooking</span>
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider">Soon</span>
               </Link>
               
               <div className="flex w-full xl:w-auto items-center gap-3">
@@ -179,6 +181,24 @@ export default async function DishDetailPage({ params }: PageProps) {
                 baseServings={servings ?? null}
                 required={required ?? []}
                 optional={optional ?? []}
+              />
+              <MissingIngredients
+                dishIngredients={[
+                  ...(required ?? []).map((di: any) => ({
+                    ingredient_id: di.ingredient_id,
+                    ingredients: di.ingredients,
+                    quantity: di.quantity,
+                    amount: di.amount,
+                    unit: di.unit,
+                  })),
+                  ...(optional ?? []).map((di: any) => ({
+                    ingredient_id: di.ingredient_id,
+                    ingredients: di.ingredients,
+                    quantity: di.quantity,
+                    amount: di.amount,
+                    unit: di.unit,
+                  })),
+                ]}
               />
             </div>
           </div>
