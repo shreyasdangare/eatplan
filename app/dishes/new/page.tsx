@@ -37,7 +37,7 @@ export default function NewDishPage() {
   const [loading, setLoading] = useState(false);
   const [importUrl, setImportUrl] = useState("");
   const [importScreenshotFile, setImportScreenshotFile] = useState<File | null>(null);
-  const [importing, setImporting] = useState(false);
+  const [importingType, setImportingType] = useState<null | "name" | "url" | "screenshot">(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [importName, setImportName] = useState("");
   const [newIngredientName, setNewIngredientName] = useState("");
@@ -134,13 +134,13 @@ export default function NewDishPage() {
     const url = importUrl.trim();
     if (!url) return;
     setImportError(null);
-    setImporting(true);
+    setImportingType("url");
     const res = await fetch("/api/import-recipe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url })
     });
-    setImporting(false);
+    setImportingType(null);
     if (res.ok) {
       const data = (await res.json()) as { id: string };
       router.push(`/dishes/${data.id}`);
@@ -154,14 +154,14 @@ export default function NewDishPage() {
     e.preventDefault();
     if (!importScreenshotFile) return;
     setImportError(null);
-    setImporting(true);
+    setImportingType("screenshot");
     const formData = new FormData();
     formData.append("file", importScreenshotFile);
     const res = await fetch("/api/import-recipe", {
       method: "POST",
       body: formData
     });
-    setImporting(false);
+    setImportingType(null);
     if (res.ok) {
       const data = (await res.json()) as { id: string };
       router.push(`/dishes/${data.id}`);
@@ -176,13 +176,13 @@ export default function NewDishPage() {
     const nameToImport = importName.trim();
     if (!nameToImport) return;
     setImportError(null);
-    setImporting(true);
+    setImportingType("name");
     const res = await fetch("/api/import-recipe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ recipeName: nameToImport })
     });
-    setImporting(false);
+    setImportingType(null);
     if (res.ok) {
       const data = (await res.json()) as { id: string };
       router.push(`/dishes/${data.id}`);
@@ -291,14 +291,14 @@ export default function NewDishPage() {
                     className={inputClasses}
                     value={importName}
                     onChange={(e) => setImportName(e.target.value)}
-                    disabled={importing}
+                    disabled={!!importingType}
                   />
                   <button
                     type="submit"
-                    disabled={importing || !importName.trim()}
+                    disabled={!!importingType || !importName.trim()}
                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
-                     {importing ? "Generating…" : "Generate Recipe"}
+                     {importingType === "name" ? "Generating…" : "Generate Recipe"}
                   </button>
                 </form>
               </div>
@@ -321,14 +321,14 @@ export default function NewDishPage() {
                     className={inputClasses}
                     value={importUrl}
                     onChange={(e) => setImportUrl(e.target.value)}
-                    disabled={importing}
+                    disabled={!!importingType}
                   />
                   <button
                     type="submit"
-                    disabled={importing || !importUrl.trim()}
+                    disabled={!!importingType || !importUrl.trim()}
                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
-                     {importing ? "Importing…" : "Extract Recipe"}
+                     {importingType === "url" ? "Importing…" : "Extract Recipe"}
                   </button>
                 </form>
               </div>
@@ -350,14 +350,14 @@ export default function NewDishPage() {
                     accept="image/png,image/jpeg,image/webp"
                     className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-200 file:px-4 file:py-1.5 file:font-semibold file:text-stone-700 hover:file:bg-stone-300 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-400 dark:file:bg-stone-700 dark:file:text-stone-300 dark:hover:file:bg-stone-600"
                     onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
-                    disabled={importing}
+                    disabled={!!importingType}
                   />
                   <button
                     type="submit"
-                    disabled={importing || !importScreenshotFile}
+                    disabled={!!importingType || !importScreenshotFile}
                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
-                    {importing ? "Importing…" : "Scan Image"}
+                    {importingType === "screenshot" ? "Importing…" : "Scan Image"}
                   </button>
                 </form>
               </div>

@@ -57,7 +57,9 @@ export function DishImageUpload({
             className={imageClass}
           />
           <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
-          <label className="absolute bottom-4 right-4 cursor-pointer flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-black hover:scale-105 active:scale-95 shadow-lg border border-white/20 z-20">
+          <label className={`absolute cursor-pointer flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-black hover:scale-105 active:scale-95 shadow-lg border border-white/20 z-20 ${
+            isHero ? "top-4 right-4 sm:top-6 sm:right-6" : "bottom-4 right-4"
+          }`}>
             <Camera className="h-4 w-4" />
             <span>Change photo</span>
             <input

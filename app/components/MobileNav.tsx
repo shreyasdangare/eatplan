@@ -24,6 +24,35 @@ export function MobileNav() {
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
           const Icon = item.icon;
+          const isSoon = item.label === "Cook?";
+
+          if (isSoon) {
+            return (
+              <li
+                key={item.href}
+                className={`flex flex-col items-center justify-center min-w-[4rem] h-full gap-1 transition-all opacity-60 cursor-not-allowed ${
+                  isActive 
+                    ? `${item.activeColor} font-bold` 
+                    : "text-stone-500 font-medium"
+                }`}
+              >
+                <div 
+                  className={`flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-300 ${
+                    isActive ? `${item.activeBg} scale-110` : "bg-transparent"
+                  }`}
+                >
+                  <Icon className={`h-5 w-5 ${isActive ? "opacity-100" : "opacity-80 drop-shadow-sm"}`} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] leading-none tracking-tight">
+                    {item.label}
+                  </span>
+                  <span className="text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter mt-0.5">Soon</span>
+                </div>
+              </li>
+            );
+          }
+
           return (
             <Link
               key={item.href}

@@ -214,8 +214,12 @@ export default async function DishDetailPage({ params }: PageProps) {
                 </div>
                 <div className="prose prose-stone dark:prose-invert prose-lg max-w-none text-stone-700 dark:text-stone-300 leading-relaxed font-medium">
                    {/* Here we might assume instructions could be markdown later, but for now we just render pre-line text nicely */}
-                  <div className="whitespace-pre-line rounded-[2rem] glass-panel p-6 sm:p-8 shadow-sm">
-                    {instructions}
+                  <div className="rounded-[2rem] glass-panel p-6 sm:p-8 shadow-sm space-y-4">
+                    {instructions.split('\n').filter(line => line.trim() !== '').map((line, idx) => (
+                      <p key={idx} className="text-stone-700 dark:text-stone-300">
+                        {line}
+                      </p>
+                    ))}
                   </div>
                 </div>
               </section>

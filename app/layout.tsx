@@ -80,13 +80,13 @@ export default function RootLayout({
                     >
                       Pantry
                     </a>
-                    <a
-                      href="/what-can-i-cook"
-                      title="Enter what you have and see matching recipes"
-                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-emerald-500/10 hover:text-emerald-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-300"
+                    <div
+                      title="Coming Soon: Enter what you have and see matching recipes"
+                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-400 cursor-not-allowed gap-2"
                     >
                       Cook?
-                    </a>
+                      <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight leading-none">Soon</span>
+                    </div>
                   </nav>
                   <div className="flex shrink-0 items-center justify-center sm:border-l sm:pl-2 border-stone-200 dark:border-stone-700">
                     <DarkModeToggle />
