@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
+import { Settings } from "lucide-react";
 
 export function AuthLinks() {
   const [user, setUser] = useState<{
@@ -62,24 +62,10 @@ export function AuthLinks() {
       <div className="flex items-center gap-2">
         <Link
           href="/settings"
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 active:opacity-80 dark:text-stone-400 dark:hover:bg-stone-800 transition-colors"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 transition-all hover:scale-110 active:scale-95"
           title="Account Settings"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-settings"
-          >
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2 2.01 2.01 0 0 1-2.12 2 2 2 0 0 0-2 2 2.01 2.01 0 0 1-2 2.12 2 2 0 0 0-2 2v.44a2 2 0 0 0 2 2 2.01 2.01 0 0 1 2.12 2 2 2 0 0 0 2 2 2.01 2.01 0 0 1 2 2.12 2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2 2.01 2.01 0 0 1 2.12-2 2 2 0 0 0 2-2 2.01 2.01 0 0 1 2-2.12 2 2 0 0 0 2-2v-.44a2 2 0 0 0-2-2 2.01 2.01 0 0 1-2.12-2 2 2 0 0 0-2-2 2.01 2.01 0 0 1-2-2.12 2 2 0 0 0-2-2z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
+          <Settings className="h-5 w-5" />
         </Link>
       </div>
     );
