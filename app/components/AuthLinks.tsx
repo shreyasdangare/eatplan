@@ -61,18 +61,26 @@ export function AuthLinks() {
     return (
       <div className="flex items-center gap-2">
         <Link
-          href="/settings/household"
-          className="min-h-[44px] flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold text-orange-700 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-stone-700 transition-colors"
+          href="/settings"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 active:opacity-80 dark:text-stone-400 dark:hover:bg-stone-800 transition-colors"
+          title="Account Settings"
         >
-          Household
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-settings"
+          >
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2 2.01 2.01 0 0 1-2.12 2 2 2 0 0 0-2 2 2.01 2.01 0 0 1-2 2.12 2 2 0 0 0-2 2v.44a2 2 0 0 0 2 2 2.01 2.01 0 0 1 2.12 2 2 2 0 0 0 2 2 2.01 2.01 0 0 1 2 2.12 2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2 2.01 2.01 0 0 1 2.12-2 2 2 0 0 0 2-2 2.01 2.01 0 0 1 2-2.12 2 2 0 0 0 2-2v-.44a2 2 0 0 0-2-2 2.01 2.01 0 0 1-2.12-2 2 2 0 0 0-2-2 2.01 2.01 0 0 1-2-2.12 2 2 0 0 0-2-2z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
         </Link>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full px-3 py-2.5 text-sm text-stone-600 hover:bg-stone-100 active:opacity-80 dark:text-stone-400 dark:hover:bg-stone-800 transition-colors"
-        >
-          Log out
-        </button>
       </div>
     );
   }

@@ -77,8 +77,8 @@ export default function HouseholdSettings() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 pb-24 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <Link href="/" className="mb-6 inline-block text-sm font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
-          ← Back to Dashboard
+        <Link href="/settings" className="mb-6 inline-block text-sm font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+          ← Back to Settings
         </Link>
         <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
           <Users className="h-8 w-8 text-orange-500" /> Household Sharing
