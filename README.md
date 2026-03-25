@@ -8,12 +8,12 @@
 
 ## Features
 
-- **Recipes** — Add dishes with ingredients, photos, servings, and tags. Filter by tag or favorites. Import from URL, screenshot, or YouTube (Gemini).
-- **This week** — Drag recipes onto breakfast, lunch, and dinner for each day.
-- **Shopping list** — Pick recipes and get one combined grocery list.
+- **Recipes** — Add dishes with ingredients, photos, servings, and tags. Filter by tag or favorites. Import from URL, screenshot, or YouTube, and translate ingredients (Gemini).
+- **Planner** — Drag recipes onto breakfast, lunch, and dinner for each day.
+- **List** — Pick recipes and get one combined grocery list.
 - **Pantry** — Ingredients you always have; used when searching “What can I cook?”.
 - **What can I cook?** — Enter what you have; see matching recipes.
-- **Auth** — Email sign-up/sign-in via Supabase. Multi-user: each user has their own recipes, plans, and list.
+- **Auth & Households** — Email sign-up/sign-in via Supabase. Collaborative planning: share recipes, plans, and lists within a **Household**.
 
 ---
 
@@ -25,7 +25,7 @@
 | UI         | React 18, Tailwind CSS, mobile-first layout |
 | Backend    | Next.js Route Handlers under `app/api` |
 | Database   | Supabase (Postgres) — dishes, ingredients, meal plans, pantry, auth |
-| Optional   | Google AI (Gemini) for recipe import; Spoonacular for auto dish images |
+| Optional   | Google AI (Gemini) for recipe import and ingredient translation; Spoonacular for auto dish images |
 
 ---
 
@@ -36,9 +36,9 @@
 │   ├── api/              # Route Handlers (recipes, dishes, meal-plans, pantry, auth, etc.)
 │   ├── components/       # Shared UI (HeaderTitle, AuthLinks, InstallPrompt, …)
 │   ├── dishes/           # Recipe CRUD, edit, cook view, image upload
-│   ├── plan/             # Weekly meal plan (drag-and-drop)
+│   ├── plan/             # Planner (drag-and-drop)
 │   ├── recipes/          # Recipe list and filters
-│   ├── shopping-list/    # Combined grocery list
+│   ├── shopping-list/    # Combined grocery list & reordering
 │   ├── pantry/           # “Always have” ingredients
 │   ├── what-can-i-cook/  # Match ingredients → recipes
 │   ├── login/, signup/   # Auth pages
@@ -78,7 +78,7 @@ Create `.env.local` in the project root (see [DEPLOYMENT.md](DEPLOYMENT.md) for 
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (server-only) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes (multi-user) | Same as `SUPABASE_URL` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (multi-user) | Supabase anon key (client auth) |
-| `GOOGLE_GEMINI_API_KEY` | For recipe import | Google AI Studio key (URL/screenshot/YouTube import) |
+| `GOOGLE_GEMINI_API_KEY` | For recipe import/translation | Google AI Studio key (URL/screenshot/YouTube import & translation) |
 | `SPOONACULAR_API_KEY` | Optional | Auto dish image when importing recipe |
 | `NEXT_PUBLIC_APP_URL` | Optional (production) | Canonical app URL (e.g. `https://eatplan.app`) so favicon and PWA icons load the logo correctly |
 
