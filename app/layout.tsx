@@ -45,13 +45,9 @@ export default function RootLayout({
           </Suspense>
           <div className="mx-auto flex min-h-[100dvh] min-w-0 max-w-4xl flex-col px-4 py-3 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
             <header className="relative z-50 mb-4 sm:mb-6 rounded-2xl glass-panel px-3 py-2 sm:px-4 sm:py-3 sticky top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
-              <div className="flex flex-row-reverse items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <HeaderTitle />
                 <div className="flex items-center gap-2">
-                  <div className="flex shrink-0 items-center justify-center sm:border-r sm:pr-2 border-stone-200 dark:border-stone-700">
-                    <AuthLinks />
-                    <DarkModeToggle />
-                  </div>
                   <nav
                     className="hidden sm:flex flex-wrap gap-1 sm:gap-1.5 text-sm"
                     aria-label="Main navigation"
@@ -92,6 +88,10 @@ export default function RootLayout({
                       <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight leading-none">Soon</span>
                     </div>
                   </nav>
+                  <div className="flex shrink-0 items-center justify-center sm:border-l sm:pl-2 border-stone-200 dark:border-stone-700">
+                    <DarkModeToggle />
+                    <AuthLinks />
+                  </div>
                 </div>
               </div>
             </header>
