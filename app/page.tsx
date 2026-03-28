@@ -84,9 +84,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-6 sm:p-8 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto">
               <Logo className="mb-3 sm:mb-4 h-16 w-16 sm:h-24 sm:w-24 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
-              <h2 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+              <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
                 EatPlan
-              </h2>
+              </h1>
               <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
                 काय खायचं?
               </p>
@@ -111,9 +111,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-5 py-10 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto max-w-2xl">
               <Logo className="mb-4 sm:mb-6 h-20 w-20 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2 sm:h-40 sm:w-40" />
-              <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-6xl lg:text-7xl">
+              <h1 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-6xl lg:text-7xl">
                 EatPlan
-              </h2>
+              </h1>
               <p className="mt-2 text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400 sm:text-2xl">
                 काय खायचं?
               </p>
@@ -149,9 +149,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="mx-auto w-full max-w-5xl">
             <div className="mb-8 flex items-center gap-4">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
-              <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
                 Everything you need
-              </h3>
+              </h2>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
             </div>
 
@@ -169,9 +169,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                       >
                         <Icon className="h-6 w-6" strokeWidth={2.5} />
                       </div>
-                      <span className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-50">
+                      <h3 className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-50">
                         {f.title}
-                      </span>
+                      </h3>
                       <span className="mb-6 flex-1 text-sm font-medium leading-relaxed text-stone-600 dark:text-stone-400">
                         {f.description}
                       </span>

@@ -10,12 +10,48 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { MobileNav } from "./components/MobileNav";
+import { StructuredData } from "./components/StructuredData";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
-  title: "EatPlan – काय खायचं?",
-  description: "Simple ingredient-based meal planning app"
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://eatplan.app"),
+  title: {
+    default: "EatPlan – काय खायचं? | Smart Meal Planner",
+    template: "%s | EatPlan",
+  },
+  description: "Simple ingredient-based meal planning app. Plan your meals, manage your digital cookbook, and automate your shopping list.",
+  keywords: ["meal planner", "grocery list", "pantry manager", "what to cook", "recipe organizer", "smart cooking"],
+  authors: [{ name: "EatPlan Team" }],
+  creator: "EatPlan",
+  publisher: "EatPlan",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://eatplan.app",
+    siteName: "EatPlan",
+    title: "EatPlan – काय खायचं? | Smart Meal Planner",
+    description: "Deciding what to eat made easy. Simple ingredient-based meal planning and shopping lists.",
+    images: [
+      {
+        url: "/icon", // Fallback to icon if OG image is not present
+        width: 512,
+        height: 512,
+        alt: "EatPlan Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EatPlan – काय खायचं?",
+    description: "Smart meal planning and automated shopping lists.",
+    images: ["/icon"],
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon",
+    apple: "/apple-icon",
+  },
 };
 
 export const viewport: Viewport = {
@@ -39,6 +75,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body>
+        <StructuredData />
         <ThemeProvider>
           <Suspense fallback={null}>
             <AuthCodeExchange />
