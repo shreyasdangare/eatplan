@@ -53,6 +53,7 @@ export default function EditDishPage() {
   const [mealType, setMealType] = useState<string>("both");
   const [prepTime, setPrepTime] = useState<string>("");
   const [tags, setTags] = useState("");
+  const [dietCategory, setDietCategory] = useState<"Veg" | "Non-Veg" | "Both">("Both");
   const [servings, setServings] = useState("");
   const [instructions, setInstructions] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -95,7 +96,23 @@ export default function EditDishPage() {
         setPrepTime(
           dishData.prep_time_minutes != null ? String(dishData.prep_time_minutes) : ""
         );
-        setTags((dishData.tags ?? []).join(", "));
+        const loadedTags = dishData.tags ?? [];
+        const isVeg = loadedTags.some(t => {
+           const lower = t.toLowerCase();
+           return lower === 'veg' || lower === 'vegetarian';
+        });
+        const isNonVeg = loadedTags.some(t => {
+           const lower = t.toLowerCase();
+           return lower === 'non-veg' || lower === 'non veg' || lower === 'non-vegetarian';
+        });
+        if (isVeg) setDietCategory("Veg");
+        else if (isNonVeg) setDietCategory("Non-Veg");
+        else setDietCategory("Both");
+        
+        setTags(loadedTags.filter(t => {
+           const lower = t.toLowerCase();
+           return lower !== 'veg' && lower !== 'vegetarian' && lower !== 'non-veg' && lower !== 'non veg' && lower !== 'non-vegetarian';
+        }).join(", "));
         setServings(
           dishData.servings != null ? String(dishData.servings) : ""
         );
@@ -223,10 +240,17 @@ export default function EditDishPage() {
           description: description || null,
           meal_type: mealType,
           prep_time_minutes: prepTime ? Number(prepTime) : null,
-          tags: tags
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean),
+          tags: [
+            ...tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+              .filter(t => {
+                const lower = t.toLowerCase();
+                return lower !== 'veg' && lower !== 'vegetarian' && lower !== 'non-veg' && lower !== 'non veg' && lower !== 'non-vegetarian';
+              }),
+            ...(dietCategory === "Veg" ? ["Veg"] : dietCategory === "Non-Veg" ? ["Non-Veg"] : [])
+          ],
           servings: servings ? Number(servings) : null,
           instructions: instructions.trim() || null,
           ingredients: selectedIngredients.map((s) => ({
@@ -375,6 +399,49 @@ export default function EditDishPage() {
               value={servings}
               onChange={(e) => setServings(e.target.value)}
             />
+          </div>
+        </div>
+
+        {/* Dietary Classification Toggle */}
+        <div className="space-y-3 rounded-2xl bg-stone-50/50 p-5 dark:bg-stone-900/50 border border-stone-200/50 dark:border-stone-700/50">
+          <label className={`${labelClasses} mb-0`}>Dietary Category</label>
+          <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-3">
+             Classify this explicitly to ensure your filters work flawlessly!
+          </p>
+          <div className="flex items-center gap-2 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-stone-200 dark:bg-stone-800 dark:ring-stone-700">
+             <button
+               type="button"
+               onClick={() => setDietCategory("Veg")}
+               className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.98] ${
+                  dietCategory === "Veg" 
+                    ? "bg-emerald-500 text-white shadow-md"
+                    : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700"
+               }`}
+             >
+               Vegetarian
+             </button>
+             <button
+               type="button"
+               onClick={() => setDietCategory("Both")}
+               className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.98] ${
+                  dietCategory === "Both" 
+                    ? "bg-stone-800 text-white shadow-md dark:bg-stone-200 dark:text-stone-900"
+                    : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700"
+               }`}
+             >
+               Uncategorized
+             </button>
+             <button
+               type="button"
+               onClick={() => setDietCategory("Non-Veg")}
+               className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.98] ${
+                  dietCategory === "Non-Veg" 
+                    ? "bg-rose-600 text-white shadow-md"
+                    : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700"
+               }`}
+             >
+               Non-Vegetarian
+             </button>
           </div>
         </div>
 

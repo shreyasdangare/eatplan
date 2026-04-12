@@ -38,26 +38,21 @@ async function DishesList() {
     );
   }
 
-  return <DishesListWithFilter dishes={dishes} />;
+  const defaultVegOnly = user.user_metadata?.isVegetarianOnly === true;
+
+  return (
+    <DishesListWithFilter dishes={dishes} defaultVegOnly={defaultVegOnly}>
+      <div className="flex flex-wrap items-center gap-3">
+        <RecipesSheetActions />
+        <AddRecipeDropdown />
+      </div>
+    </DishesListWithFilter>
+  );
 }
 
 export default function RecipesPage() {
   return (
-    <section className="space-y-8 lg:space-y-10 pb-12">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-4xl">
-            Recipes
-          </h1>
-          <p className="mt-2 text-base font-medium text-stone-500 dark:text-stone-400 max-w-lg">
-            Your collection. Add from URL or screenshot, filter by tag or favorites.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <RecipesSheetActions />
-          <AddRecipeDropdown />
-        </div>
-      </div>
+    <section className="space-y-8 lg:space-y-10 pb-12 pt-4">
       
       <Suspense fallback={
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -196,16 +196,32 @@ function SignupForm() {
         </div>
         <div>
           <label htmlFor="native_language" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-            Mother Tongue (for translations) <span className="text-stone-400 dark:text-stone-500 font-normal">Optional</span>
+            Mother Tongue <span className="text-stone-400 dark:text-stone-500 font-normal">Optional</span>
           </label>
-          <input
-            id="native_language"
-            type="text"
-            placeholder="e.g. Marathi, Hindi, Spanish"
-            value={nativeLanguage}
-            onChange={(e) => setNativeLanguage(e.target.value)}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
-          />
+          <div className="relative">
+            <select
+              id="native_language"
+              value={nativeLanguage}
+              onChange={(e) => setNativeLanguage(e.target.value)}
+              className="w-full min-h-[44px] appearance-none rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            >
+              <option value="">Select a language...</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Marathi">Marathi</option>
+              <option value="Gujarati">Gujarati</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Telugu">Telugu</option>
+              <option value="Kannada">Kannada</option>
+              <option value="Bengali">Bengali</option>
+              <option value="Malayalam">Malayalam</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
         </div>
         {error && (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>

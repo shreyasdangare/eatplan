@@ -1,5 +1,5 @@
 export function getTranslatedTagline(language?: string): string {
-  if (!language) return "काय खायचं?";
+  if (!language) return "What to eat?";
   const lang = language.toLowerCase().trim();
   
   if (lang.includes("english") || lang === "en") return "What to eat?";
@@ -16,5 +16,19 @@ export function getTranslatedTagline(language?: string): string {
   if (lang.includes("malayalam") || lang === "ml") return "എന്ത് കഴിക്കണം?";
   if (lang.includes("urdu") || lang === "ur") return "کیا کھائیں؟";
   
-  return "काय खायचं?";
+  return "What to eat?";
+}
+
+export function getTranslatedWelcome(language?: string, isFirstVisit: boolean = false): string {
+  const prefix = isFirstVisit ? "Welcome," : "Welcome back,";
+  if (!language) return prefix;
+  
+  const lang = language.toLowerCase().trim();
+  if (lang.includes("english") || lang === "en") return prefix;
+  if (lang.includes("hindi") || lang === "hi") return isFirstVisit ? "स्वागत है," : "वापसी पर स्वागत है,";
+  if (lang.includes("marathi") || lang === "mr") return isFirstVisit ? "स्वागत आहे," : "परत आल्याबद्दल स्वागत,";
+  if (lang.includes("spanish") || lang === "es") return isFirstVisit ? "Bienvenido," : "Bienvenido de nuevo,";
+  if (lang.includes("french") || lang === "fr") return isFirstVisit ? "Bienvenue," : "Bon retour,";
+  
+  return prefix;
 }

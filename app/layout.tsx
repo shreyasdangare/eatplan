@@ -5,7 +5,6 @@ import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { HeaderTitle } from "./components/HeaderTitle";
 import { AuthLinks } from "./components/AuthLinks";
-import { DarkModeToggle } from "./components/DarkModeToggle";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -97,7 +96,6 @@ export default async function RootLayout({
                     </div>
                   </nav>
                   <div className="flex shrink-0 items-center justify-center sm:border-l sm:pl-2 border-stone-200 dark:border-stone-700">
-                    <DarkModeToggle />
                     <AuthLinks />
                   </div>
                 </div>

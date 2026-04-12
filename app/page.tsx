@@ -49,7 +49,7 @@ type HomePageProps = {
   searchParams: Promise<{ error?: string; error_code?: string }>;
 };
 
-import { getTranslatedTagline } from "@/lib/taglines";
+import { getTranslatedTagline, getTranslatedWelcome } from "@/lib/taglines";
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { user } = await getSession();
@@ -59,11 +59,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const chefName =
     user?.preferred_name?.trim() || user?.email?.split("@")[0] || "Chef";
   const isFirstVisit = user && !user.has_visited_home;
-  const welcomePrefix = isFirstVisit ? "Welcome," : "Welcome back,";
+  const welcomePrefix = getTranslatedWelcome(user?.native_language, isFirstVisit);
   const tagline = getTranslatedTagline(user?.native_language);
 
   return (
-    <div className="flex flex-col gap-12 lg:gap-16">
+    <div className="flex flex-col gap-6 lg:gap-8">
       <Suspense fallback={null}>
         <ClearAuthErrorUrl />
       </Suspense>
@@ -81,28 +81,34 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       )}
       {user && (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
           {isFirstVisit && <MarkHomeVisited />}
 
-          <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-6 sm:p-8 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
+          <section className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-4 sm:p-5 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto">
-              <Logo className="mb-3 sm:mb-4 h-16 w-16 sm:h-24 sm:w-24 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
-              <h2 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+              <Logo className="mb-2 sm:mb-3 h-12 w-12 sm:h-16 sm:w-16 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
+              <h2 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-4xl">
                 EatPlan
               </h2>
-              <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
+              <p className="mt-1 text-base sm:text-lg font-medium tracking-wide text-orange-600 dark:text-orange-400">
                 {tagline}
               </p>
-              <div className="mt-8 rounded-full bg-white/60 px-6 py-2.5 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
+              <div className="mt-4 rounded-full bg-white/60 px-5 py-2 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
                 👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
               </div>
+              
+              {!user?.native_language && (
+                <div className="mt-3 rounded-xl bg-orange-100/80 px-4 py-2 text-sm font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border border-orange-200/50 dark:border-orange-800/30 shadow-sm flex items-center justify-between gap-4">
+                  You haven&apos;t set your Mother Tongue yet. Go to <Link href="/settings" className="text-orange-600 dark:text-orange-400 font-bold hover:underline">Settings</Link> to configure it for personalized messages!
+                </div>
+              )}
             </div>
 
-            <div className="absolute right-[-10%] top-[-50%] h-[300px] w-[300px] rounded-full bg-orange-400/20 mix-blend-multiply blur-3xl transition-transform duration-1000 ease-in-out group-hover:scale-110 dark:bg-orange-500/10 dark:mix-blend-screen" aria-hidden />
-            <div className="absolute bottom-[-50%] left-[-10%] h-[200px] w-[200px] rounded-full bg-rose-400/20 mix-blend-multiply blur-3xl transition-transform duration-1000 ease-in-out delay-75 group-hover:scale-110 dark:bg-rose-500/10 dark:mix-blend-screen" aria-hidden />
+            <div className="absolute right-[-10%] top-[-50%] h-[200px] w-[200px] rounded-full bg-orange-400/20 mix-blend-multiply blur-2xl transition-transform duration-1000 ease-in-out group-hover:scale-110 dark:bg-orange-500/10 dark:mix-blend-screen" aria-hidden />
+            <div className="absolute bottom-[-50%] left-[-10%] h-[150px] w-[150px] rounded-full bg-rose-400/20 mix-blend-multiply blur-2xl transition-transform duration-1000 ease-in-out delay-75 group-hover:scale-110 dark:bg-rose-500/10 dark:mix-blend-screen" aria-hidden />
           </section>
 
-          <Suspense fallback={<div className="h-64 rounded-[2rem] glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
+          <Suspense fallback={<div className="h-48 rounded-[1.5rem] glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
             <WeeklyPlanOverview />
           </Suspense>
         </div>

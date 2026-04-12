@@ -12,7 +12,7 @@ type PlanEntry = {
   id: string;
   date: string;
   slot_type: "breakfast" | "lunch" | "dinner";
-  dishes?: { id: string; name: string } | null;
+  dishes?: { id: string; name: string; image_url?: string | null } | null;
 };
 
 const SLOT_ICONS = {
@@ -29,8 +29,9 @@ function getUpcomingDates() {
   for (let i = 0; i < 2; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     dates.push({
-      dateStr: d.toISOString().slice(0, 10),
+      dateStr: dateStr,
       dayName: i === 0 ? "Today" : "Tomorrow",
       monthDay: `${months[d.getMonth()]} ${d.getDate()}`,
       isToday: i === 0
@@ -54,7 +55,7 @@ export async function WeeklyPlanOverview() {
     .from("meal_plans")
     .select(`
       id, date, slot_type, dish_id,
-      dishes ( id, name )
+      dishes ( id, name, image_url )
     `)
     .eq("household_id", householdId)
     .gte("date", startStr)
@@ -149,16 +150,26 @@ export async function WeeklyPlanOverview() {
                       const isPrepared = isMealPast(dayData.dateStr, slot);
 
                       return (
-                        <div key={slot} className="group relative flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+                        <div key={slot} className="group relative overflow-hidden flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-stone-100/80 dark:hover:bg-stone-800/80">
+                          {entry.dishes.image_url && (
+                             <div 
+                               className="absolute z-0 inset-0 bg-cover bg-center opacity-30 dark:opacity-20 blur-[1px] transition-all"
+                               style={{ backgroundImage: `url(${entry.dishes.image_url})` }}
+                             />
+                          )}
+                          {entry.dishes.image_url && (
+                             <div className="absolute z-0 inset-0 bg-gradient-to-r from-stone-50/90 via-stone-50/60 to-stone-50/90 dark:from-stone-900/90 dark:via-stone-900/60 dark:to-stone-900/90" />
+                          )}
                           {/* Left Icon Container */}
-                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-white shadow-sm ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50 ${isPrepared ? 'text-emerald-500 dark:text-emerald-400' : 'text-stone-500 dark:text-stone-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors'}`}>
+                          <div className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-white shadow-sm ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50 ${isPrepared ? 'text-emerald-500 dark:text-emerald-400' : 'text-stone-500 dark:text-stone-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors'}`}>
                             <Icon className="h-5 w-5" strokeWidth={2.5} />
                           </div>
                           
-                          {/* Dish Name & Slot */}
-                          <div className="flex min-w-0 flex-1 flex-col pb-0.5">
+                          <div className="relative z-10 flex min-w-0 flex-1 flex-col pb-0.5">
                             <span className={`truncate text-[15px] font-semibold tracking-tight ${isPrepared ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-900 dark:text-stone-100'}`}>
-                              {dishName}
+                              <Link href={`/dishes/${entry.dishes.id}`} className="hover:underline hover:text-orange-600 dark:hover:text-orange-400">
+                                {dishName}
+                              </Link>
                             </span>
                             <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 mt-0.5">
                               {slot}
@@ -166,11 +177,13 @@ export async function WeeklyPlanOverview() {
                           </div>
                           
                           {/* Right Indicator */}
-                          {isPrepared ? (
-                            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400 shadow-sm rounded-full bg-white dark:bg-stone-900" />
-                          ) : (
-                            <div className="h-5 w-5 shrink-0 rounded-full border-2 border-stone-200 dark:border-stone-700 transition-colors group-hover:border-stone-300 dark:group-hover:border-stone-600" />
-                          )}
+                          <div className="relative z-10">
+                            {isPrepared ? (
+                              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400 shadow-sm rounded-full bg-white dark:bg-stone-900" />
+                            ) : (
+                              <div className="h-5 w-5 shrink-0 rounded-full border-2 border-stone-200 dark:border-stone-700 transition-colors group-hover:border-stone-500 dark:group-hover:border-stone-400 bg-white/50 dark:bg-stone-800/50" />
+                            )}
+                          </div>
                         </div>
                       );
                     })}

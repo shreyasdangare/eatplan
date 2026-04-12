@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { isMealPast } from "@/lib/isMealPast";
+import { getSupabaseClient } from "@/lib/supabaseBrowser";
 
 const SLOT_LABELS: Record<string, string> = {
   breakfast: "Breakfast",
@@ -59,7 +60,7 @@ function DroppableSlot({
 }: {
   date: string;
   slot: string;
-  current: string | null;
+  current: { id: string; name: string; image_url?: string | null } | null;
   prepared: boolean;
   onClear: () => void;
 }) {
@@ -78,17 +79,31 @@ function DroppableSlot({
             : "border-dashed border-stone-200/60 bg-stone-50/40 hover:border-stone-300 dark:border-stone-700/60 dark:bg-stone-800/30 dark:hover:border-stone-600"
         }`}
       >
+        {current?.image_url && (
+           <div 
+              className="absolute inset-0 bg-cover bg-center opacity-30 dark:opacity-20 blur-[1.5px] rounded-[1.1rem] transition-all"
+              style={{ backgroundImage: `url(${current.image_url})` }}
+           />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-white/40 to-white/70 dark:from-stone-900/80 dark:via-stone-900/50 dark:to-stone-900/80 rounded-[1.1rem]" />
+        
         {current ? (
-          <div className="flex h-full flex-col">
+          <div className="relative z-10 flex h-full flex-col">
             <div className="flex items-start justify-between gap-2">
-              <span
-                className={`min-w-0 flex-1 break-words text-sm font-semibold leading-tight ${
-                  prepared ? "line-through text-stone-400 dark:text-stone-500" : "text-stone-800 dark:text-stone-200"
-                }`}
-                title={current}
-              >
-                {current}
-              </span>
+                  <span
+                    className={`min-w-0 flex-1 break-words text-sm font-semibold leading-tight ${
+                      prepared ? "line-through text-stone-400 dark:text-stone-500" : "text-stone-800 dark:text-stone-200"
+                    }`}
+                    title={current?.name}
+                  >
+                    {current?.id ? (
+                      <Link href={`/dishes/${current.id}`} className="hover:underline hover:text-orange-700 dark:hover:text-orange-400">
+                        {current.name}
+                      </Link>
+                    ) : (
+                      current?.name
+                    )}
+                  </span>
               {prepared ? (
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
               ) : (
@@ -112,8 +127,8 @@ function DroppableSlot({
             )}
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center opacity-0 transition-opacity group-hover/slot:opacity-100">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+          <div className="relative z-10 flex h-full items-center justify-center opacity-0 transition-opacity group-hover/slot:opacity-100">
+            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300">
               Drop here
             </span>
           </div>
@@ -129,6 +144,7 @@ type Dish = {
   meal_type?: string | null;
   prep_time_minutes?: number | null;
   tags?: string[] | null;
+  image_url?: string | null;
 };
 type PlanEntry = {
   id: string;
@@ -183,6 +199,7 @@ export default function PlanPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const [dietFilter, setDietFilter] = useState<"Both" | "Veg" | "Non-Veg">("Both");
+  const [hasSetInitialDiet, setHasSetInitialDiet] = useState(false);
 
   const filteredDishes = dishes.filter((d) => {
     const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -212,15 +229,21 @@ export default function PlanPage() {
 
   useEffect(() => {
     (async () => {
-      const [dishesRes, plansRes] = await Promise.all([
+      const [dishesRes, plansRes, supabase] = await Promise.all([
         fetch("/api/dishes"),
-        fetch(`/api/meal-plans?from=${from}&to=${to}`)
+        fetch(`/api/meal-plans?from=${from}&to=${to}`),
+        getSupabaseClient()
       ]);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!hasSetInitialDiet && user?.user_metadata?.isVegetarianOnly) {
+         setDietFilter("Veg");
+         setHasSetInitialDiet(true);
+      }
       if (dishesRes.ok) setDishes((await dishesRes.json()) ?? []);
       if (plansRes.ok) setPlans((await plansRes.json()) ?? []);
       setLoading(false);
     })();
-  }, [from, to]);
+  }, [from, to, hasSetInitialDiet]);
 
   const setSlot = useCallback(
     async (date: string, slot_type: string, dish_id: string | null) => {
@@ -269,9 +292,14 @@ export default function PlanPage() {
       const p = plans.find(
         (x) => x.date === date && x.slot_type === slot_type
       );
-      return p?.dishes?.name ?? (p?.dish_id
-        ? dishes.find((d) => d.id === p.dish_id)?.name
-        : null);
+      if (p?.dish_id) {
+         const d = dishes.find((d) => d.id === p.dish_id);
+         if (d) return { id: d.id, name: d.name, image_url: d.image_url };
+      }
+      if (p?.dishes?.id && p?.dishes?.name) {
+         return { id: p.dishes.id, name: p.dishes.name };
+      }
+      return null;
     },
     [plans, dishes]
   );
@@ -339,65 +367,68 @@ export default function PlanPage() {
   }
 
   return (
-    <section className="space-y-8 pb-12">
-      {/* Header + week nav */}
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-4xl">
-            Planner
-          </h1>
-          <p className="mt-2 text-base font-medium text-stone-500 dark:text-stone-400">
-            Plan your recipes. Build your <Link href="/shopping-list" className="text-orange-600 underline hover:no-underline dark:text-orange-400">list.</Link>
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-2xl glass-panel p-1 shadow-sm">
-            <button
-              type="button"
-              onClick={prevWeek}
-              className="group flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl transition-colors hover:bg-stone-200/50 dark:hover:bg-stone-700/50"
-              aria-label="Previous week"
-            >
-              <ChevronLeft className="h-5 w-5 text-stone-600 transition-transform group-hover:-translate-x-0.5 dark:text-stone-300" />
-            </button>
-            <span className="flex min-h-[44px] items-center px-4 text-sm font-bold text-stone-800 dark:text-stone-200">
-              {weekStart.toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short"
-              })}{" "}
-              – {new Date(weekDates[6] + "T12:00:00").toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short"
-              })}
-            </span>
-            <button
-              type="button"
-              onClick={nextWeek}
-              className="group flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl transition-colors hover:bg-stone-200/50 dark:hover:bg-stone-700/50"
-              aria-label="Next week"
-            >
-              <ChevronRight className="h-5 w-5 text-stone-600 transition-transform group-hover:translate-x-0.5 dark:text-stone-300" />
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={() => setWeekStart(getWeekStart(new Date()))}
-            className="rounded-2xl glass-panel bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 hover:text-stone-900 shadow-sm transition-all active:scale-95 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700 dark:hover:text-white"
-          >
-            This Week
-          </button>
-        </div>
-      </div>
-
+    <section className="space-y-4 pb-12 pt-4">
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        {/* Desktop Only: Recipe strip */}
+        {/* Desktop Only: Sticky Main Bar */}
         <div className="hidden sm:block sticky top-24 z-40 rounded-3xl glass-panel p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+          {/* Top Row: Date nav & Recipe search/action */}
           <div className="mb-4 flex items-center justify-between gap-4">
+            
+            {/* Left side: Date control */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center rounded-2xl p-1 shadow-inner bg-stone-100/80 dark:bg-stone-800/80">
+                <button
+                  type="button"
+                  onClick={prevWeek}
+                  className="group flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl transition-colors hover:bg-stone-200/50 dark:hover:bg-stone-700/50"
+                  aria-label="Previous week"
+                >
+                  <ChevronLeft className="h-4 w-4 text-stone-600 transition-transform group-hover:-translate-x-0.5 dark:text-stone-300" />
+                </button>
+                <span className="flex min-h-[40px] items-center px-4 text-sm font-bold text-stone-800 dark:text-stone-200">
+                  {weekStart.toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short"
+                  })}{" "}
+                  – {new Date(weekDates[6] + "T12:00:00").toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short"
+                  })}
+                </span>
+                <button
+                  type="button"
+                  onClick={nextWeek}
+                  className="group flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl transition-colors hover:bg-stone-200/50 dark:hover:bg-stone-700/50"
+                  aria-label="Next week"
+                >
+                  <ChevronRight className="h-4 w-4 text-stone-600 transition-transform group-hover:translate-x-0.5 dark:text-stone-300" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setWeekStart(getWeekStart(new Date()))}
+                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-sm transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
+                >
+                  This Week
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = new Date();
+                    next.setDate(next.getDate() + 7);
+                    setWeekStart(getWeekStart(next));
+                  }}
+                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-sm transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
+                >
+                  Next Week
+                </button>
+              </div>
+            </div>
             <div className="flex items-center gap-4 flex-1">
               <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 whitespace-nowrap">
                 Your Recipes
@@ -558,8 +589,19 @@ export default function PlanPage() {
             easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
           }}>
           {activeDish ? (
-            <div className="rotate-3 scale-105 rounded-full border-2 border-orange-400 bg-white px-5 py-2.5 text-sm font-bold text-stone-800 shadow-xl dark:border-orange-500 dark:bg-stone-800 dark:text-stone-100">
-              {activeDish.name}
+            <div className="rotate-3 scale-105 overflow-hidden flex items-center justify-center rounded-2xl border-2 border-orange-400 bg-white/80 backdrop-blur-md shadow-2xl dark:border-orange-500 dark:bg-stone-800/80 w-40 h-24 relative group">
+              {activeDish.image_url && (
+                <div 
+                   className="absolute inset-0 bg-cover bg-center opacity-40 blur-[2px] transition-all"
+                   style={{ backgroundImage: `url(${activeDish.image_url})` }}
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="relative z-10 px-3 py-2 text-center">
+                 <span className="text-sm font-bold text-white drop-shadow-md line-clamp-2 leading-tight">
+                   {activeDish.name}
+                 </span>
+              </div>
             </div>
           ) : null}
         </DragOverlay>
@@ -603,7 +645,7 @@ export default function PlanPage() {
                        ) : (
                          <div className={`flex h-[46px] items-center justify-between gap-2 rounded-xl border px-3.5 transition-colors ${isPrepared ? 'bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30' : 'bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm'}`}>
                            <span className={`truncate text-[14px] font-bold tracking-tight ${isPrepared ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-800 dark:text-stone-200'}`}>
-                             {dishName}
+                             {dishName.id ? <Link href={`/dishes/${dishName.id}`} className="hover:underline">{dishName.name}</Link> : dishName.name}
                            </span>
                            {isPrepared ? (
                              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />
