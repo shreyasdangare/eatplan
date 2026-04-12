@@ -58,7 +58,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     params?.error === "access_denied" && params?.error_code === "otp_expired";
   const chefName =
     user?.preferred_name?.trim() || user?.email?.split("@")[0] || "Chef";
-  const isFirstVisit = user && !user.has_visited_home;
+  const isFirstVisit = user ? !user.has_visited_home : false;
   const welcomePrefix = getTranslatedWelcome(user?.native_language, isFirstVisit);
   const tagline = getTranslatedTagline(user?.native_language);
 
