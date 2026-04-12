@@ -31,7 +31,6 @@ export type SessionUser = {
   email?: string;
   preferred_name?: string;
   native_language?: string;
-  native_language?: string;
   has_visited_home?: boolean;
   is_vegetarian_only?: boolean;
 };
