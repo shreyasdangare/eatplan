@@ -14,7 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { isMealPast } from "@/lib/isMealPast";
 
 const SLOT_LABELS: Record<string, string> = {
@@ -39,10 +39,10 @@ function DraggableDish({ dish }: { dish: Dish }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`shrink-0 cursor-grab rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition-all active:cursor-grabbing ${
+      className={`shrink-0 cursor-grab rounded-full border px-4 py-2.5 text-[15px] font-semibold tracking-tight backdrop-blur-md transition-all active:scale-[0.98] active:cursor-grabbing ${
         isDragging
-          ? "border-orange-500 bg-orange-100 text-orange-900 opacity-50 dark:bg-orange-900/50 dark:text-orange-100"
-          : "border-stone-200/50 bg-white/80 text-stone-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-900 hover:shadow-md dark:border-stone-700/50 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:border-orange-600 dark:hover:bg-stone-700"
+          ? "border-orange-400 bg-orange-100/80 text-orange-900 shadow-inner dark:border-orange-600 dark:bg-orange-900/60 dark:text-orange-100"
+          : "border-stone-200/60 bg-white/60 text-stone-700 shadow-sm hover:border-orange-300 hover:bg-orange-50/80 hover:text-orange-900 hover:shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:border-stone-700/60 dark:bg-stone-800/60 dark:text-stone-200 dark:hover:border-orange-500/50 dark:hover:bg-stone-800/90 dark:hover:shadow-[0_4px_12px_rgb(0,0,0,0.2)]"
       }`}
     >
       {dish.name}
@@ -123,7 +123,13 @@ function DroppableSlot({
   );
 }
 
-type Dish = { id: string; name: string };
+type Dish = { 
+  id: string; 
+  name: string;
+  meal_type?: string | null;
+  prep_time_minutes?: number | null;
+  tags?: string[] | null;
+};
 type PlanEntry = {
   id: string;
   date: string;
@@ -133,9 +139,13 @@ type PlanEntry = {
 };
 
 const SLOTS = ["breakfast", "lunch", "dinner"] as const;
+const FILTERS = ["All", "Breakfast", "Lunch", "Dinner", "Quick (<30m)"];
 
 function formatDate(d: Date) {
-  return d.toISOString().slice(0, 10);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 function getWeekDates(weekStart: Date): string[] {
@@ -169,6 +179,32 @@ export default function PlanPage() {
   
   // State for mobile tappable slots
   const [mobileSlotOpen, setMobileSlotOpen] = useState<{date: string, slot: string} | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [dietFilter, setDietFilter] = useState<"Both" | "Veg" | "Non-Veg">("Both");
+
+  const filteredDishes = dishes.filter((d) => {
+    const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase());
+    let matchesFilter = true;
+    if (activeFilter === "Breakfast") matchesFilter = d.meal_type?.toLowerCase() === "breakfast";
+    else if (activeFilter === "Lunch") matchesFilter = d.meal_type?.toLowerCase() === "lunch";
+    else if (activeFilter === "Dinner") matchesFilter = d.meal_type?.toLowerCase() === "dinner";
+    else if (activeFilter === "Quick (<30m)") matchesFilter = d.prep_time_minutes != null && d.prep_time_minutes < 30;
+
+    let matchesDiet = true;
+    if (dietFilter !== "Both") {
+      const isVeg = d.tags?.some((t) => {
+        const lower = t.toLowerCase();
+        return lower === 'veg' || lower === 'vegetarian';
+      }) ?? false;
+      
+      if (dietFilter === "Veg") matchesDiet = isVeg;
+      if (dietFilter === "Non-Veg") matchesDiet = !isVeg;
+    }
+
+    return matchesSearch && matchesFilter && matchesDiet;
+  });
 
   const weekDates = getWeekDates(weekStart);
   const from = weekDates[0];
@@ -344,6 +380,13 @@ export default function PlanPage() {
               <ChevronRight className="h-5 w-5 text-stone-600 transition-transform group-hover:translate-x-0.5 dark:text-stone-300" />
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setWeekStart(getWeekStart(new Date()))}
+            className="rounded-2xl glass-panel bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 hover:text-stone-900 shadow-sm transition-all active:scale-95 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700 dark:hover:text-white"
+          >
+            This Week
+          </button>
         </div>
       </div>
 
@@ -353,25 +396,91 @@ export default function PlanPage() {
         onDragEnd={handleDragEnd}
       >
         {/* Desktop Only: Recipe strip */}
-        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl glass-panel p-4 pb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
-              Your Recipes
-            </h3>
-            <Link href="/recipes" className="text-xs font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
+        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl glass-panel p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 flex-1">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 whitespace-nowrap">
+                Your Recipes
+              </h3>
+              
+              <div className="relative max-w-xs flex-1 transition-all focus-within:max-w-md">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <input
+                  type="text"
+                  placeholder="Search recipes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                  >
+                    <X className="h-3 w-3" strokeWidth={3} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <Link href="/recipes" className="text-xs font-bold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors">
               Manage →
             </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+
+          {/* Desktop Filters & Diet */}
+          <div className="mb-3 flex items-center justify-between gap-4">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+              {FILTERS.map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  className={`shrink-0 rounded-full px-4 py-1.5 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
+                    activeFilter === f
+                      ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-sm"
+                      : "bg-transparent border-stone-200/60 text-stone-600 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center rounded-full bg-stone-100/80 p-1 dark:bg-stone-800/80 shadow-inner shrink-0 hidden lg:flex">
+              {(["Both", "Veg", "Non-Veg"] as const).map((diet) => (
+                <button
+                  key={diet}
+                  onClick={() => setDietFilter(diet)}
+                  className={`px-3 py-1.5 text-[13px] font-bold rounded-full transition-all active:scale-[0.98] ${
+                    dietFilter === diet 
+                      ? diet === "Veg" ? "bg-emerald-500 text-white shadow-sm" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-sm" : "bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100"
+                      : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
+                  }`}
+                >
+                  {diet}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide py-1">
             {dishes.length === 0 ? (
-              <p className="py-3 text-sm font-medium text-stone-500 dark:text-stone-400">
-                You haven't added any recipes yet.{" "}
-                <Link href="/recipes" className="text-orange-600 underline dark:text-orange-400">
-                  Add one here.
-                </Link>
-              </p>
+              <div className="flex w-full items-center justify-center py-4 rounded-2xl bg-stone-50 border border-dashed border-stone-200 dark:bg-stone-900/30 dark:border-stone-800">
+                <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+                  You haven't added any recipes yet.{" "}
+                  <Link href="/recipes" className="text-orange-600 font-semibold hover:underline dark:text-orange-400">
+                    Add one here.
+                  </Link>
+                </p>
+              </div>
+            ) : filteredDishes.length === 0 ? (
+              <div className="flex w-full items-center justify-center py-4">
+                <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+                  No recipes found for "{searchQuery}"
+                </p>
+              </div>
             ) : (
-              dishes.map((d) => (
+              filteredDishes.map((d) => (
                 <DraggableDish key={d.id} dish={d} />
               ))
             )}
@@ -523,42 +632,121 @@ export default function PlanPage() {
       {mobileSlotOpen && (
         <div className="sm:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-stone-900/40 backdrop-blur-sm dark:bg-black/80 transition-opacity outline-none animate-in fade-in duration-200 pb-[env(safe-area-inset-bottom)]">
           {/* Close backdrop hit area */}
-          <div className="absolute inset-0 z-0" onClick={() => setMobileSlotOpen(null)} />
+          <div className="absolute inset-0 z-0" onClick={() => {
+            setSearchQuery("");
+            setActiveFilter("All");
+            setMobileSlotOpen(null);
+          }} />
           
-          <div className="relative z-10 flex max-h-[85vh] min-h-[50vh] flex-col rounded-t-[2.5rem] bg-white pt-6 shadow-2xl dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 animate-in slide-in-from-bottom-8 duration-300">
-            <div className="px-6 flex items-center justify-between mb-4">
+          <div className="relative z-10 flex max-h-[90vh] min-h-[60vh] flex-col rounded-t-[2.5rem] bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-xl border-t border-stone-200 dark:border-stone-800 animate-in slide-in-from-bottom-8 duration-300 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+            
+            {/* Sheet Handle */}
+            <div className="w-full flex justify-center pt-3 pb-1">
+               <div className="w-12 h-1.5 rounded-full bg-stone-300 dark:bg-stone-700" />
+            </div>
+
+            <div className="px-6 flex items-center justify-between mb-4 mt-2">
               <div>
-                <h3 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
-                  Select a Recipe
+                <h3 className="text-[28px] font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
+                  Select Recipe
                 </h3>
-                <p className="text-sm font-medium text-stone-500 dark:text-stone-400 empty:hidden">
-                  For {SLOT_LABELS[mobileSlotOpen.slot]} on {new Date(mobileSlotOpen.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
+                <p className="text-[15px] font-semibold text-stone-500 dark:text-stone-400 empty:hidden">
+                  {SLOT_LABELS[mobileSlotOpen.slot]} · {new Date(mobileSlotOpen.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
                 </p>
               </div>
-              <button onClick={() => setMobileSlotOpen(null)} className="rounded-full bg-stone-100 p-2.5 text-stone-600 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors">
-                <X className="h-5 w-5" strokeWidth={2.5} />
+              <button 
+                 onClick={() => {
+                   setSearchQuery("");
+                   setActiveFilter("All");
+                   setMobileSlotOpen(null);
+                 }} 
+                 className="rounded-full bg-stone-200/80 p-2 text-stone-600 hover:bg-stone-300 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors shrink-0"
+              >
+                <X className="h-5 w-5" strokeWidth={3} />
               </button>
             </div>
+
+            {/* Sticky Search & Filter Header */}
+            <div className="px-6 pb-2 sticky top-0 z-10 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-xl pt-2">
+               <div className="relative mb-3">
+                  <Search className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" strokeWidth={2.5} />
+                  <input
+                    type="text"
+                    placeholder="Search recipes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-2xl border-none bg-stone-200/60 dark:bg-stone-800/60 py-3 pl-[42px] pr-10 text-[17px] font-medium text-stone-900 placeholder:text-stone-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-stone-100 dark:focus:bg-stone-900 transition-all shadow-inner"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-300 p-1 text-stone-600 dark:bg-stone-700 dark:text-stone-300"
+                    >
+                      <X className="h-3 w-3" strokeWidth={3} />
+                    </button>
+                  )}
+               </div>
+               
+               {/* Mobile Filters */}
+                 <div className="flex flex-col gap-3 pb-2 -mx-2 px-2">
+                 <div className="flex items-center rounded-full bg-stone-200/50 p-1 dark:bg-stone-800/80 shadow-inner w-full">
+                   {(["Both", "Veg", "Non-Veg"] as const).map((diet) => (
+                     <button
+                       key={diet}
+                       onClick={() => setDietFilter(diet)}
+                       className={`flex-1 px-3 py-2 text-[14px] font-bold rounded-full transition-all active:scale-[0.98] ${
+                         dietFilter === diet 
+                           ? diet === "Veg" ? "bg-emerald-500 text-white shadow-sm" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-sm" : "bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100"
+                           : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
+                       }`}
+                     >
+                       {diet}
+                     </button>
+                   ))}
+                 </div>
+                 <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                   {FILTERS.map((f) => (
+                     <button
+                       key={f}
+                       onClick={() => setActiveFilter(f)}
+                       className={`shrink-0 rounded-full px-4 py-1.5 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
+                         activeFilter === f
+                           ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-sm"
+                           : "bg-transparent border-stone-200/60 text-stone-500 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:border-stone-600/80"
+                       }`}
+                     >
+                       {f}
+                     </button>
+                   ))}
+                 </div>
+               </div>
+            </div>
             
-            <div className="flex-1 overflow-y-auto px-6 py-2 pb-12 space-y-2.5 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto px-6 pb-12 space-y-2.5 scrollbar-hide">
               {dishes.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center py-10 opacity-70">
-                    <Utensils className="h-10 w-10 text-stone-300 dark:text-stone-600 mb-3" />
-                    <p className="text-[15px] font-semibold text-stone-500 dark:text-stone-400">No recipes available.</p>
+                 <div className="flex flex-col items-center justify-center py-12 opacity-70">
+                    <Utensils className="h-12 w-12 text-stone-300 dark:text-stone-600 mb-4" />
+                    <p className="text-[17px] font-bold text-stone-500 dark:text-stone-400">No recipes available.</p>
+                 </div>
+              ) : filteredDishes.length === 0 ? (
+                 <div className="flex flex-col items-center justify-center py-12 opacity-70">
+                    <Search className="h-12 w-12 text-stone-300 dark:text-stone-600 mb-4" strokeWidth={2} />
+                    <p className="text-[17px] font-bold text-stone-500 dark:text-stone-400">No recipes found.</p>
                  </div>
               ) : (
-                 dishes.map((dish) => (
+                 filteredDishes.map((dish) => (
                    <button
                      key={dish.id}
                      type="button"
                      onClick={() => {
                         setSlot(mobileSlotOpen.date, mobileSlotOpen.slot, dish.id);
+                        setSearchQuery("");
                         setMobileSlotOpen(null);
                      }}
-                     className="group flex w-full items-center justify-between gap-3 rounded-[1.25rem] border border-stone-200/60 bg-white px-4 py-4 text-left shadow-sm active:scale-[0.98] active:bg-orange-50 active:border-orange-500/30 transition-all dark:border-stone-800 dark:bg-stone-900/50 dark:active:bg-orange-950/40"
+                     className="group flex w-full items-center justify-between gap-4 rounded-[1.5rem] border-none bg-white px-5 py-4 text-left shadow-sm active:scale-[0.97] active:bg-orange-50 transition-all dark:bg-stone-900 dark:active:bg-orange-950/40"
                    >
-                     <span className="truncate text-[16px] font-bold text-stone-800 dark:text-stone-200 group-active:text-orange-700 dark:group-active:text-orange-400">{dish.name}</span>
-                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-4 w-4" strokeWidth={3} /></div>
+                     <span className="truncate text-[17px] font-bold tracking-tight text-stone-800 dark:text-stone-200 group-active:text-orange-700 dark:group-active:text-orange-400">{dish.name}</span>
+                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-5 w-5" strokeWidth={3} /></div>
                    </button>
                  ))
               )}

@@ -10,9 +10,10 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { MobileNav } from "./components/MobileNav";
+import { getSession } from "@/lib/supabaseServerClient";
+import { getTranslatedTagline } from "@/lib/taglines";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
-
 export const metadata: Metadata = {
   title: "EatPlan – काय खायचं?",
   description: "Simple ingredient-based meal planning app"
@@ -27,11 +28,14 @@ export const viewport: Viewport = {
   themeColor: "#ea580c",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: {
   children: React.ReactNode;
 }) {
+  const { user } = await getSession();
+  const tagline = getTranslatedTagline(user?.native_language);
+
   return (
     <html lang="en" suppressHydrationWarning className={outfit.className}>
       <head>
@@ -46,7 +50,7 @@ export default function RootLayout({
           <div className="mx-auto flex min-h-[100dvh] min-w-0 max-w-4xl flex-col px-4 py-3 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
             <header className="relative z-50 mb-4 sm:mb-6 rounded-2xl glass-panel px-3 py-2 sm:px-4 sm:py-3 sticky top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
               <div className="flex items-center justify-between gap-2">
-                <HeaderTitle />
+                <HeaderTitle tagline={tagline} />
                 <div className="flex items-center gap-2">
                   <nav
                     className="hidden sm:flex flex-wrap gap-1 sm:gap-1.5 text-sm"

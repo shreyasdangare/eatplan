@@ -49,6 +49,8 @@ type HomePageProps = {
   searchParams: Promise<{ error?: string; error_code?: string }>;
 };
 
+import { getTranslatedTagline } from "@/lib/taglines";
+
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { user } = await getSession();
   const params = await searchParams;
@@ -58,6 +60,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     user?.preferred_name?.trim() || user?.email?.split("@")[0] || "Chef";
   const isFirstVisit = user && !user.has_visited_home;
   const welcomePrefix = isFirstVisit ? "Welcome," : "Welcome back,";
+  const tagline = getTranslatedTagline(user?.native_language);
 
   return (
     <div className="flex flex-col gap-12 lg:gap-16">
@@ -88,7 +91,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 EatPlan
               </h2>
               <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400">
-                काय खायचं?
+                {tagline}
               </p>
               <div className="mt-8 rounded-full bg-white/60 px-6 py-2.5 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
                 👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
@@ -115,7 +118,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 EatPlan
               </h2>
               <p className="mt-2 text-xl font-medium tracking-wide text-orange-600 dark:text-orange-400 sm:text-2xl">
-                काय खायचं?
+                {tagline}
               </p>
               <p className="mt-4 max-w-lg text-base leading-relaxed text-stone-600 dark:text-stone-300 sm:text-xl">
                 Remove the pain of deciding what to eat every day. Plan meals, build shopping lists, and cook with what you have.

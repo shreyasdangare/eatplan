@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 
-export function HeaderTitle() {
+export function HeaderTitle({ tagline = "काय खायचं?" }: { tagline?: string }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -23,7 +23,7 @@ export function HeaderTitle() {
           EatPlan
         </h1>
         <span className="text-xs text-amber-700 dark:text-amber-300">
-          काय खायचं?
+          {tagline}
         </span>
       </div>
     </Link>

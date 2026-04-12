@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
 import { getHouseholdId } from "@/lib/getHouseholdId";
+import { fetchImageUrlForRecipe } from "@/lib/recipeImages";
 
 type ExtractedIngredient = {
   name: string;
@@ -60,39 +61,6 @@ const VIDEO_USER_PROMPT = `Extract the recipe from this cooking video (e.g. reel
 
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
-
-async function fetchImageUrlForRecipe(recipeName: string): Promise<string | null> {
-  const key = process.env.SPOONACULAR_API_KEY?.trim();
-  if (!key) return null;
-  const query = recipeName.trim();
-  try {
-    const res = await fetch(
-      `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&number=1&apiKey=${key}`,
-      { signal: AbortSignal.timeout(5000) }
-    );
-    if (!res.ok) {
-      console.error("Spoonacular Search error", res.status);
-      return null;
-    }
-    const data = (await res.json()) as {
-      results?: { image?: string }[];
-    };
-    if (!data.results || data.results.length === 0) {
-      console.warn("Spoonacular returned 0 images for query:", query);
-      return null;
-    }
-    
-    // Spoonacular returns 312x231 by default. We can request a larger size by replacing the dimensions in the URL.
-    const smallUrl = data.results[0].image;
-    if (smallUrl) {
-      return smallUrl.replace("-312x231.jpg", "-636x393.jpg");
-    }
-    return null;
-  } catch (e) {
-    console.error("Spoonacular fetch error", e);
-    return null;
-  }
-}
 
 async function extractWithGeminiFromImage(
   imageBase64: string,
@@ -473,7 +441,12 @@ export async function POST(req: NextRequest) {
     if (recipeName && typeof recipeName === "string") {
       if (!geminiKey) return NextResponse.json({ error: "Requires GOOGLE_GEMINI_API_KEY." }, { status: 400 });
       try {
-        recipe = await generateWithGeminiByName(recipeName.trim(), geminiKey);
+        const [recipeData, spoonUrl] = await Promise.all([
+          generateWithGeminiByName(recipeName.trim(), geminiKey),
+          fetchImageUrlForRecipe(recipeName.trim())
+        ]);
+        recipe = recipeData;
+        pageImageUrl = spoonUrl;
       } catch (e) {
         console.error("Recipe generation error", e);
         return NextResponse.json({ error: e instanceof Error ? e.message : "Failed to generate recipe" }, { status: 502 });
