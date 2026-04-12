@@ -31,10 +31,17 @@ export type SessionUser = {
   email?: string;
   preferred_name?: string;
   native_language?: string;
+  native_language?: string;
   has_visited_home?: boolean;
+  is_vegetarian_only?: boolean;
 };
 
-type UserMetadata = { preferred_name?: string; native_language?: string; has_visited_home?: boolean };
+type UserMetadata = { 
+  preferred_name?: string; 
+  native_language?: string; 
+  has_visited_home?: boolean;
+  isVegetarianOnly?: boolean;
+};
 
 export async function getSession(): Promise<{
   user: SessionUser | null;
@@ -56,6 +63,7 @@ export async function getSession(): Promise<{
         preferred_name: meta.preferred_name ?? undefined,
         native_language: meta.native_language ?? undefined,
         has_visited_home: meta.has_visited_home === true,
+        is_vegetarian_only: meta.isVegetarianOnly === true,
       }
     : null;
   return { user, error: null };

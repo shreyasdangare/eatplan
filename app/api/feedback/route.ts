@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
 
   const userEmail = auth.user.email;
-  const userName = auth.user.user_metadata?.preferred_name || "User";
+  const userName = auth.user.preferred_name || "User";
 
   try {
     const res = await fetch("https://api.resend.com/emails", {

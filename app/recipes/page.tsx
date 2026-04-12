@@ -38,7 +38,7 @@ async function DishesList() {
     );
   }
 
-  const defaultVegOnly = user.user_metadata?.isVegetarianOnly === true;
+  const defaultVegOnly = user.is_vegetarian_only === true;
 
   return (
     <DishesListWithFilter dishes={dishes} defaultVegOnly={defaultVegOnly}>
