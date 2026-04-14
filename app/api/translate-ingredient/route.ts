@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/supabaseServerClient";
 import { getHouseholdId } from "@/lib/getHouseholdId";
+import { logLlmUsage, extractGeminiTokens } from "@/lib/logLlmUsage";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
@@ -76,6 +77,18 @@ Provide ONLY the translated ingredient name as your response. Do not include any
 
     // Clean up any potential markdown or quotes sometimes returned by LLM
     translation = translation.replace(/['"]/g, "");
+
+    // Log LLM usage (fire-and-forget)
+    const householdId = await getHouseholdId(auth.user.id);
+    const tokens = extractGeminiTokens(data);
+    logLlmUsage({
+      userId: auth.user.id,
+      householdId,
+      endpoint: "translate-ingredient",
+      model: "gemini-2.5-flash",
+      input_tokens: tokens.input_tokens,
+      output_tokens: tokens.output_tokens,
+    });
 
     return NextResponse.json({ translation });
   } catch (error: any) {

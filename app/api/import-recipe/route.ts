@@ -4,6 +4,7 @@ import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
 import { getHouseholdId } from "@/lib/getHouseholdId";
 import { fetchImageUrlForRecipe } from "@/lib/recipeImages";
+import { logLlmUsage, extractGeminiTokens } from "@/lib/logLlmUsage";
 
 type ExtractedIngredient = {
   name: string;
@@ -66,7 +67,7 @@ async function extractWithGeminiFromImage(
   imageBase64: string,
   mimeType: string,
   apiKey: string
-): Promise<ExtractedRecipe> {
+): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
   const res = await fetch(apiUrl, {
     method: "POST",
@@ -97,15 +98,13 @@ async function extractWithGeminiFromImage(
     throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
   }
 
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-  };
+  const data = (await res.json()) as any;
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
   const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
-  return JSON.parse(jsonStr) as ExtractedRecipe;
+  return { recipe: JSON.parse(jsonStr) as ExtractedRecipe, rawResponse: data };
 }
 
-async function extractWithGemini(text: string, apiKey: string): Promise<ExtractedRecipe> {
+async function extractWithGemini(text: string, apiKey: string): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url, {
     method: "POST",
@@ -133,15 +132,13 @@ async function extractWithGemini(text: string, apiKey: string): Promise<Extracte
     throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
   }
 
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-  };
+  const data = (await res.json()) as any;
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
   const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
-  return JSON.parse(jsonStr) as ExtractedRecipe;
+  return { recipe: JSON.parse(jsonStr) as ExtractedRecipe, rawResponse: data };
 }
 
-async function generateWithGeminiByName(recipeName: string, apiKey: string): Promise<ExtractedRecipe> {
+async function generateWithGeminiByName(recipeName: string, apiKey: string): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url, {
     method: "POST",
@@ -169,12 +166,10 @@ async function generateWithGeminiByName(recipeName: string, apiKey: string): Pro
     throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
   }
 
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-  };
+  const data = (await res.json()) as any;
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
   const jsonStr = raw.replace(/^[\`\s]*json?/i, "").replace(/[\s\`]*$/i, "").trim();
-  return JSON.parse(jsonStr) as ExtractedRecipe;
+  return { recipe: JSON.parse(jsonStr) as ExtractedRecipe, rawResponse: data };
 }
 
 function isYouTubeUrl(url: URL): boolean {
@@ -213,7 +208,7 @@ function normalizeYouTubeUrl(url: URL): string {
 async function extractWithGeminiFromYouTube(
   youtubeUrl: string,
   apiKey: string
-): Promise<ExtractedRecipe> {
+): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
   const res = await fetch(apiUrl, {
     method: "POST",
@@ -249,13 +244,7 @@ async function extractWithGeminiFromYouTube(
     throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
   }
 
-  const data = (await res.json()) as {
-    candidates?: {
-      content?: { parts?: { text?: string }[] };
-      finishReason?: string;
-    }[];
-    promptFeedback?: { blockReason?: string };
-  };
+  const data = (await res.json()) as any;
   const candidate = data.candidates?.[0];
   const blockReason = data.promptFeedback?.blockReason ?? candidate?.finishReason;
   if (blockReason === "SAFETY" || blockReason === "RECITATION" || blockReason === "BLOCKED") {
@@ -272,7 +261,7 @@ async function extractWithGeminiFromYouTube(
   } catch {
     throw new Error("Could not parse recipe from video. Try a different video or link.");
   }
-  return recipe;
+  return { recipe, rawResponse: data };
 }
 
 function isErrorLikeRecipe(recipe: ExtractedRecipe): boolean {
@@ -390,6 +379,9 @@ export async function POST(req: NextRequest) {
 
   let recipe: ExtractedRecipe;
   let pageImageUrl: string | null = null;
+  let geminiRawResponse: any = null;
+  let geminiEndpoint = "import-recipe";
+  const geminiModel = "gemini-3-flash-preview";
 
   if (contentType.includes("multipart/form-data")) {
     if (!geminiKey) {
@@ -423,7 +415,10 @@ export async function POST(req: NextRequest) {
     const imageBase64 = Buffer.from(buf).toString("base64");
     const mimeType = type;
     try {
-      recipe = await extractWithGeminiFromImage(imageBase64, mimeType, geminiKey);
+      const result = await extractWithGeminiFromImage(imageBase64, mimeType, geminiKey);
+      recipe = result.recipe;
+      geminiRawResponse = result.rawResponse;
+      geminiEndpoint = "import-recipe-image";
     } catch (e) {
       console.error("Screenshot extract error", e);
       return NextResponse.json(
@@ -441,11 +436,13 @@ export async function POST(req: NextRequest) {
     if (recipeName && typeof recipeName === "string") {
       if (!geminiKey) return NextResponse.json({ error: "Requires GOOGLE_GEMINI_API_KEY." }, { status: 400 });
       try {
-        const [recipeData, spoonUrl] = await Promise.all([
+        const [recipeResult, spoonUrl] = await Promise.all([
           generateWithGeminiByName(recipeName.trim(), geminiKey),
           fetchImageUrlForRecipe(recipeName.trim())
         ]);
-        recipe = recipeData;
+        recipe = recipeResult.recipe;
+        geminiRawResponse = recipeResult.rawResponse;
+        geminiEndpoint = "import-recipe-generate";
         pageImageUrl = spoonUrl;
       } catch (e) {
         console.error("Recipe generation error", e);
@@ -485,7 +482,10 @@ export async function POST(req: NextRequest) {
     if (isYouTubeUrl(targetUrl)) {
       const youtubeUrl = normalizeYouTubeUrl(targetUrl);
       try {
-        recipe = await extractWithGeminiFromYouTube(youtubeUrl, geminiKey);
+        const ytResult = await extractWithGeminiFromYouTube(youtubeUrl, geminiKey);
+        recipe = ytResult.recipe;
+        geminiRawResponse = ytResult.rawResponse;
+        geminiEndpoint = "import-recipe-youtube";
       } catch (e) {
         console.error("YouTube recipe extract error", e);
         return NextResponse.json(
@@ -518,7 +518,10 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        recipe = await extractWithGemini(text, geminiKey);
+        const urlResult = await extractWithGemini(text, geminiKey);
+        recipe = urlResult.recipe;
+        geminiRawResponse = urlResult.rawResponse;
+        geminiEndpoint = "import-recipe-url";
       } catch (e) {
         console.error("Recipe extract error", e);
         return NextResponse.json(
@@ -552,6 +555,19 @@ export async function POST(req: NextRequest) {
   }
 
   const imageUrl = pageImageUrl || await fetchImageUrlForRecipe(recipe.name);
+
+  // Log LLM usage (fire-and-forget)
+  if (geminiRawResponse) {
+    const tokens = extractGeminiTokens(geminiRawResponse);
+    logLlmUsage({
+      userId: auth.user.id,
+      householdId,
+      endpoint: geminiEndpoint,
+      model: geminiModel,
+      input_tokens: tokens.input_tokens,
+      output_tokens: tokens.output_tokens,
+    });
+  }
 
   try {
     const result = await saveExtractedRecipe(recipe, householdId, imageUrl);

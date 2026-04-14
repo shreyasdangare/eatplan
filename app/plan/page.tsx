@@ -12,9 +12,16 @@ import {
   useSensor,
   useSensors
 } from "@dnd-kit/core";
-import { useCallback, useEffect, useState } from "react";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
+import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search, GripVertical } from "lucide-react";
 import { isMealPast } from "@/lib/isMealPast";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
 
@@ -30,9 +37,10 @@ const SLOT_ICONS: Record<string, any> = {
   dinner: Moon
 };
 
+/* ─── Draggable pill (recipe tray) ─── */
 function DraggableDish({ dish }: { dish: Dish }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: dish.id
+    id: `tray:${dish.id}`
   });
   return (
     <button
@@ -40,97 +48,247 @@ function DraggableDish({ dish }: { dish: Dish }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`shrink-0 cursor-grab rounded-full border px-4 py-2.5 text-[15px] font-semibold tracking-tight backdrop-blur-md transition-all active:scale-[0.98] active:cursor-grabbing ${
+      className={`shrink-0 cursor-grab rounded-full border w-[150px] px-4 py-2.5 text-[16px] font-semibold backdrop-blur-md transition-all active:scale-[0.98] active:cursor-grabbing truncate ${
         isDragging
           ? "border-orange-400 bg-orange-100/80 text-orange-900 shadow-inner dark:border-orange-600 dark:bg-orange-900/60 dark:text-orange-100"
           : "border-stone-200/60 bg-white/60 text-stone-700 shadow-sm hover:border-orange-300 hover:bg-orange-50/80 hover:text-orange-900 hover:shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:border-stone-700/60 dark:bg-stone-800/60 dark:text-stone-200 dark:hover:border-orange-500/50 dark:hover:bg-stone-800/90 dark:hover:shadow-[0_4px_12px_rgb(0,0,0,0.2)]"
       }`}
+      title={dish.name}
     >
       {dish.name}
     </button>
   );
 }
 
+/* ─── Sortable dish pill inside a slot ─── */
+function SortableDishPill({
+  entry,
+  prepared,
+  onRemove,
+}: {
+  entry: PlanEntry;
+  prepared: boolean;
+  onRemove: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: entry.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const dishName = entry.dishes?.name ?? "Unknown";
+  const dishId = entry.dishes?.id ?? entry.dish_id;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group/pill flex items-center gap-1.5 rounded-xl border px-3 py-2 transition-colors ${
+        prepared
+          ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
+          : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm"
+      }`}
+    >
+      {/* Drag handle */}
+      {!prepared && (
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="shrink-0 cursor-grab rounded p-0.5 text-stone-300 hover:text-stone-500 active:cursor-grabbing dark:text-stone-600 dark:hover:text-stone-400 touch-none"
+          aria-label="Reorder"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+      )}
+
+      <span
+        className={`min-w-0 flex-1 truncate text-[15px] font-bold tracking-tight ${
+          prepared
+            ? "text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600"
+            : "text-stone-800 dark:text-stone-200"
+        }`}
+        title={dishName}
+      >
+        {dishId ? (
+          <Link href={`/dishes/${dishId}`} className="hover:underline hover:text-orange-700 dark:hover:text-orange-400">
+            {dishName}
+          </Link>
+        ) : (
+          dishName
+        )}
+      </span>
+
+      {prepared ? (
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
+      ) : (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="shrink-0 rounded-full p-1 text-stone-400 opacity-0 transition-all hover:bg-red-100 hover:text-red-600 group-hover/pill:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+          aria-label="Remove"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ─── Inline type-to-add search ─── */
+function InlineAddDish({
+  dishes,
+  onSelect,
+  onClose,
+}: {
+  dishes: Dish[];
+  onSelect: (dishId: string) => void;
+  onClose: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const filtered = dishes.filter((d) =>
+    d.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div className="relative mt-1">
+      <div className="flex items-center gap-1.5 rounded-lg border border-orange-300/60 bg-white dark:bg-stone-900 dark:border-orange-600/40 px-2.5 py-1.5 shadow-sm">
+        <Search className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") onClose();
+            if (e.key === "Enter" && filtered.length === 1) {
+              onSelect(filtered[0].id);
+            }
+          }}
+          placeholder="Type recipe name…"
+          className="flex-1 bg-transparent text-sm font-medium text-stone-800 placeholder:text-stone-400 outline-none dark:text-stone-200 min-w-0"
+        />
+        <button onClick={onClose} className="shrink-0 rounded-full p-0.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300">
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      {query && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-40 overflow-y-auto rounded-xl border border-stone-200 bg-white shadow-lg dark:border-stone-700 dark:bg-stone-900 scrollbar-hide">
+          {filtered.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-stone-400">No recipes found</p>
+          ) : (
+            filtered.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => onSelect(d.id)}
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-stone-700 hover:bg-orange-50 dark:text-stone-300 dark:hover:bg-orange-900/20 transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5 text-orange-500 shrink-0" />
+                <span className="truncate">{d.name}</span>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Droppable slot (table cell) ─── */
 function DroppableSlot({
   date,
   slot,
-  current,
-  prepared,
-  onClear
+  entries,
+  dishes,
+  onAddDish,
+  onRemoveDish,
+  onReorder,
 }: {
   date: string;
   slot: string;
-  current: { id: string; name: string; image_url?: string | null } | null;
-  prepared: boolean;
-  onClear: () => void;
+  entries: PlanEntry[];
+  dishes: Dish[];
+  onAddDish: (date: string, slot: string, dishId: string) => void;
+  onRemoveDish: (planId: string) => void;
+  onReorder: (date: string, slot: string, orderedIds: string[]) => void;
 }) {
   const slotId = `${date}:${slot}`;
   const { setNodeRef, isOver } = useDroppable({ id: slotId });
+  const [showInlineAdd, setShowInlineAdd] = useState(false);
+
+  const allPrepared = entries.length > 0 && entries.every((e) => isMealPast(date, slot));
 
   return (
-    <td className="min-w-[8rem] border-b border-stone-200/50 p-2 align-top dark:border-stone-700/50 sm:min-w-[10rem] group/slot">
+    <td className="min-w-[10rem] border-b border-stone-200/50 p-2 align-top dark:border-stone-700/50 group/slot">
       <div
         ref={setNodeRef}
-        className={`relative flex min-h-[5.5rem] flex-col rounded-[1.25rem] border-2 p-3 transition-all duration-300 ${
+        className={`relative flex min-h-[5.5rem] flex-col rounded-[1.25rem] border-2 p-2.5 transition-all duration-300 ${
           isOver
             ? "scale-[1.02] border-orange-400 bg-orange-50 shadow-md dark:border-orange-500/80 dark:bg-orange-900/30"
-            : prepared
+            : allPrepared && entries.length > 0
             ? "border-emerald-300/80 bg-emerald-50/80 dark:border-emerald-700/80 dark:bg-emerald-950/40"
             : "border-dashed border-stone-200/60 bg-stone-50/40 hover:border-stone-300 dark:border-stone-700/60 dark:bg-stone-800/30 dark:hover:border-stone-600"
         }`}
       >
-        {current?.image_url && (
-           <div 
-              className="absolute inset-0 bg-cover bg-center opacity-30 dark:opacity-20 blur-[1.5px] rounded-[1.1rem] transition-all"
-              style={{ backgroundImage: `url(${current.image_url})` }}
-           />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-white/40 to-white/70 dark:from-stone-900/80 dark:via-stone-900/50 dark:to-stone-900/80 rounded-[1.1rem]" />
-        
-        {current ? (
-          <div className="relative z-10 flex h-full flex-col">
-            <div className="flex items-start justify-between gap-2">
-                  <span
-                    className={`min-w-0 flex-1 break-words text-sm font-semibold leading-tight ${
-                      prepared ? "line-through text-stone-400 dark:text-stone-500" : "text-stone-800 dark:text-stone-200"
-                    }`}
-                    title={current?.name}
-                  >
-                    {current?.id ? (
-                      <Link href={`/dishes/${current.id}`} className="hover:underline hover:text-orange-700 dark:hover:text-orange-400">
-                        {current.name}
-                      </Link>
-                    ) : (
-                      current?.name
-                    )}
-                  </span>
-              {prepared ? (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
-              ) : (
-                <button
-                  type="button"
-                  onClick={onClear}
-                  className="shrink-0 -mr-1 -mt-1 rounded-full p-1.5 text-stone-400 opacity-0 transition-all hover:bg-red-100 hover:text-red-600 focus:opacity-100 group-hover/slot:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
-                  aria-label="Clear slot"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+        {entries.length > 0 ? (
+          <SortableContext items={entries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+            <div className="flex flex-col gap-1.5 relative z-10">
+              {entries.map((entry) => (
+                <SortableDishPill
+                  key={entry.id}
+                  entry={entry}
+                  prepared={isMealPast(date, slot)}
+                  onRemove={() => onRemoveDish(entry.id)}
+                />
+              ))}
             </div>
-            {prepared && (
-              <div className="mt-auto pt-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-3 w-3 fill-emerald-100 dark:fill-emerald-900" />
-                  Done
-                </span>
-              </div>
-            )}
-          </div>
-        ) : (
+          </SortableContext>
+        ) : !showInlineAdd ? (
           <div className="relative z-10 flex h-full items-center justify-center opacity-0 transition-opacity group-hover/slot:opacity-100">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300">
+            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
               Drop here
             </span>
+          </div>
+        ) : null}
+
+        {/* Add more button / inline search */}
+        {!allPrepared && entries.length < 5 && (
+          <div className="mt-1.5 relative z-10">
+            {showInlineAdd ? (
+              <InlineAddDish
+                dishes={dishes}
+                onSelect={(dishId) => {
+                  onAddDish(date, slot, dishId);
+                  setShowInlineAdd(false);
+                }}
+                onClose={() => setShowInlineAdd(false)}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowInlineAdd(true)}
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-400 opacity-0 transition-all hover:bg-orange-50 hover:text-orange-600 group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-500"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -151,6 +309,7 @@ type PlanEntry = {
   date: string;
   slot_type: string;
   dish_id: string | null;
+  position: number;
   dishes?: { id: string; name: string } | null;
 };
 
@@ -245,76 +404,119 @@ export default function PlanPage() {
     })();
   }, [from, to, hasSetInitialDiet]);
 
-  const setSlot = useCallback(
-    async (date: string, slot_type: string, dish_id: string | null) => {
-      let previousPlans: PlanEntry[] = [];
+  /* ─── Slot helpers ─── */
+  const getSlotEntries = useCallback(
+    (date: string, slot_type: string) => {
+      return plans
+        .filter((x) => x.date === date && x.slot_type === slot_type)
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    },
+    [plans]
+  );
 
-      setPlans((prev) => {
-        previousPlans = prev;
-        const rest = prev.filter(
-          (p) => !(p.date === date && p.slot_type === slot_type)
-        );
-        if (dish_id) {
-          const dish = dishes.find((d) => d.id === dish_id);
-          return [
-            ...rest,
-            {
-              id: crypto.randomUUID(),
-              date,
-              slot_type,
-              dish_id,
-              dishes: dish ? { id: dish.id, name: dish.name } : null
-            }
-          ];
-        }
-        return rest;
-      });
+  const addDishToSlot = useCallback(
+    async (date: string, slot_type: string, dish_id: string) => {
+      const existing = plans.filter((p) => p.date === date && p.slot_type === slot_type);
+      if (existing.length >= 5) return; // Max 5
+
+      const dish = dishes.find((d) => d.id === dish_id);
+      const nextPosition = existing.length > 0
+        ? Math.max(...existing.map((e) => e.position ?? 0)) + 1
+        : 0;
+
+      const tempId = crypto.randomUUID();
+      const newEntry: PlanEntry = {
+        id: tempId,
+        date,
+        slot_type,
+        dish_id,
+        position: nextPosition,
+        dishes: dish ? { id: dish.id, name: dish.name } : null,
+      };
+
+      setPlans((prev) => [...prev, newEntry]);
 
       try {
         const res = await fetch("/api/meal-plans", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date, slot_type, dish_id })
+          body: JSON.stringify({ date, slot_type, dish_id }),
         });
-        if (!res.ok) {
-          throw new Error("Failed to update slot");
-        }
+        if (!res.ok) throw new Error("Failed to add dish");
+        // Refetch to get real IDs
+        const plansRes = await fetch(`/api/meal-plans?from=${from}&to=${to}`);
+        if (plansRes.ok) setPlans((await plansRes.json()) ?? []);
       } catch (err) {
-        console.error("Optimistic update failed, rolling back:", err);
+        console.error("Add dish failed:", err);
+        setPlans((prev) => prev.filter((p) => p.id !== tempId));
+      }
+    },
+    [dishes, plans, from, to]
+  );
+
+  const removeDishFromSlot = useCallback(
+    async (planId: string) => {
+      const previousPlans = plans;
+      setPlans((prev) => prev.filter((p) => p.id !== planId));
+
+      try {
+        const res = await fetch(`/api/meal-plans?id=${planId}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed to remove dish");
+      } catch (err) {
+        console.error("Remove dish failed:", err);
         setPlans(previousPlans);
       }
-    },
-    [dishes]
-  );
-
-  const getSlotDish = useCallback(
-    (date: string, slot_type: string) => {
-      const p = plans.find(
-        (x) => x.date === date && x.slot_type === slot_type
-      );
-      if (p?.dish_id) {
-         const d = dishes.find((d) => d.id === p.dish_id);
-         if (d) return { id: d.id, name: d.name, image_url: d.image_url };
-      }
-      if (p?.dishes?.id && p?.dishes?.name) {
-         return { id: p.dishes.id, name: p.dishes.name };
-      }
-      return null;
-    },
-    [plans, dishes]
-  );
-
-  const getSlotPrepared = useCallback(
-    (date: string, slot_type: string) => {
-      const p = plans.find(
-        (x) => x.date === date && x.slot_type === slot_type
-      );
-      if (!p || (!p.dish_id && !p.dishes?.name)) return false;
-      return isMealPast(date, slot_type);
     },
     [plans]
   );
 
+  const clearSlot = useCallback(
+    async (date: string, slot_type: string) => {
+      const previousPlans = plans;
+      setPlans((prev) => prev.filter((p) => !(p.date === date && p.slot_type === slot_type)));
+
+      try {
+        const res = await fetch("/api/meal-plans", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, slot_type, dish_id: null }),
+        });
+        if (!res.ok) throw new Error("Failed to clear slot");
+      } catch (err) {
+        console.error("Clear slot failed:", err);
+        setPlans(previousPlans);
+      }
+    },
+    [plans]
+  );
+
+  const reorderSlot = useCallback(
+    async (date: string, slot_type: string, orderedIds: string[]) => {
+      // Optimistic: re-assign positions
+      setPlans((prev) => {
+        const rest = prev.filter((p) => !(p.date === date && p.slot_type === slot_type));
+        const slotEntries = prev.filter((p) => p.date === date && p.slot_type === slot_type);
+        const reordered = orderedIds.map((id, i) => {
+          const entry = slotEntries.find((e) => e.id === id);
+          return entry ? { ...entry, position: i } : null;
+        }).filter(Boolean) as PlanEntry[];
+        return [...rest, ...reordered];
+      });
+
+      try {
+        await fetch("/api/meal-plans", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, slot_type, ordered_ids: orderedIds }),
+        });
+      } catch (err) {
+        console.error("Reorder failed:", err);
+      }
+    },
+    []
+  );
+
+  /* ─── DnD ─── */
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { distance: 8 }
@@ -325,19 +527,48 @@ export default function PlanPage() {
   );
 
   const handleDragStart = (e: DragStartEvent) => {
-    const id = e.active.id as string;
-    const dish = dishes.find((d) => d.id === id);
-    if (dish) setActiveDish(dish);
+    const rawId = e.active.id as string;
+    if (rawId.startsWith("tray:")) {
+      const dishId = rawId.replace("tray:", "");
+      const dish = dishes.find((d) => d.id === dishId);
+      if (dish) setActiveDish(dish);
+    }
   };
 
   const handleDragEnd = (e: DragEndEvent) => {
     setActiveDish(null);
-    const dishId = e.active.id as string;
+    const rawActiveId = e.active.id as string;
     const over = e.over?.id;
     if (!over || typeof over !== "string") return;
-    const [date, slot_type] = over.split(":");
-    if (date && slot_type && SLOTS.includes(slot_type as (typeof SLOTS)[number])) {
-      setSlot(date, slot_type, dishId);
+
+    // Case 1: Dragging from tray to slot
+    if (rawActiveId.startsWith("tray:")) {
+      const dishId = rawActiveId.replace("tray:", "");
+      const [date, slot_type] = (over as string).split(":");
+      if (date && slot_type && SLOTS.includes(slot_type as (typeof SLOTS)[number])) {
+        addDishToSlot(date, slot_type, dishId);
+      }
+      return;
+    }
+
+    // Case 2: Reordering within a slot (sortable)
+    const activeId = rawActiveId;
+    const overId = over as string;
+    if (activeId !== overId) {
+      // Find which slot contains these entries
+      const activeEntry = plans.find((p) => p.id === activeId);
+      const overEntry = plans.find((p) => p.id === overId);
+      if (activeEntry && overEntry &&
+          activeEntry.date === overEntry.date &&
+          activeEntry.slot_type === overEntry.slot_type) {
+        const slotEntries = getSlotEntries(activeEntry.date, activeEntry.slot_type);
+        const oldIndex = slotEntries.findIndex((e) => e.id === activeId);
+        const newIndex = slotEntries.findIndex((e) => e.id === overId);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newOrder = arrayMove(slotEntries, oldIndex, newIndex);
+          reorderSlot(activeEntry.date, activeEntry.slot_type, newOrder.map((e) => e.id));
+        }
+      }
     }
   };
 
@@ -507,7 +738,7 @@ export default function PlanPage() {
             ) : filteredDishes.length === 0 ? (
               <div className="flex w-full items-center justify-center py-4">
                 <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
-                  No recipes found for "{searchQuery}"
+                  No recipes found for &quot;{searchQuery}&quot;
                 </p>
               </div>
             ) : (
@@ -572,9 +803,11 @@ export default function PlanPage() {
                         key={`${date}:${slot}`}
                         date={date}
                         slot={slot}
-                        current={getSlotDish(date, slot) ?? null}
-                        prepared={getSlotPrepared(date, slot)}
-                        onClear={() => setSlot(date, slot, null)}
+                        entries={getSlotEntries(date, slot)}
+                        dishes={filteredDishes}
+                        onAddDish={addDishToSlot}
+                        onRemoveDish={removeDishFromSlot}
+                        onReorder={reorderSlot}
                       />
                     ))}
                   </tr>
@@ -624,17 +857,67 @@ export default function PlanPage() {
             <div className="px-4 py-4 pb-5 space-y-3">
               {SLOTS.map((slot) => {
                  const Icon = SLOT_ICONS[slot];
-                 const dishName = getSlotDish(date, slot);
-                 const isPrepared = getSlotPrepared(date, slot);
+                 const entries = getSlotEntries(date, slot);
+                 const allPrepared = entries.length > 0 && entries.every(() => isMealPast(date, slot));
 
                  return (
-                   <div key={slot} className="relative flex items-center gap-3">
-                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${isPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-400 dark:text-stone-500 ring-stone-200/80 dark:ring-stone-700/80'} shadow-sm`}>
+                   <div key={slot} className="flex gap-3">
+                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-400 dark:text-stone-500 ring-stone-200/80 dark:ring-stone-700/80'} shadow-sm mt-0.5`}>
                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
                      </div>
                      
-                     <div className="flex-1 min-w-0">
-                       {!dishName ? (
+                     <div className="flex-1 min-w-0 space-y-1.5">
+                       {entries.length > 0 ? (
+                         <>
+                           {entries.map((entry) => {
+                             const dishName = entry.dishes?.name ?? "Unknown";
+                             const dishId = entry.dishes?.id ?? entry.dish_id;
+                             const isPrepared = isMealPast(date, slot);
+
+                             return (
+                               <div
+                                 key={entry.id}
+                                 className={`flex items-center justify-between gap-2 rounded-xl border px-3.5 h-[46px] transition-colors ${
+                                   isPrepared
+                                     ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
+                                     : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm"
+                                 }`}
+                               >
+                                 <span
+                                   className={`truncate text-[15px] font-bold tracking-tight ${
+                                     isPrepared
+                                       ? "text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600"
+                                       : "text-stone-800 dark:text-stone-200"
+                                   }`}
+                                 >
+                                   {dishId ? (
+                                     <Link href={`/dishes/${dishId}`} className="hover:underline">
+                                       {dishName}
+                                     </Link>
+                                   ) : (
+                                     dishName
+                                   )}
+                                 </span>
+                                 {isPrepared ? (
+                                   <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />
+                                 ) : (
+                                   <button
+                                     type="button"
+                                     onClick={() => removeDishFromSlot(entry.id)}
+                                     className="shrink-0 -mr-1.5 rounded-full p-1.5 text-stone-400 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
+                                     aria-label="Remove recipe"
+                                   >
+                                     <X className="h-4 w-4" strokeWidth={2.5} />
+                                   </button>
+                                 )}
+                               </div>
+                             );
+                           })}
+                         </>
+                       ) : null}
+
+                       {/* Add button (always show if under limit and not all prepared) */}
+                       {!allPrepared && entries.length < 5 && (
                          <button 
                            type="button" 
                            onClick={() => setMobileSlotOpen({ date, slot })}
@@ -642,24 +925,6 @@ export default function PlanPage() {
                          >
                            <Plus className="h-4 w-4" strokeWidth={3} /> Add {SLOT_LABELS[slot]}
                          </button>
-                       ) : (
-                         <div className={`flex h-[46px] items-center justify-between gap-2 rounded-xl border px-3.5 transition-colors ${isPrepared ? 'bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30' : 'bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm'}`}>
-                           <span className={`truncate text-[14px] font-bold tracking-tight ${isPrepared ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-800 dark:text-stone-200'}`}>
-                             {dishName.id ? <Link href={`/dishes/${dishName.id}`} className="hover:underline">{dishName.name}</Link> : dishName.name}
-                           </span>
-                           {isPrepared ? (
-                             <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400" strokeWidth={2.5} />
-                           ) : (
-                             <button
-                               type="button"
-                               onClick={() => setSlot(date, slot, null)}
-                               className="shrink-0 -mr-1.5 rounded-full p-1.5 text-stone-400 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
-                               aria-label="Remove recipe"
-                             >
-                               <X className="h-4 w-4" strokeWidth={2.5} />
-                             </button>
-                           )}
-                         </div>
                        )}
                      </div>
                    </div>
@@ -781,7 +1046,7 @@ export default function PlanPage() {
                      key={dish.id}
                      type="button"
                      onClick={() => {
-                        setSlot(mobileSlotOpen.date, mobileSlotOpen.slot, dish.id);
+                        addDishToSlot(mobileSlotOpen.date, mobileSlotOpen.slot, dish.id);
                         setSearchQuery("");
                         setMobileSlotOpen(null);
                      }}
