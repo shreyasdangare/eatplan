@@ -48,14 +48,23 @@ function DraggableDish({ dish }: { dish: Dish }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`shrink-0 cursor-grab rounded-full border w-[150px] px-4 py-2.5 text-[16px] font-semibold backdrop-blur-md transition-all active:scale-[0.98] active:cursor-grabbing truncate ${
+      className={`group/tray relative shrink-0 cursor-grab overflow-hidden rounded-full border w-[150px] h-[46px] text-[16px] font-bold transition-all active:scale-[0.98] active:cursor-grabbing ${
         isDragging
-          ? "border-orange-400 bg-orange-100/80 text-orange-900 shadow-inner dark:border-orange-600 dark:bg-orange-900/60 dark:text-orange-100"
-          : "border-stone-200/60 bg-white/60 text-stone-700 shadow-sm hover:border-orange-300 hover:bg-orange-50/80 hover:text-orange-900 hover:shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:border-stone-700/60 dark:bg-stone-800/60 dark:text-stone-200 dark:hover:border-orange-500/50 dark:hover:bg-stone-800/90 dark:hover:shadow-[0_4px_12px_rgb(0,0,0,0.2)]"
+          ? "border-orange-400 ring-2 ring-orange-400 shadow-xl opacity-0"
+          : "border-stone-200/60 shadow-sm hover:border-orange-300 hover:shadow-md dark:border-stone-700/60"
       }`}
-      title={dish.name}
     >
-      {dish.name}
+      {/* Blurred background image */}
+      {dish.image_url && (
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 blur-[2px] transition-all group-hover/tray:opacity-50 group-hover/tray:blur-[1px]" 
+          style={{ backgroundImage: `url(${dish.image_url})` }}
+        />
+      )}
+      <div className="absolute inset-0 bg-white/70 backdrop-blur-md dark:bg-stone-900/70" />
+      <span className="relative z-10 block truncate px-4 text-stone-700 dark:text-stone-200 group-hover/tray:text-orange-900 dark:group-hover/tray:text-orange-300">
+        {dish.name}
+      </span>
     </button>
   );
 }
@@ -82,29 +91,42 @@ function SortableDishPill({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.3 : 1,
+    zIndex: isDragging ? 50 : 1,
   };
 
   const dishName = entry.dishes?.name ?? "Unknown";
   const dishId = entry.dishes?.id ?? entry.dish_id;
+  const imageUrl = entry.dishes?.image_url;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group/pill flex items-center gap-1.5 rounded-xl border px-3 py-2 transition-colors ${
+      className={`group/pill relative flex items-center gap-1.5 overflow-hidden rounded-xl border px-3 py-2 transition-all ${
         prepared
           ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
           : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm"
       }`}
     >
+      {/* Blurred background image if not prepared */}
+      {!prepared && imageUrl && (
+        <>
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-[0.15] blur-[3px] transition-all group-hover/pill:opacity-[0.25]"
+            style={{ backgroundImage: `url(${imageUrl})` }}
+          />
+          <div className="absolute inset-0 bg-white/60 dark:bg-stone-900/60" />
+        </>
+      )}
+
       {/* Drag handle */}
       {!prepared && (
         <button
           type="button"
           {...attributes}
           {...listeners}
-          className="shrink-0 cursor-grab rounded p-0.5 text-stone-300 hover:text-stone-500 active:cursor-grabbing dark:text-stone-600 dark:hover:text-stone-400 touch-none"
+          className="relative z-10 shrink-0 cursor-grab rounded p-0.5 text-stone-400 hover:text-stone-600 active:cursor-grabbing dark:text-stone-500 dark:hover:text-stone-300 touch-none"
           aria-label="Reorder"
         >
           <GripVertical className="h-3.5 w-3.5" />
@@ -112,7 +134,7 @@ function SortableDishPill({
       )}
 
       <span
-        className={`min-w-0 flex-1 truncate text-[15px] font-bold tracking-tight ${
+        className={`relative z-10 min-w-0 flex-1 truncate text-[15px] font-bold tracking-tight ${
           prepared
             ? "text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600"
             : "text-stone-800 dark:text-stone-200"
@@ -134,7 +156,7 @@ function SortableDishPill({
         <button
           type="button"
           onClick={onRemove}
-          className="shrink-0 rounded-full p-1 text-stone-400 opacity-0 transition-all hover:bg-red-100 hover:text-red-600 group-hover/pill:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+          className="relative z-10 shrink-0 rounded-full p-1 text-stone-400 opacity-0 transition-all hover:bg-red-100/80 hover:text-red-600 group-hover/pill:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/40 dark:hover:text-red-400"
           aria-label="Remove"
         >
           <X className="h-3.5 w-3.5" />
@@ -310,7 +332,7 @@ type PlanEntry = {
   slot_type: string;
   dish_id: string | null;
   position: number;
-  dishes?: { id: string; name: string } | null;
+  dishes?: { id: string; name: string, image_url?: string | null } | null;
 };
 
 const SLOTS = ["breakfast", "lunch", "dinner"] as const;
@@ -551,16 +573,21 @@ export default function PlanPage() {
       return;
     }
 
-    // Case 2: Reordering within a slot (sortable)
+    // Case 2: Moving or Reordering existing plan entries
     const activeId = rawActiveId;
     const overId = over as string;
-    if (activeId !== overId) {
-      // Find which slot contains these entries
-      const activeEntry = plans.find((p) => p.id === activeId);
-      const overEntry = plans.find((p) => p.id === overId);
-      if (activeEntry && overEntry &&
-          activeEntry.date === overEntry.date &&
-          activeEntry.slot_type === overEntry.slot_type) {
+    
+    if (activeId === overId) return;
+
+    const activeEntry = plans.find((p) => p.id === activeId);
+    if (!activeEntry) return;
+
+    // Check if we dropped on another entry
+    const overEntry = plans.find((p) => p.id === overId);
+    
+    if (overEntry) {
+      if (activeEntry.date === overEntry.date && activeEntry.slot_type === overEntry.slot_type) {
+        // Reordering within the SAME slot
         const slotEntries = getSlotEntries(activeEntry.date, activeEntry.slot_type);
         const oldIndex = slotEntries.findIndex((e) => e.id === activeId);
         const newIndex = slotEntries.findIndex((e) => e.id === overId);
@@ -568,9 +595,40 @@ export default function PlanPage() {
           const newOrder = arrayMove(slotEntries, oldIndex, newIndex);
           reorderSlot(activeEntry.date, activeEntry.slot_type, newOrder.map((e) => e.id));
         }
+      } else {
+        // Moving to a DIFFERENT slot (and specifically onto another item)
+        updateEntrySlotView(activeId, overEntry.date, overEntry.slot_type);
+      }
+    } else if (overId.includes(":")) {
+      // Dropped on a Slot background
+      const [date, slot_type] = overId.split(":");
+      if (date && slot_type && (activeEntry.date !== date || activeEntry.slot_type !== slot_type)) {
+        updateEntrySlotView(activeId, date, slot_type);
       }
     }
   };
+
+  const updateEntrySlotView = useCallback(async (planId: string, date: string, slot_type: string) => {
+    // Optimistic UI update
+    const previousPlans = [...plans];
+    setPlans(prev => prev.map(p => p.id === planId ? { ...p, date, slot_type, position: 999 } : p));
+
+    try {
+      const res = await fetch("/api/meal-plans", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: planId, date, slot_type }),
+      });
+      if (!res.ok) throw new Error("Move failed");
+      
+      // Full refetch to get correct positions
+      const plansRes = await fetch(`/api/meal-plans?from=${from}&to=${to}`);
+      if (plansRes.ok) setPlans((await plansRes.json()) ?? []);
+    } catch (err) {
+      console.error("Move failed:", err);
+      setPlans(previousPlans);
+    }
+  }, [plans, from, to]);
 
   const prevWeek = () => {
     setWeekStart((d) => {

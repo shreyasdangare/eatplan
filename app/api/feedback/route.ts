@@ -16,9 +16,10 @@ export async function POST(req: NextRequest) {
   }
 
   const userEmail = auth.user.email;
-  const userName = auth.user.preferred_name || "User";
+  const userName = auth.user.preferred_name || "A User";
 
   try {
+    console.log(`Sending feedback from ${userEmail}...`);
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -26,24 +27,30 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "EatPlan App <onboarding@resend.dev>",
+        from: "EatPlan Feedback <onboarding@resend.dev>",
         to: "shreyasdangare@gmail.com",
-        subject: `New Feedback from ${userName}`,
+        subject: `[EatPlan Feedback] from ${userName}`,
         html: `
-          <h3>Feedback from ${userName} (${userEmail})</h3>
-          <p>${message}</p>
+          <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
+            <h2>New Feedback Received</h2>
+            <p><strong>From:</strong> ${userName} (${userEmail})</p>
+            <hr />
+            <p style="white-space: pre-wrap;">${message}</p>
+          </div>
         `
       })
     });
 
     if (!res.ok) {
       const errorText = await res.text();
-      throw new Error(`Resend API Error: ${errorText}`);
+      console.error("Resend API Error details:", errorText);
+      return NextResponse.json({ error: `Resend Error: ${errorText}` }, { status: res.status });
     }
 
+    console.log("Feedback sent successfully.");
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("Feedback error:", err);
-    return NextResponse.json({ error: "Failed to send feedback" }, { status: 500 });
+    console.error("Critical Feedback error:", err);
+    return NextResponse.json({ error: "Internal server error while sending feedback" }, { status: 500 });
   }
 }

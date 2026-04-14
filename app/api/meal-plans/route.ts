@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabaseServer
     .from("meal_plans")
-    .select("id, date, slot_type, dish_id, position, prepared_at, dishes(id, name)")
+    .select("id, date, slot_type, dish_id, position, prepared_at, dishes(id, name, image_url)")
     .eq("household_id", householdId)
     .gte("date", from)
     .lte("date", to)
@@ -198,15 +198,11 @@ export async function DELETE(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const body = (await req.json()) as {
-    date: string;
-    slot_type: string;
-    ordered_ids: string[];
+    id?: string;
+    date?: string;
+    slot_type?: string;
+    ordered_ids?: string[];
   };
-  const { date, slot_type, ordered_ids } = body;
-
-  if (!date || !slot_type || !ordered_ids?.length) {
-    return NextResponse.json({ error: "date, slot_type, and ordered_ids required" }, { status: 400 });
-  }
 
   const auth = await requireAuth();
   if ("error" in auth) return auth.error;
@@ -216,19 +212,91 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Household not found" }, { status: 403 });
   }
 
-  // Update positions based on the new order
-  for (let i = 0; i < ordered_ids.length; i++) {
-    const { error } = await supabaseServer
-      .from("meal_plans")
-      .update({ position: i })
-      .eq("id", ordered_ids[i])
-      .eq("household_id", householdId);
+  // Case 1: Reordering within a slot
+  if (body.ordered_ids && body.date && body.slot_type) {
+    const { ordered_ids } = body;
+    for (let i = 0; i < ordered_ids.length; i++) {
+      const { error } = await supabaseServer
+        .from("meal_plans")
+        .update({ position: i })
+        .eq("id", ordered_ids[i])
+        .eq("household_id", householdId);
 
-    if (error) {
-      console.error("Error reordering meal plan", error);
-      return NextResponse.json({ error: "Failed to reorder" }, { status: 500 });
+      if (error) {
+        console.error("Error reordering meal plan", error);
+        return NextResponse.json({ error: "Failed to reorder" }, { status: 500 });
+      }
     }
+    return NextResponse.json({ ok: true });
   }
 
-  return NextResponse.json({ ok: true });
+  // Case 2: Moving a single entry to a different slot/date
+  if (body.id && body.date && body.slot_type) {
+    const { id, date, slot_type } = body;
+
+    // 1. Get current slot info to re-compact later
+    const { data: currentEntry } = await supabaseServer
+      .from("meal_plans")
+      .select("date, slot_type")
+      .eq("id", id)
+      .eq("household_id", householdId)
+      .maybeSingle();
+
+    if (!currentEntry) {
+      return NextResponse.json({ error: "Entry not found" }, { status: 404 });
+    }
+
+    // 2. Find position in destination slot
+    const { data: destExisting } = await supabaseServer
+      .from("meal_plans")
+      .select("position")
+      .eq("household_id", householdId)
+      .eq("date", date)
+      .eq("slot_type", slot_type)
+      .order("position", { ascending: false })
+      .limit(1);
+
+    const nextPos = (destExisting?.length ?? 0) > 0 ? (destExisting![0].position + 1) : 0;
+    if (nextPos >= MAX_DISHES_PER_SLOT) {
+      return NextResponse.json({ error: "Destination slot is full" }, { status: 400 });
+    }
+
+    // 3. Update the entry
+    const { error: updateError } = await supabaseServer
+      .from("meal_plans")
+      .update({ date, slot_type, position: nextPos })
+      .eq("id", id)
+      .eq("household_id", householdId);
+
+    if (updateError) {
+      console.error("Error moving meal plan", updateError);
+      return NextResponse.json({ error: "Failed to move entry" }, { status: 500 });
+    }
+
+    // 4. Re-compact source slot if moved out
+    if (currentEntry.date !== date || currentEntry.slot_type !== slot_type) {
+      const { data: remaining } = await supabaseServer
+        .from("meal_plans")
+        .select("id, position")
+        .eq("household_id", householdId)
+        .eq("date", currentEntry.date)
+        .eq("slot_type", currentEntry.slot_type)
+        .order("position", { ascending: true });
+
+      if (remaining && remaining.length > 0) {
+        for (let i = 0; i < remaining.length; i++) {
+          if (remaining[i].position !== i) {
+            await supabaseServer
+              .from("meal_plans")
+              .update({ position: i })
+              .eq("id", remaining[i].id);
+          }
+        }
+      }
+    }
+
+    return NextResponse.json({ ok: true });
+  }
+
+  return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
 }
