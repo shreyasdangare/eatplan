@@ -8,25 +8,40 @@ import Link from "next/link";
 export default function FeedbackPage() {
   const [feedback, setFeedback] = useState("");
   const [feedbackStatus, setFeedbackStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
   const submitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!feedback.trim()) return;
+    
     setFeedbackStatus("sending");
+    setErrorMessage("");
+
     try {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: feedback })
       });
-      if (!res.ok) throw new Error("Failed to send");
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send feedback");
+      }
+      
       setFeedbackStatus("success");
       setFeedback("");
       setTimeout(() => setFeedbackStatus("idle"), 3000);
-    } catch {
+    } catch (err: any) {
       setFeedbackStatus("error");
-      setTimeout(() => setFeedbackStatus("idle"), 3000);
+      setErrorMessage(err.message);
+      // Keep error visible for awareness, then clear
+      setTimeout(() => {
+        setFeedbackStatus("idle");
+        setErrorMessage("");
+      }, 6000);
     }
   };
 
@@ -78,9 +93,16 @@ export default function FeedbackPage() {
              </p>
            )}
            {feedbackStatus === "error" && (
-             <p className="text-sm font-semibold text-red-600 dark:text-red-400 text-center mt-2">
-               Oops. There was a problem sending your feedback.
-             </p>
+             <div className="mt-2 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 text-center">
+               <p className="text-sm font-bold text-red-600 dark:text-red-400">
+                 {errorMessage || "Oops. There was a problem sending your feedback."}
+               </p>
+               {errorMessage.includes("API key") && (
+                 <p className="text-xs text-red-500 dark:text-red-500/80 mt-1">
+                   Please ensure RESEND_API_KEY is defined in your environment.
+                 </p>
+               )}
+             </div>
            )}
         </form>
       </section>
