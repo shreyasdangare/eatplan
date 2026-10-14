@@ -787,7 +787,7 @@ export default function PlanPage() {
             {dishes.length === 0 ? (
               <div className="flex w-full items-center justify-center py-4 rounded-2xl bg-stone-50 border border-dashed border-stone-200 dark:bg-stone-900/30 dark:border-stone-800">
                 <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
-                  You haven't added any recipes yet.{" "}
+                  You haven&apos;t added any recipes yet.{" "}
                   <Link href="/recipes" className="text-orange-600 font-semibold hover:underline dark:text-orange-400">
                     Add one here.
                   </Link>

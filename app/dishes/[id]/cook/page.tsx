@@ -28,7 +28,7 @@ export default function CookModePage() {
         </h1>
         <p className="mx-auto max-w-md text-base font-medium text-stone-500 dark:text-stone-400">
           A hands-free, step-by-step cooking experience with wake-lock, voice
-          control, and timer integration. We're cooking this up for you.
+          control, and timer integration. We&apos;re cooking this up for you.
         </p>
       </div>
 

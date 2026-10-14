@@ -185,7 +185,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                         {f.description}
                       </span>
                       <span className="mt-auto flex items-center gap-1.5 text-sm font-bold text-orange-600 dark:text-orange-400">
-                        Let's go
+                        Let&apos;s go
                         <span className="transition-transform group-hover:translate-x-1">→</span>
                       </span>
                     </Link>
