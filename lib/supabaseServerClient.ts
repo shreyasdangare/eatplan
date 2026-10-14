@@ -72,6 +72,15 @@ export async function requireAuth(): Promise<
   { user: SessionUser } | { error: Response }
 > {
   const { user, error } = await getSession();
+  // No/expired session cookie is an auth failure (401), not a server error.
+  if (error && error.name === "AuthSessionMissingError") {
+    return {
+      error: new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      ),
+    };
+  }
   if (error) {
     return {
       error: new Response(
