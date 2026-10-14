@@ -4,7 +4,8 @@ import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
 import { getHouseholdId } from "@/lib/getHouseholdId";
 import { fetchImageUrlForRecipe } from "@/lib/recipeImages";
-import { logLlmUsage, extractGeminiTokens } from "@/lib/logLlmUsage";
+import { logLlmUsage } from "@/lib/logLlmUsage";
+import { gatewayJson, RECIPE_MODEL, RECIPE_VIDEO_MODEL, type GatewayTokens } from "@/lib/aiGateway";
 
 type ExtractedIngredient = {
   name: string;
@@ -24,8 +25,11 @@ type ExtractedRecipe = {
 async function fetchPageText(url: string): Promise<{ text: string; imageUrl: string | null }> {
   const res = await fetch(url, {
     headers: {
+      // Many recipe sites (e.g. Allrecipes/Dotdash) return 402/403 to bot-like UAs.
       "User-Agent":
-        "Mozilla/5.0 (compatible; EatPlanRecipeBot/1.0)"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9"
     },
     signal: AbortSignal.timeout(15000)
   });
@@ -63,113 +67,58 @@ const VIDEO_USER_PROMPT = `Extract the recipe from this cooking video (e.g. reel
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 
-async function extractWithGeminiFromImage(
-  imageBase64: string,
-  mimeType: string,
-  apiKey: string
-): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const res = await fetch(apiUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: RECIPE_SYSTEM_PROMPT }]
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [
-            { inlineData: { mimeType, data: imageBase64 } },
-            { text: SCREENSHOT_USER_PROMPT }
-          ]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 4000,
-        responseMimeType: "application/json"
+// Gemini 3 Flash reasoning tokens count toward the output limit (a generate call used ~2.7k of 4k),
+// so leave room to avoid truncated JSON.
+const RECIPE_MAX_OUTPUT_TOKENS = 8192;
+
+type GeminiResult = { recipe: ExtractedRecipe; tokens: GatewayTokens; model: string };
+
+const GENERATE_SYSTEM_PROMPT = "You are an expert chef. Generate recipe data to a JSON object. No markdown. Use this shape:\n{\n  \"name\": \"Normalized Recipe Title (strip all adjectives like 'Authentic', 'Best', 'Easy', 'Dilli Vali' to just the core dish name, e.g. 'Dal Makhni')\",\n  \"description\": \"Short description\",\n  \"servings\": number,\n  \"ingredients\": [\n    { \"name\": \"ingredient name\", \"quantity\": \"2 cups\", \"amount\": 2, \"unit\": \"cups\" }\n  ],\n  \"instructions\": \"Full cooking steps as a single string. Use numbered steps (1. ... 2. ...).\"\n}\nAlways include instructions.";
+
+async function extractWithGeminiFromImage(imageBase64: string, mimeType: string): Promise<GeminiResult> {
+  const { data, tokens } = await gatewayJson<ExtractedRecipe>({
+    model: RECIPE_MODEL,
+    system: RECIPE_SYSTEM_PROMPT,
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "file", mediaType: mimeType, data: imageBase64 },
+          { type: "text", text: SCREENSHOT_USER_PROMPT }
+        ]
       }
-    })
+    ],
+    temperature: 0.2,
+    maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
   });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
-  }
-
-  const data = (await res.json()) as any;
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
-  const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
-  return { recipe: JSON.parse(jsonStr) as ExtractedRecipe, rawResponse: data };
+  return { recipe: data, tokens, model: RECIPE_MODEL };
 }
 
-async function extractWithGemini(text: string, apiKey: string): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: RECIPE_SYSTEM_PROMPT }]
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `Extract the recipe from this text:\n\n${text.slice(0, 12000)}` }]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 4000,
-        responseMimeType: "application/json"
-      }
-    })
+async function extractWithGemini(text: string): Promise<GeminiResult> {
+  const { data, tokens } = await gatewayJson<ExtractedRecipe>({
+    model: RECIPE_MODEL,
+    system: RECIPE_SYSTEM_PROMPT,
+    messages: [{ role: "user", content: `Extract the recipe from this text:\n\n${text.slice(0, 12000)}` }],
+    temperature: 0.2,
+    maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
   });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
-  }
-
-  const data = (await res.json()) as any;
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
-  const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
-  return { recipe: JSON.parse(jsonStr) as ExtractedRecipe, rawResponse: data };
+  return { recipe: data, tokens, model: RECIPE_MODEL };
 }
 
-async function generateWithGeminiByName(recipeName: string, apiKey: string): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: "You are an expert chef. Generate recipe data to a JSON object. No markdown. Use this shape:\n{\n  \"name\": \"Normalized Recipe Title (strip all adjectives like 'Authentic', 'Best', 'Easy', 'Dilli Vali' to just the core dish name, e.g. 'Dal Makhni')\",\n  \"description\": \"Short description\",\n  \"servings\": number,\n  \"ingredients\": [\n    { \"name\": \"ingredient name\", \"quantity\": \"2 cups\", \"amount\": 2, \"unit\": \"cups\" }\n  ],\n  \"instructions\": \"Full cooking steps as a single string. Use numbered steps (1. ... 2. ...).\"\n}\nAlways include instructions." }]
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `Generate a highly-rated, authentic, and detailed recipe for "${recipeName}". The ingredient quantities MUST be scaled perfectly for exactly 2 people. Set servings to 2. Reply with ONLY a valid JSON object matching the system instructions shape.` }]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 4000,
-        responseMimeType: "application/json"
+async function generateWithGeminiByName(recipeName: string): Promise<GeminiResult> {
+  const { data, tokens } = await gatewayJson<ExtractedRecipe>({
+    model: RECIPE_MODEL,
+    system: GENERATE_SYSTEM_PROMPT,
+    messages: [
+      {
+        role: "user",
+        content: `Generate a highly-rated, authentic, and detailed recipe for "${recipeName}". The ingredient quantities MUST be scaled perfectly for exactly 2 people. Set servings to 2. Reply with ONLY a valid JSON object matching the system instructions shape.`
       }
-    })
+    ],
+    temperature: 0.4,
+    maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
   });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
-  }
-
-  const data = (await res.json()) as any;
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
-  const jsonStr = raw.replace(/^[\`\s]*json?/i, "").replace(/[\s\`]*$/i, "").trim();
-  return { recipe: JSON.parse(jsonStr) as ExtractedRecipe, rawResponse: data };
+  return { recipe: data, tokens, model: RECIPE_MODEL };
 }
 
 function isYouTubeUrl(url: URL): boolean {
@@ -205,63 +154,42 @@ function normalizeYouTubeUrl(url: URL): string {
   return url.href;
 }
 
-async function extractWithGeminiFromYouTube(
-  youtubeUrl: string,
-  apiKey: string
-): Promise<{ recipe: ExtractedRecipe; rawResponse: any }> {
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const res = await fetch(apiUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: RECIPE_SYSTEM_PROMPT }]
-      },
-      contents: [
+async function extractWithGeminiFromYouTube(youtubeUrl: string): Promise<GeminiResult> {
+  let result: { data: ExtractedRecipe; finishReason: string; tokens: GatewayTokens };
+  try {
+    result = await gatewayJson<ExtractedRecipe>({
+      model: RECIPE_VIDEO_MODEL,
+      system: RECIPE_SYSTEM_PROMPT,
+      messages: [
         {
           role: "user",
-          parts: [
-            {
-              fileData: {
-                mimeType: "video/youtube",
-                fileUri: youtubeUrl
-              }
-            },
-            { text: VIDEO_USER_PROMPT }
+          content: [
+            // Gemini fetches YouTube URLs natively; pass the URL through rather than downloading it.
+            { type: "file", mediaType: "video/mp4", data: new URL(youtubeUrl) },
+            { type: "text", text: VIDEO_USER_PROMPT }
           ]
         }
       ],
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 4000,
-        responseMimeType: "application/json"
-      }
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini API error: ${res.status} ${err.slice(0, 200)}`);
+      temperature: 0.2,
+      maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/Requested entity was not found/i.test(msg)) {
+      throw new Error("YouTube video not found. Check the link and make sure the video is public.");
+    }
+    if (/parse|JSON|No output/i.test(msg)) {
+      throw new Error("Could not parse recipe from video. Try a different video or link.");
+    }
+    throw e;
   }
-
-  const data = (await res.json()) as any;
-  const candidate = data.candidates?.[0];
-  const blockReason = data.promptFeedback?.blockReason ?? candidate?.finishReason;
-  if (blockReason === "SAFETY" || blockReason === "RECITATION" || blockReason === "BLOCKED") {
+  if (result.finishReason === "content-filter") {
     throw new Error("Video was blocked by the model. Try a different video.");
   }
-  const raw = candidate?.content?.parts?.[0]?.text?.trim() ?? "";
-  if (!raw) {
+  if (!result.data) {
     throw new Error("No recipe could be extracted from the video. The model returned no content.");
   }
-  const jsonStr = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim();
-  let recipe: ExtractedRecipe;
-  try {
-    recipe = JSON.parse(jsonStr) as ExtractedRecipe;
-  } catch {
-    throw new Error("Could not parse recipe from video. Try a different video or link.");
-  }
-  return { recipe, rawResponse: data };
+  return { recipe: result.data, tokens: result.tokens, model: RECIPE_VIDEO_MODEL };
 }
 
 function isErrorLikeRecipe(recipe: ExtractedRecipe): boolean {
@@ -375,21 +303,14 @@ export async function POST(req: NextRequest) {
   }
 
   const contentType = req.headers.get("content-type") ?? "";
-  const geminiKey = process.env.GOOGLE_GEMINI_API_KEY?.trim();
 
   let recipe: ExtractedRecipe;
   let pageImageUrl: string | null = null;
-  let geminiRawResponse: any = null;
+  let geminiTokens: GatewayTokens | null = null;
   let geminiEndpoint = "import-recipe";
-  const geminiModel = "gemini-3-flash-preview";
+  let geminiModel = RECIPE_MODEL;
 
   if (contentType.includes("multipart/form-data")) {
-    if (!geminiKey) {
-      return NextResponse.json(
-        { error: "Screenshot import requires GOOGLE_GEMINI_API_KEY." },
-        { status: 400 }
-      );
-    }
     const formData = await req.formData();
     const file = formData.get("file");
     if (!file || !(file instanceof File)) {
@@ -415,9 +336,10 @@ export async function POST(req: NextRequest) {
     const imageBase64 = Buffer.from(buf).toString("base64");
     const mimeType = type;
     try {
-      const result = await extractWithGeminiFromImage(imageBase64, mimeType, geminiKey);
+      const result = await extractWithGeminiFromImage(imageBase64, mimeType);
       recipe = result.recipe;
-      geminiRawResponse = result.rawResponse;
+      geminiTokens = result.tokens;
+      geminiModel = result.model;
       geminiEndpoint = "import-recipe-image";
     } catch (e) {
       console.error("Screenshot extract error", e);
@@ -434,14 +356,14 @@ export async function POST(req: NextRequest) {
     const { url, recipeName } = body;
 
     if (recipeName && typeof recipeName === "string") {
-      if (!geminiKey) return NextResponse.json({ error: "Requires GOOGLE_GEMINI_API_KEY." }, { status: 400 });
       try {
         const [recipeResult, spoonUrl] = await Promise.all([
-          generateWithGeminiByName(recipeName.trim(), geminiKey),
+          generateWithGeminiByName(recipeName.trim()),
           fetchImageUrlForRecipe(recipeName.trim())
         ]);
         recipe = recipeResult.recipe;
-        geminiRawResponse = recipeResult.rawResponse;
+        geminiTokens = recipeResult.tokens;
+      geminiModel = recipeResult.model;
         geminiEndpoint = "import-recipe-generate";
         pageImageUrl = spoonUrl;
       } catch (e) {
@@ -472,19 +394,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!geminiKey) {
-      return NextResponse.json(
-        { error: "Recipe import requires GOOGLE_GEMINI_API_KEY in server environment." },
-        { status: 400 }
-      );
-    }
-
     if (isYouTubeUrl(targetUrl)) {
       const youtubeUrl = normalizeYouTubeUrl(targetUrl);
       try {
-        const ytResult = await extractWithGeminiFromYouTube(youtubeUrl, geminiKey);
+        const ytResult = await extractWithGeminiFromYouTube(youtubeUrl);
         recipe = ytResult.recipe;
-        geminiRawResponse = ytResult.rawResponse;
+        geminiTokens = ytResult.tokens;
+      geminiModel = ytResult.model;
         geminiEndpoint = "import-recipe-youtube";
       } catch (e) {
         console.error("YouTube recipe extract error", e);
@@ -518,9 +434,10 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        const urlResult = await extractWithGemini(text, geminiKey);
+        const urlResult = await extractWithGemini(text);
         recipe = urlResult.recipe;
-        geminiRawResponse = urlResult.rawResponse;
+        geminiTokens = urlResult.tokens;
+      geminiModel = urlResult.model;
         geminiEndpoint = "import-recipe-url";
       } catch (e) {
         console.error("Recipe extract error", e);
@@ -557,8 +474,8 @@ export async function POST(req: NextRequest) {
   const imageUrl = pageImageUrl || await fetchImageUrlForRecipe(recipe.name);
 
   // Log LLM usage (fire-and-forget)
-  if (geminiRawResponse) {
-    const tokens = extractGeminiTokens(geminiRawResponse);
+  if (geminiTokens) {
+    const tokens = geminiTokens;
     logLlmUsage({
       userId: auth.user.id,
       householdId,
