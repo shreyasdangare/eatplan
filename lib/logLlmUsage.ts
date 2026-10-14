@@ -1,26 +1,5 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 
-type GeminiUsageMetadata = {
-  promptTokenCount?: number;
-  candidatesTokenCount?: number;
-  totalTokenCount?: number;
-};
-
-/**
- * Extracts token usage from a raw Gemini API response body.
- * Gemini responses include `usageMetadata` at the top level.
- */
-export function extractGeminiTokens(responseBody: any): {
-  input_tokens: number | null;
-  output_tokens: number | null;
-} {
-  const usage = responseBody?.usageMetadata as GeminiUsageMetadata | undefined;
-  return {
-    input_tokens: usage?.promptTokenCount ?? null,
-    output_tokens: usage?.candidatesTokenCount ?? null,
-  };
-}
-
 /**
  * Logs an LLM API call to the `llm_usage_log` table.
  * Fire-and-forget — errors are logged but don't block the request.

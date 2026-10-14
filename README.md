@@ -78,7 +78,7 @@ Create `.env.local` in the project root (see [DEPLOYMENT.md](DEPLOYMENT.md) for 
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (server-only) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes (multi-user) | Same as `SUPABASE_URL` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (multi-user) | Supabase anon key (client auth) |
-| `GOOGLE_GEMINI_API_KEY` | For recipe import/translation | Google AI Studio key (URL/screenshot/YouTube import & translation) |
+| `AI_GATEWAY_RECIPE_MODEL` etc. | Optional | Gemini runs via Vercel AI Gateway (OIDC on Vercel; `vercel env pull` or `AI_GATEWAY_API_KEY` locally). Model overrides: `AI_GATEWAY_RECIPE_MODEL`, `AI_GATEWAY_RECIPE_VIDEO_MODEL`, `AI_GATEWAY_TRANSLATE_MODEL` |
 | `SPOONACULAR_API_KEY` | Optional | Auto dish image when importing recipe |
 | `NEXT_PUBLIC_APP_URL` | Optional (production) | Canonical app URL (e.g. `https://eatplan.app`) so favicon and PWA icons load the logo correctly |
 
