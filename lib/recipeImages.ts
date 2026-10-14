@@ -3,12 +3,18 @@
  * Tries Spoonacular first, then Wikipedia with smart search fallbacks.
  */
 
+// Wikimedia requires a descriptive User-Agent; anonymous server-side requests get throttled/blocked.
+const WIKI_HEADERS = { "User-Agent": "EatPlan/1.0 (https://github.com/shreyasdangare/eatplan; recipe image lookup)" };
+
 async function fetchWikiImageByTitle(title: string): Promise<string | null> {
   const imageRes = await fetch(
     `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=600`,
-    { signal: AbortSignal.timeout(5000) }
+    { headers: WIKI_HEADERS, signal: AbortSignal.timeout(5000) }
   );
-  if (!imageRes.ok) return null;
+  if (!imageRes.ok) {
+    console.warn(`Wikipedia image lookup failed: HTTP ${imageRes.status}`);
+    return null;
+  }
   const imageData = await imageRes.json();
   const pages = imageData?.query?.pages;
   if (!pages) return null;
@@ -25,9 +31,12 @@ export async function fetchImageUrlFromWikipedia(recipeName: string): Promise<st
     // Try up to 5 search results (sometimes the first result is a disambiguation page with no image)
     const searchRes = await fetch(
       `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(recipeName)}&utf8=&format=json&srlimit=5`,
-      { signal: AbortSignal.timeout(5000) }
+      { headers: WIKI_HEADERS, signal: AbortSignal.timeout(5000) }
     );
-    if (!searchRes.ok) return null;
+    if (!searchRes.ok) {
+      console.warn(`Wikipedia search failed: HTTP ${searchRes.status}`);
+      return null;
+    }
     const searchData = await searchRes.json();
     const results = searchData?.query?.search;
     if (!results || results.length === 0) return null;
@@ -50,7 +59,7 @@ export async function fetchImageUrlFromWikipedia(recipeName: string): Promise<st
       // Try the dish + "food" context (helps disambiguate things like "Poha")
       const foodSearchRes = await fetch(
         `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(recipeName + " food dish")}&utf8=&format=json&srlimit=5`,
-        { signal: AbortSignal.timeout(5000) }
+        { headers: WIKI_HEADERS, signal: AbortSignal.timeout(5000) }
       );
       if (foodSearchRes.ok) {
         const foodData = await foodSearchRes.json();
@@ -87,6 +96,9 @@ export async function fetchImageUrlForRecipe(recipeName: string): Promise<string
           const smallUrl = data.results[0].image;
           if (smallUrl) return smallUrl.replace("-312x231.jpg", "-636x393.jpg");
         }
+      } else {
+        // 401 = bad key, 402 = daily quota exhausted
+        console.warn(`Spoonacular lookup failed: HTTP ${res.status}`);
       }
     } catch (e) {
       console.error("Spoonacular fetch error", e);
