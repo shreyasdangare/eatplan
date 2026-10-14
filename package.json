@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint .",
     "delete-user": "node --env-file=.env.local scripts/delete-user-by-email.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -36,6 +38,7 @@
     "eslint-config-next": "16.1.6",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^5.0.4"
   }
 }
