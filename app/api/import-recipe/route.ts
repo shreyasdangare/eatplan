@@ -284,7 +284,7 @@ async function saveExtractedRecipe(
         is_optional: false
       };
     })
-    .filter(Boolean);
+    .filter((row): row is NonNullable<typeof row> => row !== null);
 
   if (rows.length > 0) {
     await supabaseServer.from("dish_ingredients").insert(rows);

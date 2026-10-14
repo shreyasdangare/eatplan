@@ -10,6 +10,8 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
       "react-hooks/set-state-in-effect": "warn",
+      // React Compiler is not enabled; these are advisory until it is.
+      "react-hooks/preserve-manual-memoization": "warn",
     },
   },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "node_modules/**"]),
