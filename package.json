@@ -19,7 +19,7 @@
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^1.3.1",
+    "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.140",
     "cheerio": "^1.2.0",
     "exceljs": "^4.4.0",
