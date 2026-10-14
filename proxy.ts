@@ -1,3 +1,4 @@
+import { safeNextPath } from "@/lib/safeNext";
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
@@ -57,7 +58,7 @@ export async function proxy(request: NextRequest) {
       request.nextUrl.pathname === "/signup") &&
     user
   ) {
-    const next = request.nextUrl.searchParams.get("next") ?? "/";
+    const next = safeNextPath(request.nextUrl.searchParams.get("next"));
     return NextResponse.redirect(new URL(next, request.url));
   }
 

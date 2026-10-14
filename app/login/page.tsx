@@ -1,4 +1,5 @@
 "use client";
+import { safeNextPath } from "@/lib/safeNext";
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
@@ -16,7 +17,7 @@ function LoginForm() {
   const [showResendHint, setShowResendHint] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/";
+  const next = safeNextPath(searchParams.get("next"));
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);

@@ -1,4 +1,5 @@
 "use client";
+import { safeNextPath } from "@/lib/safeNext";
 
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
@@ -7,7 +8,7 @@ import { getSupabaseClient } from "@/lib/supabaseBrowser";
 
 function SignupForm() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/";
+  const next = safeNextPath(searchParams.get("next"));
   const hintNoAccount = searchParams.get("hint") === "no_account";
   const emailFromUrl = searchParams.get("email") ?? "";
 
