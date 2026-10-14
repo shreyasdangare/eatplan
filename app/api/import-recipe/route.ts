@@ -64,6 +64,10 @@ const VIDEO_USER_PROMPT = `Extract the recipe from this cooking video (e.g. reel
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 
+// Gemini 3 Flash reasoning tokens count toward the output limit (a generate call used ~2.7k of 4k),
+// so leave room to avoid truncated JSON.
+const RECIPE_MAX_OUTPUT_TOKENS = 8192;
+
 type GeminiResult = { recipe: ExtractedRecipe; tokens: GatewayTokens; model: string };
 
 const GENERATE_SYSTEM_PROMPT = "You are an expert chef. Generate recipe data to a JSON object. No markdown. Use this shape:\n{\n  \"name\": \"Normalized Recipe Title (strip all adjectives like 'Authentic', 'Best', 'Easy', 'Dilli Vali' to just the core dish name, e.g. 'Dal Makhni')\",\n  \"description\": \"Short description\",\n  \"servings\": number,\n  \"ingredients\": [\n    { \"name\": \"ingredient name\", \"quantity\": \"2 cups\", \"amount\": 2, \"unit\": \"cups\" }\n  ],\n  \"instructions\": \"Full cooking steps as a single string. Use numbered steps (1. ... 2. ...).\"\n}\nAlways include instructions.";
@@ -82,7 +86,7 @@ async function extractWithGeminiFromImage(imageBase64: string, mimeType: string)
       }
     ],
     temperature: 0.2,
-    maxOutputTokens: 4000
+    maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
   });
   return { recipe: data, tokens, model: RECIPE_MODEL };
 }
@@ -93,7 +97,7 @@ async function extractWithGemini(text: string): Promise<GeminiResult> {
     system: RECIPE_SYSTEM_PROMPT,
     messages: [{ role: "user", content: `Extract the recipe from this text:\n\n${text.slice(0, 12000)}` }],
     temperature: 0.2,
-    maxOutputTokens: 4000
+    maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
   });
   return { recipe: data, tokens, model: RECIPE_MODEL };
 }
@@ -109,7 +113,7 @@ async function generateWithGeminiByName(recipeName: string): Promise<GeminiResul
       }
     ],
     temperature: 0.4,
-    maxOutputTokens: 4000
+    maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
   });
   return { recipe: data, tokens, model: RECIPE_MODEL };
 }
@@ -164,10 +168,13 @@ async function extractWithGeminiFromYouTube(youtubeUrl: string): Promise<GeminiR
         }
       ],
       temperature: 0.2,
-      maxOutputTokens: 4000
+      maxOutputTokens: RECIPE_MAX_OUTPUT_TOKENS
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    if (/Requested entity was not found/i.test(msg)) {
+      throw new Error("YouTube video not found. Check the link and make sure the video is public.");
+    }
     if (/parse|JSON|No output/i.test(msg)) {
       throw new Error("Could not parse recipe from video. Try a different video or link.");
     }

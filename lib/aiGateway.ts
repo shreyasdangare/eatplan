@@ -21,6 +21,7 @@ type GatewayCall = {
   messages: ModelMessage[];
   temperature: number;
   maxOutputTokens: number;
+  providerOptions?: Parameters<typeof generateText>[0]["providerOptions"];
 };
 
 function tokensOf(usage: { inputTokens?: number; outputTokens?: number } | undefined): GatewayTokens {

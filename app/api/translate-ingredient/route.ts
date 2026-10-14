@@ -38,7 +38,10 @@ Provide ONLY the translated ingredient name as your response. Do not include any
       model: TRANSLATE_MODEL,
       messages: [{ role: "user", content: prompt }],
       temperature: 0.1,
-      maxOutputTokens: 150,
+      // Gemini 2.5 Flash counts "thinking" tokens against maxOutputTokens; a one-word
+      // translation needs no reasoning, so turn it off and leave headroom.
+      maxOutputTokens: 512,
+      providerOptions: { google: { thinkingConfig: { thinkingBudget: 0 } } },
     });
     let translation = text;
 
