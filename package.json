@@ -6,35 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "delete-user": "node --env-file=.env.local scripts/delete-user-by-email.mjs"
+    "lint": "eslint .",
+    "delete-user": "node --env-file=.env.local scripts/delete-user-by-email.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.48.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^1.3.1",
+    "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.140",
     "cheerio": "^1.2.0",
     "exceljs": "^4.4.0",
-    "lucide-react": "^0.577.0",
-    "next": "16.1.6",
+    "lucide-react": "^1.57.0",
+    "next": "^16.4.1",
     "next-themes": "^0.4.6",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.15.0",
-    "eslint-config-next": "16.1.6",
-    "postcss": "^8.4.49",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.6.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.1",
+    "postcss": "^8.5.30",
     "tailwindcss": "^3.4.15",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }
