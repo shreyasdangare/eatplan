@@ -138,7 +138,7 @@ export default function HouseholdSettings() {
         {/* Join Household */}
         <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-2">
-            <LinkIcon className="h-5 w-5 text-stone-500" /> Join Existing Household
+            <LinkIcon className="h-5 w-5 text-stone-500 dark:text-stone-400" /> Join Existing Household
           </h2>
           <p className="text-sm font-medium text-stone-500 dark:text-stone-400 mb-6 max-w-md">
             Got an invite code from your partner? Paste it below to merge your account into their household. 

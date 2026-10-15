@@ -7,7 +7,7 @@ type IngredientOption = { id: string; name: string; category?: string | null };
 
 type CategoryBrowserProps = {
   ingredients: IngredientOption[];
-  onAddItem: (item: { ingredient_id: string; custom_name?: string }) => void;
+  onAddItem: (item: { ingredient_id: string; custom_name?: string; name?: string }) => void;
 };
 
 function groupIngredientsByCategory(
@@ -92,7 +92,7 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
                       <button
                         key={ing.id}
                         type="button"
-                        onClick={() => onAddItem({ ingredient_id: ing.id })}
+                        onClick={() => onAddItem({ ingredient_id: ing.id, name: ing.name })}
                         className="min-h-11 rounded-full border border-orange-200 bg-white px-3.5 text-sm text-amber-950 hover:bg-orange-100 active:scale-95 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                       >
                         {ing.name}

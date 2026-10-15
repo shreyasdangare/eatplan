@@ -55,7 +55,7 @@ export default function FeedbackPage() {
           <ChevronLeft className="h-4 w-4" /> Back to Settings
         </Link>
         <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
-          <MessageSquare className="h-8 w-8 text-stone-500" /> Send Feedback
+          <MessageSquare className="h-8 w-8 text-stone-500 dark:text-stone-400" /> Send Feedback
         </h1>
         <p className="mt-2 text-stone-500 dark:text-stone-400 font-medium">
           Have an idea or found a bug? Let the developers know! Your feedback goes directly to the team.

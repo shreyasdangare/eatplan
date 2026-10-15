@@ -8,7 +8,7 @@ type IngredientOption = { id: string; name: string };
 type ShoppingListHeaderProps = {
   onAddFromMealPlan: () => void;
   onCopyList: () => void;
-  onAddItem: (item: { ingredient_id?: string; custom_name?: string; quantity?: string; category?: string }) => void;
+  onAddItem: (item: { ingredient_id?: string; custom_name?: string; quantity?: string; category?: string; name?: string }) => void;
   toBuyCount: number;
   populateLoading?: boolean;
 };
@@ -76,7 +76,7 @@ export function ShoppingListHeader({
   const handleSelect = useCallback(
     (ing: IngredientOption | null, customName?: string) => {
       if (ing) {
-        onAddItem({ ingredient_id: ing.id, custom_name: undefined });
+        onAddItem({ ingredient_id: ing.id, custom_name: undefined, name: ing.name });
       } else if (customName) {
         onAddItem({ custom_name: customName.trim() });
       }

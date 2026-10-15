@@ -21,6 +21,8 @@ import { ShoppingItemDetail } from "@/app/components/ShoppingItemDetail";
 import { ShoppingListHeader } from "@/app/components/ShoppingListHeader";
 import { CategoryBrowser } from "@/app/components/CategoryBrowser";
 import { BottomSheet } from "@/app/components/ui/BottomSheet";
+import { Skeleton, LoadingRegion } from "@/app/components/ui/Skeleton";
+import { toast } from "@/app/components/ui/Toast";
 import { SHOPPING_CATEGORIES, getCategoryEmoji, inferCategoryFromName } from "@/lib/categoryEmoji";
 
 function SortableTile({
@@ -60,7 +62,7 @@ function SortableTile({
       {...listeners}
       className={`no-callout touch-manipulation ${isDragging ? "relative z-50 scale-[1.03] opacity-95 shadow-xl rounded-xl" : ""}`}
     >
-      <ShoppingTile item={item} onTap={onTap} onOpenDetail={onOpenDetail} animating={animating} dragAttributes={a11y} />
+      <ShoppingTile item={item} onTap={onTap} onOpenDetail={onOpenDetail} animating={animating} dragAttributes={a11y} disabled={item.id.startsWith("temp-")} />
     </div>
   );
 }
@@ -161,14 +163,20 @@ export default function ShoppingListPage() {
         setToBuy((prev) => [...prev, updatedItem]);
       }
 
+      if (navigator.vibrate) navigator.vibrate(nextStatus === "bought" ? 12 : 6);
       // Persist in background; revert on failure
       fetch(`/api/shopping-list/${item.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus }),
-      }).then((res) => {
-        if (!res.ok) loadList();
-      });
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error();
+        })
+        .catch(() => {
+          toast({ message: "Couldn't sync that change. Refreshing…", tone: "error" });
+          loadList();
+        });
     },
     [loadList]
   );
@@ -182,13 +190,17 @@ export default function ShoppingListPage() {
         notes?: string | null;
       }
     ) => {
+      const apply = (list: ShoppingTileItem[]) => list.map((i) => (i.id === id ? { ...i, ...updates } : i));
+      setToBuy(apply);
+      setBought(apply);
+      setDetailItem(null);
       const res = await fetch(`/api/shopping-list/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
-      });
-      if (res.ok) {
-        setDetailItem(null);
+      }).catch(() => null);
+      if (!res?.ok) {
+        toast({ message: "Couldn't save changes.", tone: "error" });
         loadList();
       }
     },
@@ -197,9 +209,12 @@ export default function ShoppingListPage() {
 
   const handleDeleteItem = useCallback(
     async (id: string) => {
-      const res = await fetch(`/api/shopping-list/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setDetailItem(null);
+      setToBuy((prev) => prev.filter((i) => i.id !== id));
+      setBought((prev) => prev.filter((i) => i.id !== id));
+      setDetailItem(null);
+      const res = await fetch(`/api/shopping-list/${id}`, { method: "DELETE" }).catch(() => null);
+      if (!res?.ok) {
+        toast({ message: "Couldn't remove item.", tone: "error" });
         loadList();
       }
     },
@@ -212,21 +227,46 @@ export default function ShoppingListPage() {
       custom_name?: string;
       quantity?: string;
       category?: string;
+      name?: string;
     }) => {
-      const res = await fetch("/api/shopping-list", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ingredient_id: item.ingredient_id ?? null,
-          custom_name: item.custom_name ?? null,
-          quantity: item.quantity ?? null,
-          category: item.category ?? null,
-          source: "manual",
-        }),
-      });
-      if (res.ok) loadList();
+      // Optimistic: show the tile immediately, swap in the saved row when the API answers.
+      const tempId = `temp-${Date.now()}`;
+      const known = item.ingredient_id ? ingredients.find((i) => i.id === item.ingredient_id) : undefined;
+      const displayName = item.name ?? known?.name ?? item.custom_name ?? "Item";
+      const temp: ShoppingTileItem = {
+        id: tempId,
+        ingredient_id: item.ingredient_id ?? null,
+        custom_name: item.custom_name ?? null,
+        ingredient_name: item.ingredient_id ? displayName : null,
+        quantity: item.quantity ?? null,
+        category: item.category ?? known?.category ?? null,
+        status: "to_buy",
+        source: "manual",
+      };
+      setToBuy((prev) => [...prev, temp]);
+      if (navigator.vibrate) navigator.vibrate(8);
+      try {
+        const res = await fetch("/api/shopping-list", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ingredient_id: item.ingredient_id ?? null,
+            custom_name: item.custom_name ?? null,
+            quantity: item.quantity ?? null,
+            category: item.category ?? null,
+            source: "manual",
+          }),
+        });
+        if (!res.ok) throw new Error();
+        const data = (await res.json()) as { items?: ShoppingTileItem[] };
+        const saved = data.items?.[0];
+        setToBuy((prev) => prev.map((i) => (i.id === tempId && saved ? { ...temp, ...saved } : i)));
+      } catch {
+        setToBuy((prev) => prev.filter((i) => i.id !== tempId));
+        toast({ message: `Couldn't add ${displayName}.`, tone: "error" });
+      }
     },
-    [loadList]
+    [ingredients]
   );
 
   const handleAddFromMealPlan = useCallback(() => {
@@ -244,6 +284,9 @@ export default function ShoppingListPage() {
       if (res.ok) {
         setShowMealPlanModal(false);
         loadList();
+        toast("Meal plan ingredients added");
+      } else {
+        toast({ message: "Couldn't add from the plan.", tone: "error" });
       }
     } finally {
       setPopulateLoading(false);
@@ -290,7 +333,7 @@ export default function ShoppingListPage() {
         return i.quantity ? `${name}: ${i.quantity}` : name;
       })
       .join("\n");
-    if (text) void navigator.clipboard.writeText(text);
+    if (text) void navigator.clipboard.writeText(text).then(() => toast("List copied"), () => toast({ message: "Copy failed", tone: "error" }));
   }, [toBuy]);
 
   // Mouse: drag after 8px. Touch: long-press (200ms) so normal swipes still scroll the page.
@@ -333,7 +376,31 @@ export default function ShoppingListPage() {
       <CategoryBrowser ingredients={ingredients} onAddItem={handleAddItem} />
 
       {loading ? (
-        <p className="text-sm text-amber-800 dark:text-amber-200">Loading…</p>
+        <LoadingRegion label="Loading your shopping list">
+          <div className="space-y-2 rounded-xl border border-orange-200 p-2 dark:border-stone-700">
+            <Skeleton className="h-4 w-32" />
+            <div className="grid grid-cols-2 gap-2">
+              {Array.from({ length: 6 }, (_, i) => (
+                <Skeleton key={i} className="h-[52px]" />
+              ))}
+            </div>
+          </div>
+        </LoadingRegion>
+      ) : toBuy.length === 0 && bought.length === 0 ? (
+        <div className="flex flex-col items-center rounded-3xl border border-dashed border-orange-300 bg-orange-50/60 px-6 py-10 text-center dark:border-stone-700 dark:bg-stone-900/40">
+          <span className="text-4xl" aria-hidden>🛒</span>
+          <h2 className="mt-3 text-lg font-bold text-stone-900 dark:text-stone-50">Your list is empty</h2>
+          <p className="mt-1 max-w-xs text-sm text-stone-700 dark:text-stone-300">
+            Type an item above, or pull in everything you need for this week&apos;s meals.
+          </p>
+          <button
+            type="button"
+            onClick={handleAddFromMealPlan}
+            className="mt-4 min-h-12 rounded-full bg-orange-600 px-6 text-base font-bold text-white active:scale-95"
+          >
+            Add from this week&apos;s plan
+          </button>
+        </div>
       ) : (
         <>
           <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800/80">
@@ -365,7 +432,7 @@ export default function ShoppingListPage() {
                           groups.get(cat)!.push(item);
                         }
                         // Sort groups by SHOPPING_CATEGORIES order
-                        const ordered = [...SHOPPING_CATEGORIES, "Other"].filter((c) => groups.has(c));
+                        const ordered = [...new Set([...SHOPPING_CATEGORIES, "Other"])].filter((c) => groups.has(c));
                         // Include any categories not in SHOPPING_CATEGORIES
                         for (const c of groups.keys()) {
                           if (!ordered.includes(c)) ordered.push(c);

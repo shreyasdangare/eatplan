@@ -21,7 +21,11 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search, GripVertical } from "lucide-react";
+import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search, GripVertical, ShoppingCart } from "lucide-react";
+import { BottomSheet } from "@/app/components/ui/BottomSheet";
+import { Skeleton, LoadingRegion } from "@/app/components/ui/Skeleton";
+import { toast } from "@/app/components/ui/Toast";
+import { currentSlot, toISODate } from "@/lib/dates";
 import { isMealPast } from "@/lib/isMealPast";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
 
@@ -190,7 +194,7 @@ function InlineAddDish({
   return (
     <div className="relative mt-1">
       <div className="flex items-center gap-1.5 rounded-lg border border-orange-300/60 bg-white dark:bg-stone-900 dark:border-orange-600/40 px-2.5 py-1.5 shadow-xs">
-        <Search className="h-3.5 w-3.5 text-stone-500 shrink-0" />
+        <Search className="h-3.5 w-3.5 text-stone-500 dark:text-stone-400 shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -205,14 +209,14 @@ function InlineAddDish({
           placeholder="Type recipe name…"
           className="flex-1 bg-transparent text-sm font-medium text-stone-800 placeholder:text-stone-400 outline-hidden dark:text-stone-200 min-w-0"
         />
-        <button onClick={onClose} className="shrink-0 rounded-full p-0.5 text-stone-500 hover:text-stone-600 dark:hover:text-stone-300">
+        <button onClick={onClose} className="shrink-0 rounded-full p-0.5 text-stone-500 dark:text-stone-400 hover:text-stone-600 dark:hover:text-stone-300">
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
       {query && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-40 overflow-y-auto rounded-xl border border-stone-200 bg-white shadow-lg dark:border-stone-700 dark:bg-stone-900 scrollbar-hide">
           {filtered.length === 0 ? (
-            <p className="px-3 py-2 text-xs text-stone-500">No recipes found</p>
+            <p className="px-3 py-2 text-xs text-stone-500 dark:text-stone-400">No recipes found</p>
           ) : (
             filtered.map((d) => (
               <button
@@ -376,6 +380,24 @@ export default function PlanPage() {
   
   // State for mobile tappable slots
   const [mobileSlotOpen, setMobileSlotOpen] = useState<{date: string, slot: string} | null>(null);
+  const [focusDate, setFocusDate] = useState<string | null>(null);
+  const [populating, setPopulating] = useState(false);
+
+  // Deep links: /plan?date=YYYY-MM-DD[&add=1|breakfast|lunch|dinner] jumps to that day
+  // (and optionally opens the recipe picker), e.g. from "Add a meal" on Home.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const date = params.get("date");
+    const add = params.get("add");
+    const target = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : toISODate(new Date());
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL on mount
+    setWeekStart(getWeekStart(new Date(target + "T12:00:00")));
+    setFocusDate(target);
+    if (date && add) {
+      const slot = SLOTS.includes(add as (typeof SLOTS)[number]) ? add : currentSlot();
+      setMobileSlotOpen({ date: target, slot });
+    }
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
@@ -467,10 +489,21 @@ export default function PlanPage() {
         if (!res.ok) throw new Error("Failed to add dish");
         // Refetch to get real IDs
         const plansRes = await fetch(`/api/meal-plans?from=${from}&to=${to}`);
-        if (plansRes.ok) setPlans((await plansRes.json()) ?? []);
+        if (plansRes.ok) {
+          const fresh = ((await plansRes.json()) ?? []) as PlanEntry[];
+          setPlans(fresh);
+          const before = new Set(existing.map((e) => e.id));
+          const created = fresh.find(
+            (p) => p.date === date && p.slot_type === slot_type && p.dish_id === dish_id && !before.has(p.id)
+          );
+          return created?.id ?? null;
+        }
+        return null;
       } catch (err) {
         console.error("Add dish failed:", err);
         setPlans((prev) => prev.filter((p) => p.id !== tempId));
+        toast({ message: "Couldn't add that meal. Try again.", tone: "error" });
+        return null;
       }
     },
     [dishes, plans, from, to]
@@ -479,18 +512,60 @@ export default function PlanPage() {
   const removeDishFromSlot = useCallback(
     async (planId: string) => {
       const previousPlans = plans;
+      const removed = plans.find((p) => p.id === planId);
       setPlans((prev) => prev.filter((p) => p.id !== planId));
 
       try {
         const res = await fetch(`/api/meal-plans?id=${planId}`, { method: "DELETE" });
         if (!res.ok) throw new Error("Failed to remove dish");
+        if (removed?.dish_id) {
+          toast({
+            message: `Removed ${removed.dishes?.name ?? "meal"}`,
+            action: { label: "Undo", onClick: () => void addDishToSlot(removed.date, removed.slot_type, removed.dish_id!) },
+          });
+        }
       } catch (err) {
         console.error("Remove dish failed:", err);
         setPlans(previousPlans);
+        toast({ message: "Couldn't remove that meal.", tone: "error" });
       }
     },
-    [plans]
+    [plans, addDishToSlot]
   );
+
+  const addWeekToList = useCallback(async () => {
+    setPopulating(true);
+    try {
+      const res = await fetch("/api/shopping-list/populate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from, to }),
+      });
+      if (!res.ok) throw new Error();
+      toast({ message: "This week's ingredients are on your list", action: { label: "View list", href: "/shopping-list" } });
+    } catch {
+      toast({ message: "Couldn't build the list. Try again.", tone: "error" });
+    } finally {
+      setPopulating(false);
+    }
+  }, [from, to]);
+
+  const removeDishSilently = useCallback(async (planId: string) => {
+    setPlans((prev) => prev.filter((p) => p.id !== planId));
+    await fetch(`/api/meal-plans?id=${planId}`, { method: "DELETE" }).catch(() => {});
+  }, []);
+
+  // Scroll the focused day (today, or ?date=) into view once the week has rendered.
+  useEffect(() => {
+    if (loading || !focusDate) return;
+    const el = document.getElementById(`day-${focusDate}`);
+    if (el && window.matchMedia("(max-width: 639px)").matches) {
+      el.scrollIntoView({ block: "start" });
+      window.scrollBy(0, -136);
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- consume the one-shot focus request
+    setFocusDate(null);
+  }, [loading, focusDate]);
 
   const clearSlot = useCallback(
     async (date: string, slot_type: string) => {
@@ -648,12 +723,32 @@ export default function PlanPage() {
 
   if (loading) {
     return (
-      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
-         <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-orange-500 dark:border-stone-700 dark:border-t-orange-500" />
-         <p className="text-sm font-medium text-stone-500 dark:text-stone-400">Loading your meals…</p>
-      </section>
+      <LoadingRegion label="Loading your meal plan">
+        <section className="space-y-4 pt-2">
+          <Skeleton className="h-28 w-full rounded-3xl" />
+          {[0, 1].map((i) => (
+            <div key={i} className="space-y-3 rounded-4xl glass-panel p-5">
+              <Skeleton className="h-7 w-40" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ))}
+        </section>
+      </LoadingRegion>
     );
   }
+
+  const todayIso = toISODate(new Date());
+  const isThisWeek = weekDates.includes(todayIso);
+  const plannedCount = plans.filter((p) => p.dish_id).length;
+  // Recipes matching the slot's meal type first, so the likely pick is near the thumb.
+  const sheetDishes = mobileSlotOpen
+    ? [...filteredDishes].sort((a, b) => {
+        const m = (d: Dish) => (d.meal_type?.toLowerCase() === mobileSlotOpen.slot ? 0 : d.meal_type === "both" ? 1 : 2);
+        return m(a) - m(b) || a.name.localeCompare(b.name);
+      })
+    : filteredDishes;
 
   return (
     <section className="space-y-4 pb-12 pt-4">
@@ -724,7 +819,7 @@ export default function PlanPage() {
               </h3>
               
               <div className="relative max-w-xs flex-1 transition-all focus-within:max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500 dark:text-stone-400" />
                 <input
                   type="text"
                   placeholder="Search recipes..."
@@ -735,7 +830,7 @@ export default function PlanPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-stone-500 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
                   >
                     <X className="h-3 w-3" strokeWidth={3} />
                   </button>
@@ -898,10 +993,88 @@ export default function PlanPage() {
         </DragOverlay>
       </DndContext>
 
+      {/* Mobile Only: sticky week navigator + day strip */}
+      <div className="sm:hidden sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 -mx-1 rounded-3xl glass-panel bg-white/90 p-2 dark:bg-stone-900/90">
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={prevWeek}
+            aria-label="Previous week"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+          >
+            <ChevronLeft className="h-5 w-5" aria-hidden />
+          </button>
+          <h1 className="min-w-0 flex-1 text-center text-base font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
+            {isThisWeek
+              ? "This week"
+              : `${weekStart.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} – ${new Date(weekDates[6] + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`}
+          </h1>
+          {!isThisWeek && (
+            <button
+              type="button"
+              onClick={() => {
+                setWeekStart(getWeekStart(new Date()));
+                setFocusDate(todayIso);
+              }}
+              className="min-h-11 shrink-0 rounded-full bg-stone-100 px-3 text-sm font-semibold text-stone-800 dark:bg-stone-800 dark:text-stone-100"
+            >
+              Today
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={nextWeek}
+            aria-label="Next week"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+          >
+            <ChevronRight className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
+        <nav aria-label="Days" className="mt-1 grid grid-cols-7 gap-1">
+          {weekDates.map((date) => {
+            const d = new Date(date + "T12:00:00");
+            const count = plans.filter((p) => p.date === date && p.dish_id).length;
+            const isToday = date === todayIso;
+            return (
+              <a
+                key={date}
+                href={`#day-${date}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(`day-${date}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
+                  setTimeout(() => window.scrollBy({ top: -136, behavior: "smooth" }), 350);
+                }}
+                aria-label={`${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${count} meal${count === 1 ? "" : "s"} planned`}
+                className={`flex min-h-12 flex-col items-center justify-center rounded-2xl text-xs font-semibold ${
+                  isToday ? "bg-orange-600 text-white" : "text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                }`}
+              >
+                <span aria-hidden>{d.toLocaleDateString("en-GB", { weekday: "narrow" })}</span>
+                <span aria-hidden className="text-sm font-bold">{d.getDate()}</span>
+                <span aria-hidden className={`mt-0.5 h-1 w-1 rounded-full ${count ? (isToday ? "bg-white" : "bg-orange-600") : "bg-transparent"}`} />
+              </a>
+            );
+          })}
+        </nav>
+      </div>
+
       {/* Mobile Only: Vertical Stacked Designer List */}
       <div className="sm:hidden flex flex-col gap-5 mt-2">
+        {plannedCount === 0 && (
+          <div className="rounded-3xl border border-dashed border-stone-300 bg-white/60 p-5 text-center dark:border-stone-700 dark:bg-stone-900/40">
+            <p className="text-base font-bold text-stone-900 dark:text-stone-50">Nothing planned this week</p>
+            <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
+              Tap <span className="font-semibold">+ Add</span> under any meal to pick a recipe.
+            </p>
+            {dishes.length === 0 && (
+              <Link href="/dishes/new" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-orange-600 px-5 font-bold text-white">
+                Add your first recipe
+              </Link>
+            )}
+          </div>
+        )}
         {weekDates.map((date) => (
-          <div key={date} className="flex flex-col overflow-hidden rounded-4xl glass-panel bg-white/60 dark:bg-stone-900/40 outline-solid outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all">
+          <div key={date} id={`day-${date}`} className="scroll-mt-40 flex flex-col overflow-hidden rounded-4xl glass-panel bg-white/60 dark:bg-stone-900/40 outline-solid outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all">
             <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-stone-200/40 dark:border-stone-700/40">
               <div className="flex items-end gap-2 text-stone-900 dark:text-stone-50">
                 <h4 className="text-2xl font-extrabold tracking-tight">
@@ -962,7 +1135,7 @@ export default function PlanPage() {
                                    <button
                                      type="button"
                                      onClick={() => removeDishFromSlot(entry.id)}
-                                     className="shrink-0 -mr-2.5 flex h-11 w-11 items-center justify-center rounded-full text-stone-500 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
+                                     className="shrink-0 -mr-2.5 flex h-11 w-11 items-center justify-center rounded-full text-stone-500 dark:text-stone-400 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
                                      aria-label="Remove recipe"
                                    >
                                      <X className="h-4 w-4" strokeWidth={2.5} />
@@ -979,7 +1152,7 @@ export default function PlanPage() {
                          <button 
                            type="button" 
                            onClick={() => setMobileSlotOpen({ date, slot })}
-                           className="w-full h-[46px] flex items-center justify-center gap-2 rounded-xl bg-stone-100/50 hover:bg-orange-50 dark:bg-stone-800/50 dark:hover:bg-orange-900/30 text-stone-500 transition-colors border border-dashed border-stone-300 dark:border-stone-700/60 font-semibold text-[13px] active:scale-[0.98]"
+                           className="w-full h-[46px] flex items-center justify-center gap-2 rounded-xl bg-stone-100/50 hover:bg-orange-50 dark:bg-stone-800/50 dark:hover:bg-orange-900/30 text-stone-500 dark:text-stone-400 transition-colors border border-dashed border-stone-300 dark:border-stone-700/60 font-semibold text-[13px] active:scale-[0.98]"
                          >
                            <Plus className="h-4 w-4" strokeWidth={3} /> Add {SLOT_LABELS[slot]}
                          </button>
@@ -993,137 +1166,164 @@ export default function PlanPage() {
         ))}
       </div>
 
-      {/* Mobile Recipe Selection Bottom Sheet/Modal */}
-      {mobileSlotOpen && (
-        <div className="sm:hidden fixed inset-0 z-200 flex flex-col justify-end bg-stone-900/40 backdrop-blur-xs dark:bg-black/80 transition-opacity outline-hidden animate-in fade-in duration-200 pb-[env(safe-area-inset-bottom)]">
-          {/* Close backdrop hit area */}
-          <div className="absolute inset-0 z-0" onClick={() => {
-            setSearchQuery("");
-            setActiveFilter("All");
-            setMobileSlotOpen(null);
-          }} />
-          
-          <div className="relative z-10 flex max-h-[90vh] min-h-[60vh] flex-col rounded-t-[2.5rem] bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-xl border-t border-stone-200 dark:border-stone-800 animate-in slide-in-from-bottom-8 duration-300 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
-            
-            {/* Sheet Handle */}
-            <div className="w-full flex justify-center pt-3 pb-1">
-               <div className="w-12 h-1.5 rounded-full bg-stone-300 dark:bg-stone-700" />
-            </div>
-
-            <div className="px-6 flex items-center justify-between mb-4 mt-2">
-              <div>
-                <h3 className="text-[28px] font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
-                  Select Recipe
-                </h3>
-                <p className="text-[15px] font-semibold text-stone-500 dark:text-stone-400 empty:hidden">
-                  {SLOT_LABELS[mobileSlotOpen.slot]} · {new Date(mobileSlotOpen.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
-                </p>
-              </div>
-              <button 
-                 onClick={() => {
-                   setSearchQuery("");
-                   setActiveFilter("All");
-                   setMobileSlotOpen(null);
-                 }} 
-                 aria-label="Close"
-                 className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-200/80 text-stone-600 hover:bg-stone-300 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors shrink-0"
-              >
-                <X className="h-5 w-5" strokeWidth={3} />
-              </button>
-            </div>
-
-            {/* Sticky Search & Filter Header */}
-            <div className="px-6 pb-2 sticky top-0 z-10 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-xl pt-2">
-               <div className="relative mb-3">
-                  <Search className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-500" strokeWidth={2.5} />
-                  <input
-                    type="search"
-                    aria-label="Search recipes"
-                    enterKeyHint="search"
-                    autoComplete="off"
-                    placeholder="Search recipes..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-2xl border-none bg-stone-200/60 dark:bg-stone-800/60 py-3 pl-[42px] pr-10 text-[17px] font-medium text-stone-900 placeholder:text-stone-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-orange-500/50 dark:text-stone-100 dark:focus:bg-stone-900 transition-all shadow-inner"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      aria-label="Clear search"
-                      className="tap absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-300 p-1 text-stone-600 dark:bg-stone-700 dark:text-stone-300"
-                    >
-                      <X className="h-3 w-3" strokeWidth={3} />
-                    </button>
-                  )}
-               </div>
-               
-               {/* Mobile Filters */}
-                 <div className="flex flex-col gap-3 pb-2 -mx-2 px-2">
-                 <div className="flex items-center rounded-full bg-stone-200/50 p-1 dark:bg-stone-800/80 shadow-inner w-full">
-                   {(["Both", "Veg", "Non-Veg"] as const).map((diet) => (
-                     <button
-                       key={diet}
-                       onClick={() => setDietFilter(diet)}
-                       className={`flex-1 min-h-11 px-3 text-[14px] font-bold rounded-full transition-all active:scale-[0.98] ${
-                         dietFilter === diet 
-                           ? diet === "Veg" ? "bg-emerald-600 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
-                           : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
-                       }`}
-                     >
-                       {diet}
-                     </button>
-                   ))}
-                 </div>
-                 <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                   {FILTERS.map((f) => (
-                     <button
-                       key={f}
-                       onClick={() => setActiveFilter(f)}
-                       className={`shrink-0 min-h-11 rounded-full px-4 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
-                         activeFilter === f
-                           ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-xs"
-                           : "bg-transparent border-stone-200/60 text-stone-600 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:border-stone-600/80"
-                       }`}
-                     >
-                       {f}
-                     </button>
-                   ))}
-                 </div>
-               </div>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto px-6 pb-12 space-y-2.5 scrollbar-hide">
-              {dishes.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center py-12 opacity-70">
-                    <Utensils className="h-12 w-12 text-stone-300 dark:text-stone-400 mb-4" />
-                    <p className="text-[17px] font-bold text-stone-500 dark:text-stone-400">No recipes available.</p>
-                 </div>
-              ) : filteredDishes.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center py-12 opacity-70">
-                    <Search className="h-12 w-12 text-stone-300 dark:text-stone-400 mb-4" strokeWidth={2} />
-                    <p className="text-[17px] font-bold text-stone-500 dark:text-stone-400">No recipes found.</p>
-                 </div>
-              ) : (
-                 filteredDishes.map((dish) => (
-                   <button
-                     key={dish.id}
-                     type="button"
-                     onClick={() => {
-                        addDishToSlot(mobileSlotOpen.date, mobileSlotOpen.slot, dish.id);
-                        setSearchQuery("");
-                        setMobileSlotOpen(null);
-                     }}
-                     className="group flex w-full items-center justify-between gap-4 rounded-3xl border-none bg-white px-5 py-4 text-left shadow-xs active:scale-[0.97] active:bg-orange-50 transition-all dark:bg-stone-900 dark:active:bg-orange-950/40"
-                   >
-                     <span className="truncate text-[17px] font-bold tracking-tight text-stone-800 dark:text-stone-200 group-active:text-orange-700 dark:group-active:text-orange-400">{dish.name}</span>
-                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-5 w-5" strokeWidth={3} /></div>
-                   </button>
-                 ))
-              )}
-            </div>
-          </div>
+      {plannedCount > 0 && (
+        <div className="sm:hidden sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 mt-4">
+          <button
+            type="button"
+            onClick={addWeekToList}
+            disabled={populating}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-stone-900 px-5 text-base font-bold text-white shadow-xl active:scale-[0.98] disabled:opacity-60 dark:bg-stone-100 dark:text-stone-900"
+          >
+            <ShoppingCart className="h-5 w-5" aria-hidden />
+            {populating ? "Adding…" : "Add week to shopping list"}
+          </button>
         </div>
       )}
+
+      {/* Mobile Recipe Selection Bottom Sheet/Modal */}
+      <BottomSheet
+        open={!!mobileSlotOpen}
+        size="tall"
+        onClose={() => {
+          setSearchQuery("");
+          setActiveFilter("All");
+          setMobileSlotOpen(null);
+        }}
+        title={mobileSlotOpen ? `Add ${SLOT_LABELS[mobileSlotOpen.slot].toLowerCase()}` : "Add a meal"}
+        subtitle={
+          mobileSlotOpen
+            ? new Date(mobileSlotOpen.date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short" })
+            : undefined
+        }
+      >
+        {mobileSlotOpen && (
+          <>
+            <div className="sticky top-0 z-10 -mx-5 bg-white px-5 pb-3 dark:bg-stone-900">
+              <div className="relative mb-3">
+                <Search className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-500 dark:text-stone-400" strokeWidth={2.5} aria-hidden />
+                <input
+                  type="search"
+                  aria-label="Search recipes"
+                  enterKeyHint="search"
+                  autoComplete="off"
+                  placeholder="Search recipes…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="min-h-12 w-full rounded-2xl border-none bg-stone-100 pl-[42px] pr-12 text-base font-medium text-stone-900 placeholder:text-stone-500 focus:outline-hidden focus:ring-2 focus:ring-orange-500/50 dark:bg-stone-800 dark:text-stone-100"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search"
+                    className="absolute right-0.5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-stone-600 dark:text-stone-300"
+                  >
+                    <X className="h-4 w-4" strokeWidth={3} aria-hidden />
+                  </button>
+                )}
+              </div>
+              <div className="-mx-5 flex gap-2 overflow-x-auto px-5 scrollbar-hide">
+                {(["Both", "Veg", "Non-Veg"] as const).map((diet) => (
+                  <button
+                    key={diet}
+                    type="button"
+                    aria-pressed={dietFilter === diet}
+                    onClick={() => setDietFilter(diet)}
+                    className={`min-h-11 shrink-0 rounded-full border px-4 text-sm font-bold transition-all active:scale-95 ${
+                      dietFilter === diet
+                        ? diet === "Veg"
+                          ? "border-emerald-700 bg-emerald-700 text-white"
+                          : diet === "Non-Veg"
+                          ? "border-rose-700 bg-rose-700 text-white"
+                          : "border-stone-800 bg-stone-800 text-white dark:border-stone-200 dark:bg-stone-200 dark:text-stone-900"
+                        : "border-stone-300 text-stone-700 dark:border-stone-700 dark:text-stone-200"
+                    }`}
+                  >
+                    {diet === "Both" ? "All diets" : diet}
+                  </button>
+                ))}
+                <span className="w-px shrink-0 bg-stone-200 dark:bg-stone-700" aria-hidden />
+                {FILTERS.filter((f) => f === "All" || f === "Quick (<30m)").map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    aria-pressed={activeFilter === f}
+                    onClick={() => setActiveFilter(f)}
+                    className={`min-h-11 shrink-0 rounded-full border px-4 text-sm font-bold transition-all active:scale-95 ${
+                      activeFilter === f
+                        ? "border-stone-800 bg-stone-800 text-white dark:border-stone-200 dark:bg-stone-200 dark:text-stone-900"
+                        : "border-stone-300 text-stone-700 dark:border-stone-700 dark:text-stone-200"
+                    }`}
+                  >
+                    {f === "All" ? "Any time" : "Quick (<30m)"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <ul className="space-y-2 pt-1">
+              {dishes.length === 0 ? (
+                <li className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+                  <Utensils className="h-10 w-10 text-stone-400" aria-hidden />
+                  <p className="text-base font-bold text-stone-700 dark:text-stone-200">No recipes yet</p>
+                  <Link href="/dishes/new" className="min-h-11 rounded-full bg-orange-600 px-5 py-2.5 font-bold text-white">
+                    Add a recipe
+                  </Link>
+                </li>
+              ) : sheetDishes.length === 0 ? (
+                <li className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+                  <Search className="h-10 w-10 text-stone-400" aria-hidden />
+                  <p className="text-base font-bold text-stone-700 dark:text-stone-200">No recipes match</p>
+                </li>
+              ) : (
+                sheetDishes.map((dish) => (
+                  <li key={dish.id}>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const target = mobileSlotOpen;
+                        setSearchQuery("");
+                        setMobileSlotOpen(null);
+                        if (navigator.vibrate) navigator.vibrate(10);
+                        const newId = await addDishToSlot(target.date, target.slot, dish.id);
+                        toast({
+                          message: `Added ${dish.name}`,
+                          action: newId
+                            ? { label: "Undo", onClick: () => void removeDishSilently(newId) }
+                            : undefined,
+                        });
+                      }}
+                      className="flex min-h-14 w-full items-center gap-3 rounded-2xl bg-stone-50 px-3 py-2 text-left active:scale-[0.98] active:bg-orange-50 dark:bg-stone-800/60 dark:active:bg-orange-950/40"
+                    >
+                      {dish.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- tiny thumbnail
+                        <img src={dish.image_url} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-xl object-cover" />
+                      ) : (
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-stone-200 text-stone-500 dark:bg-stone-700 dark:text-stone-300">
+                          <Utensils className="h-5 w-5" aria-hidden />
+                        </span>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-base font-bold text-stone-900 dark:text-stone-100">{dish.name}</span>
+                        {(dish.prep_time_minutes || dish.meal_type) && (
+                          <span className="block truncate text-xs font-medium text-stone-600 dark:text-stone-300">
+                            {[dish.meal_type && dish.meal_type !== "both" ? dish.meal_type : null, dish.prep_time_minutes ? `${dish.prep_time_minutes} min` : null]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </span>
+                        )}
+                      </span>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white" aria-hidden>
+                        <Plus className="h-5 w-5" strokeWidth={3} />
+                      </span>
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+          </>
+        )}
+      </BottomSheet>
     </section>
   );
 }

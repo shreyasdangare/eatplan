@@ -321,7 +321,7 @@ export default function EditDishPage() {
         </div>
         <Link
           href={`/dishes/${id}`}
-          className="flex items-center gap-2 rounded-full border border-stone-200/80 bg-white/50 px-4 py-2 text-sm font-bold text-stone-600 shadow-xs transition-all hover:bg-stone-50 dark:border-stone-700/80 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:bg-stone-800"
+          className="flex min-h-11 items-center gap-2 rounded-full border border-stone-200/80 bg-white/50 px-4 text-sm font-bold text-stone-600 shadow-xs transition-all hover:bg-stone-50 dark:border-stone-700/80 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:bg-stone-800"
         >
            Cancel
         </Link>
@@ -343,7 +343,7 @@ export default function EditDishPage() {
           </div>
           <div>
             <label className={labelClasses} htmlFor="dish-field-2">
-              Description <span className="text-stone-500 font-normal">(Optional)</span>
+              Description <span className="text-stone-500 dark:text-stone-400 font-normal">(Optional)</span>
             </label>
             <textarea id="dish-field-2"
               placeholder="A brief summary of this delicious dish..."
@@ -359,7 +359,7 @@ export default function EditDishPage() {
         <div className="grid gap-5 sm:grid-cols-3">
           <div>
             <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-11">
-              <ChefHat className="h-4 w-4 text-stone-500" /> Meal Type
+              <ChefHat className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Meal Type
             </label>
             <select id="dish-field-11"
               className={inputClasses}
@@ -373,7 +373,7 @@ export default function EditDishPage() {
           </div>
           <div>
             <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-12">
-              <Clock className="h-4 w-4 text-stone-500" /> Prep Time
+              <Clock className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Prep Time
             </label>
             <div className="relative">
               <input id="dish-field-12"
@@ -385,12 +385,12 @@ export default function EditDishPage() {
                 value={prepTime}
                 onChange={(e) => setPrepTime(e.target.value)}
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-500">min</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-500 dark:text-stone-400">min</span>
             </div>
           </div>
           <div>
             <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-13">
-              <Users className="h-4 w-4 text-stone-500" /> Servings
+              <Users className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Servings
             </label>
             <input id="dish-field-13"
               type="number"
@@ -448,7 +448,7 @@ export default function EditDishPage() {
 
         <div>
            <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-14">
-            <Tags className="h-4 w-4 text-stone-500" /> Tags
+            <Tags className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Tags
           </label>
           <input id="dish-field-14"
             placeholder="e.g. spicy, vegan, quick (comma separated)"
@@ -479,7 +479,7 @@ export default function EditDishPage() {
             </h3>
             <div className="max-w-md">
               <IngredientAutocompleteInput
-                label=""
+                label="Add an ingredient"
                 ingredients={ingredientOptions}
                 value={newIngredientName}
                 onChange={setNewIngredientName}
@@ -495,26 +495,27 @@ export default function EditDishPage() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-2">
-              {ingredients.map((ing) => {
-                const selected = selectedIngredients.some(
-                  (s) => s.ingredient_id === ing.id
-                );
-                return (
-                  <button
-                    type="button"
-                    key={ing.id}
-                    onClick={() => toggleIngredient(ing.id)}
-                    className={`min-h-11 rounded-full px-4 text-sm font-semibold transition-all active:scale-95 border ${
-                      selected
-                        ? "bg-emerald-600 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
-                        : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
-                    }`}
-                  >
-                    {ing.name}
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap gap-2 pt-2" aria-label="Selected ingredients">
+              {selectedIngredients.length === 0 ? (
+                <p className="text-sm text-stone-600 dark:text-stone-300">Search above to add ingredients. Pick a suggestion or press Enter to create a new one.</p>
+              ) : (
+                selectedIngredients.map((sel) => {
+                  const ing = ingredients.find((i) => i.id === sel.ingredient_id);
+                  if (!ing) return null;
+                  return (
+                    <button
+                      type="button"
+                      key={ing.id}
+                      onClick={() => toggleIngredient(ing.id)}
+                      aria-label={`Remove ${ing.name}`}
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white transition-all active:scale-95"
+                    >
+                      {ing.name}
+                      <span aria-hidden className="text-base leading-none">×</span>
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
 

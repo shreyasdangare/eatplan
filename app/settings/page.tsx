@@ -66,7 +66,7 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 pb-24 sm:px-6 lg:px-8 space-y-6">
       <div className="mb-6 flex items-center gap-3">
-        <Settings className="h-8 w-8 text-stone-500" />
+        <Settings className="h-8 w-8 text-stone-500 dark:text-stone-400" />
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
             Settings
@@ -143,7 +143,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Invite family members to collaborate</p>
              </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-stone-500 group-hover:text-blue-500 transition-colors" />
+        <ChevronRight className="h-5 w-5 text-stone-500 dark:text-stone-400 group-hover:text-blue-500 transition-colors" />
       </Link>
 
       {/* Mother Tongue Option */}
@@ -181,7 +181,7 @@ export default function SettingsPage() {
             <option value="Spanish">Spanish</option>
             <option value="French">French</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500 dark:text-stone-400">
             <ChevronRight className="h-4 w-4 rotate-90" />
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Report an issue or suggest a feature</p>
              </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-stone-500 group-hover:text-amber-500 transition-colors" />
+        <ChevronRight className="h-5 w-5 text-stone-500 dark:text-stone-400 group-hover:text-amber-500 transition-colors" />
       </Link>
 
       {/* Option 5: Account Section (Email & Logout) */}

@@ -10,6 +10,7 @@ import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { MobileNav } from "./components/MobileNav";
+import { Toaster } from "./components/ui/Toast";
 import { getSession } from "@/lib/supabaseServerClient";
 import { getTranslatedTagline } from "@/lib/taglines";
 
@@ -90,7 +91,7 @@ export default async function RootLayout({
                     </a>
                     <div
                       title="Coming Soon"
-                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-500 cursor-not-allowed gap-2"
+                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-500 dark:text-stone-400 cursor-not-allowed gap-2"
                     >
                       Cook?
                       {/* <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight leading-none">Coming Soon</span> */}
@@ -109,6 +110,7 @@ export default async function RootLayout({
             <InstallPrompt />
             <main id="main" className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-8 min-h-0 lg:pb-12">{children}</main>
             <MobileNav />
+            <Toaster />
           </div>
         </ThemeProvider>
         <SpeedInsights />

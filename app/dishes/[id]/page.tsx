@@ -1,12 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabaseServer";
-import { FavoriteButton } from "../../components/FavoriteButton";
-import { DeleteDishButton } from "./DeleteDishButton";
+import { DishActions } from "./DishActions";
 import { DishImageUpload } from "./DishImageUpload";
 import { PortionScaling } from "./PortionScaling";
 import { MissingIngredients } from "./MissingIngredients";
-import { ChefHat, ChevronLeft, Clock, Pencil, Utensils } from "lucide-react";
+import { ChevronLeft, Clock, Utensils } from "lucide-react";
 
 interface PageProps {
   params: Promise<{
@@ -128,29 +127,16 @@ export default async function DishDetailPage({ params }: PageProps) {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-wrap items-center gap-3 xl:flex-col xl:items-end xl:w-[280px]">
-              <FavoriteButton dishId={dish.id as string} />
-
-              <Link
-                href={`/dishes/${dish.id}/cook`}
-                className="group flex flex-1 xl:w-full min-h-[56px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl hover:-translate-y-0.5 active:scale-95 dark:bg-orange-600 dark:hover:bg-orange-700"
-              >
-                <ChefHat className="h-5 w-5 transition-transform group-hover:scale-110" />
-                <span>Start Cooking</span>
-
-              </Link>
-
-              <div className="flex w-full xl:w-auto items-center gap-3">
-                <Link
-                  href={`/dishes/${dish.id}/edit`}
-                  className="flex flex-1 xl:w-auto min-h-[48px] items-center justify-center gap-2 rounded-full border-2 border-stone-200/50 bg-white/50 px-5 py-2 text-sm font-semibold text-stone-700 transition hover:bg-stone-50 hover:border-stone-300 active:scale-95 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:hover:border-stone-600 dark:hover:bg-stone-800"
-                >
-                  <Pencil className="h-4 w-4" />
-                  <span>Edit</span>
-                </Link>
-                <DeleteDishButton id={dish.id as string} />
-              </div>
-            </div>
+            <DishActions
+              dish={{ id: dish.id as string, name: dish.name as string, meal_type: dish.meal_type as string | null }}
+              ingredients={(required ?? []).map((di: any) => ({
+                ingredient_id: di.ingredient_id,
+                quantity: di.quantity,
+                amount: di.amount,
+                unit: di.unit,
+              }))}
+              hasInstructions={!!instructions}
+            />
           </div>
         </div>
       </div>

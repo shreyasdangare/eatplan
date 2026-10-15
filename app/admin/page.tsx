@@ -122,7 +122,7 @@ export default function AdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/" className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+          <Link href="/" className="rounded-xl p-2 text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>

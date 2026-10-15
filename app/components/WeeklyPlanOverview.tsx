@@ -98,7 +98,7 @@ export async function WeeklyPlanOverview() {
         </div>
         <a
           href="/plan"
-          className="group flex items-center gap-1.5 rounded-full bg-stone-100 px-4 py-2 text-sm font-semibold text-stone-600 transition-colors hover:bg-stone-200 hover:text-stone-900 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-stone-50"
+          className="group flex min-h-11 items-center gap-1.5 rounded-full bg-stone-100 px-4 text-sm font-semibold text-stone-600 transition-colors hover:bg-stone-200 hover:text-stone-900 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-stone-50"
         >
           View Planner
           <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -195,7 +195,7 @@ export async function WeeklyPlanOverview() {
                     </div>
                     <div>
                       <p className="text-[13px] font-semibold text-stone-600 dark:text-stone-300">Nothing planned</p>
-                      <a href={`/plan?date=${dayData.dateStr}`} className="mt-1 inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold text-orange-700 bg-orange-50 dark:bg-orange-500/10 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 active:scale-95 transition-transform">
+                      <a href={`/plan?date=${dayData.dateStr}&add=1`} className="mt-1 inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold text-orange-700 bg-orange-50 dark:bg-orange-500/10 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 active:scale-95 transition-transform">
                         Add a meal →
                       </a>
                     </div>
