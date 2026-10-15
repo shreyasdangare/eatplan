@@ -16,7 +16,6 @@ export function HeaderTitle({ tagline = "काय खायचं?" }: { taglin
     <Link
       href="/"
       className="flex min-h-11 items-center gap-2 shrink-0 rounded-xl hover:opacity-90"
-      aria-label="EatPlan home"
     >
       <Logo aria-hidden className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 drop-shadow-xs transition-transform group-hover:scale-105" />
       <div className="flex flex-col">

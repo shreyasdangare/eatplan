@@ -1045,11 +1045,11 @@ export default function PlanPage() {
                   document.getElementById(`day-${date}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
                   setTimeout(() => window.scrollBy({ top: -136, behavior: "smooth" }), 350);
                 }}
-                aria-label={`${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${count} meal${count === 1 ? "" : "s"} planned`}
                 className={`flex min-h-12 flex-col items-center justify-center rounded-2xl text-xs font-semibold ${
                   isToday ? "bg-orange-600 text-white" : "text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
                 }`}
               >
+                <span className="sr-only">{`${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${count} meal${count === 1 ? "" : "s"} planned`}</span>
                 <span aria-hidden>{d.toLocaleDateString("en-GB", { weekday: "narrow" })}</span>
                 <span aria-hidden className="text-sm font-bold">{d.getDate()}</span>
                 <span aria-hidden className={`mt-0.5 h-1 w-1 rounded-full ${count ? (isToday ? "bg-white" : "bg-orange-600") : "bg-transparent"}`} />
