@@ -726,7 +726,12 @@ export default function PlanPage() {
     return (
       <LoadingRegion label="Loading your meal plan">
         <section className="space-y-4 pt-2">
-          <Skeleton className="h-28 w-full rounded-3xl" />
+          <div className="rounded-3xl glass-panel px-4 py-3">
+            <p className="text-lg font-extrabold tracking-tight text-stone-900 dark:text-stone-50">This week</p>
+            <p className="mt-1 text-base text-stone-600 dark:text-stone-300">
+              Getting your breakfasts, lunches and dinners ready for the whole household…
+            </p>
+          </div>
           {[0, 1].map((i) => (
             <div key={i} className="space-y-3 rounded-4xl glass-panel p-5">
               <Skeleton className="h-7 w-40" />

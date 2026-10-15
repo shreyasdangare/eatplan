@@ -223,7 +223,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                       src={dish.image_url}
                       alt=""
                       priority={i < 2}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 50vw"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, calc(50vw - 24px)"
                       className="object-cover transition-transform duration-700 ease-out group-hover/card:scale-110"
                     />
                   ) : (
