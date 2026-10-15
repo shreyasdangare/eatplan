@@ -88,3 +88,10 @@ Every phase follows the same gate: `npm run typecheck && npm run lint && npm tes
 
 ### Rollback
 Every phase is its own commit, so revert that commit. The migrations include rollback notes. Nothing reaches production until the PR is merged by hand.
+
+## Phase 2 status (branch `stack-upgrade-2026-phase2`)
+- **Tailwind 4**: done with `@tailwindcss/upgrade` (adds `@tailwindcss/postcss`, removes autoprefixer and `tailwind.config.mjs`, uses `@custom-variant dark` for next-themes). The tool turned `.dark ::-webkit-scrollbar-thumb` into a `@utility dark`; I changed it back to a plain selector by hand. Typecheck, lint, tests and build all pass.
+  - Visual diff (390px viewport, prod Tailwind 3 vs preview Tailwind 4, light and dark): login, home and settings are nearly identical (<0.4% of pixels differ). Recipes, dish detail, plan and shopping list show small shifts of a few pixels in vertical spacing and shadows, most likely from v4's `space-y-*` selector and shadow/ring scale changes. Side-by-sides are in `docs/tailwind4-review/` (left = prod, right = TW4).
+  - Pages that still need a manual look: /recipes, /dishes/[id] (plus edit, new, cook), /plan, /shopping-list, /pantry, /what-can-i-cook, /admin, /settings/household, /settings/feedback.
+- **ESLint 10**: blocked. `eslint-plugin-react` (pulled in by `eslint-config-next`) only declares support up to ESLint 9.
+- **TypeScript 7**: blocked. `typescript-eslint` requires `typescript <6.1`.
