@@ -166,7 +166,7 @@ export default function AdminPage() {
             </div>
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[10px] font-semibold text-stone-400 dark:text-stone-500">
+        <div className="mt-2 flex justify-between text-[10px] font-semibold text-stone-500 dark:text-stone-400">
           <span>{chartDays[0]?.label}</span>
           <span>{chartDays[chartDays.length - 1]?.label}</span>
         </div>

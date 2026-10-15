@@ -66,7 +66,7 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 pb-24 sm:px-6 lg:px-8 space-y-6">
       <div className="mb-6 flex items-center gap-3">
-        <Settings className="h-8 w-8 text-stone-400" />
+        <Settings className="h-8 w-8 text-stone-500" />
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
             Settings
@@ -97,7 +97,10 @@ export default function SettingsPage() {
               handleUpdatePreferences(nativeLanguage, newVeg);
             }}
             disabled={updating}
-            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50 ${isVegetarianOnly ? 'bg-emerald-500' : 'bg-stone-300 dark:bg-stone-700'}`}
+            role="switch"
+            aria-checked={isVegetarianOnly}
+            aria-label="Vegetarian only"
+            className={`tap relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50 ${isVegetarianOnly ? 'bg-emerald-600' : 'bg-stone-300 dark:bg-stone-700'}`}
           >
             <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-xs ${isVegetarianOnly ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
@@ -118,7 +121,10 @@ export default function SettingsPage() {
         <button
            type="button"
            onClick={() => setTheme(isDark ? "light" : "dark")}
-           className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors ${isDark ? 'bg-indigo-500' : 'bg-stone-300 dark:bg-stone-700'}`}
+           role="switch"
+           aria-checked={isDark}
+           aria-label="Dark mode"
+           className={`tap relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors ${isDark ? 'bg-indigo-600' : 'bg-stone-300 dark:bg-stone-700'}`}
         >
            <span className={`inline-block flex items-center justify-center h-5 w-5 transform rounded-full bg-white transition-transform shadow-xs ${isDark ? 'translate-x-6' : 'translate-x-1'}`}>
               {isDark ? <Moon className="h-3 w-3 text-indigo-600" /> : <Sun className="h-3 w-3 text-amber-500" />}
@@ -137,7 +143,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Invite family members to collaborate</p>
              </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-stone-400 group-hover:text-blue-500 transition-colors" />
+        <ChevronRight className="h-5 w-5 text-stone-500 group-hover:text-blue-500 transition-colors" />
       </Link>
 
       {/* Mother Tongue Option */}
@@ -175,7 +181,7 @@ export default function SettingsPage() {
             <option value="Spanish">Spanish</option>
             <option value="French">French</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-400">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
             <ChevronRight className="h-4 w-4 rotate-90" />
           </div>
         </div>
@@ -192,7 +198,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Report an issue or suggest a feature</p>
              </div>
         </div>
-        <ChevronRight className="h-5 w-5 text-stone-400 group-hover:text-amber-500 transition-colors" />
+        <ChevronRight className="h-5 w-5 text-stone-500 group-hover:text-amber-500 transition-colors" />
       </Link>
 
       {/* Option 5: Account Section (Email & Logout) */}
@@ -219,7 +225,7 @@ export default function SettingsPage() {
         </button>
       </section>
 
-      <p className="text-center text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-stone-500 py-4">
+      <p className="text-center text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 py-4">
         EatPlan v0.1.2 • A Meal Planner by PP 🇮🇳
       </p>
     </div>

@@ -132,7 +132,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <div className="mt-8">
                 <Link
                   href="/recipes"
-                  className="group/btn relative inline-flex min-h-[56px] items-center justify-center overflow-hidden rounded-full bg-stone-900 px-8 py-3 text-base font-semibold text-white shadow-xl transition-all hover:scale-105 hover:bg-black hover:shadow-2xl active:scale-95 dark:bg-orange-500 dark:hover:bg-orange-400"
+                  className="group/btn relative inline-flex min-h-[56px] items-center justify-center overflow-hidden rounded-full bg-stone-900 px-8 py-3 text-base font-semibold text-white shadow-xl transition-all hover:scale-105 hover:bg-black hover:shadow-2xl active:scale-95 dark:bg-orange-600 dark:hover:bg-orange-700"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Open your digital cookbook

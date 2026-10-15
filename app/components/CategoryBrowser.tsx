@@ -41,11 +41,12 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
   );
 
   return (
-    <div className="rounded-lg border border-orange-200 bg-orange-50/50 px-2 py-1 dark:border-stone-600 dark:bg-stone-800/50">
+    <div className="rounded-xl border border-orange-200 bg-orange-50/50 px-3 py-0.5 dark:border-stone-600 dark:bg-stone-800/50">
       <button
         type="button"
         onClick={() => setExpanded((p) => (p ? null : SHOPPING_CATEGORIES[0]))}
-        className="flex w-full items-center justify-between py-1.5 text-left text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300"
+        aria-expanded={expanded !== null}
+        className="flex min-h-11 w-full items-center justify-between text-left text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200"
       >
         <span>Browse categories</span>
         <svg
@@ -68,11 +69,12 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
                 <button
                   type="button"
                   onClick={() => setExpanded((p) => (p === cat ? null : cat))}
-                  className="flex w-full items-center gap-1.5 py-1 text-left text-[11px] font-medium text-amber-800 dark:text-amber-200"
+                  aria-expanded={isOpen}
+                  className="flex min-h-11 w-full items-center gap-1.5 text-left text-sm font-semibold text-amber-900 dark:text-amber-100"
                 >
                   <span aria-hidden>{getCategoryEmoji(cat)}</span>
                   <span>{cat}</span>
-                  <span className="text-amber-600 dark:text-amber-400">
+                  <span className="text-amber-800 dark:text-amber-200">
                     ({items.length})
                   </span>
                   <svg
@@ -85,19 +87,19 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
                   </svg>
                 </button>
                 {isOpen && (
-                  <div className="mt-0.5 flex flex-wrap gap-1 pl-4">
+                  <div className="mt-0.5 flex flex-wrap gap-2 pl-1">
                     {items.slice(0, 24).map((ing) => (
                       <button
                         key={ing.id}
                         type="button"
                         onClick={() => onAddItem({ ingredient_id: ing.id })}
-                        className="rounded-sm border border-orange-200 bg-white px-1.5 py-0.5 text-[11px] text-amber-900 hover:bg-orange-100 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+                        className="min-h-11 rounded-full border border-orange-200 bg-white px-3.5 text-sm text-amber-950 hover:bg-orange-100 active:scale-95 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                       >
                         {ing.name}
                       </button>
                     ))}
                     {items.length > 24 && (
-                      <span className="py-1 text-[11px] text-amber-600 dark:text-amber-400">
+                      <span className="flex items-center text-sm text-amber-800 dark:text-amber-200">
                         +{items.length - 24} more
                       </span>
                     )}

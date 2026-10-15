@@ -106,7 +106,7 @@ export function WhatCanICookClient() {
     <div className="space-y-4">
       <form onSubmit={onSubmit} className="space-y-3">
         {pantryIds.length > 0 && (
-          <p className="text-[11px] text-amber-700 dark:text-amber-300">
+          <p className="text-xs text-amber-700 dark:text-amber-300">
             Using your pantry ({pantryIds.length} items). Add extra ingredients below.
           </p>
         )}
@@ -162,7 +162,7 @@ export function WhatCanICookClient() {
                         >
                         <span>{dish.name}</span>
                         {dish.stats && (
-                          <span className="text-[11px] text-lime-700 dark:text-lime-400">
+                          <span className="text-xs text-lime-700 dark:text-lime-400">
                             {dish.stats.matchPct}% match
                           </span>
                         )}

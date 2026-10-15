@@ -332,8 +332,8 @@ export default function EditDishPage() {
         {/* Basic Info */}
         <div className="space-y-5">
           <div>
-            <label className={labelClasses}>Recipe Name</label>
-            <input
+            <label className={labelClasses} htmlFor="dish-field-1">Recipe Name</label>
+            <input id="dish-field-1"
               required
               placeholder="e.g. Nonna's Spaghetti Bolognese"
               className={inputClasses}
@@ -342,10 +342,10 @@ export default function EditDishPage() {
             />
           </div>
           <div>
-            <label className={labelClasses}>
-              Description <span className="text-stone-400 font-normal">(Optional)</span>
+            <label className={labelClasses} htmlFor="dish-field-2">
+              Description <span className="text-stone-500 font-normal">(Optional)</span>
             </label>
-            <textarea
+            <textarea id="dish-field-2"
               placeholder="A brief summary of this delicious dish..."
               className={`${inputClasses} resize-none`}
               rows={3}
@@ -358,10 +358,10 @@ export default function EditDishPage() {
         {/* Metadata Grid */}
         <div className="grid gap-5 sm:grid-cols-3">
           <div>
-            <label className={`${labelClasses} flex items-center gap-2`}>
-              <ChefHat className="h-4 w-4 text-stone-400" /> Meal Type
+            <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-11">
+              <ChefHat className="h-4 w-4 text-stone-500" /> Meal Type
             </label>
-            <select
+            <select id="dish-field-11"
               className={inputClasses}
               value={mealType}
               onChange={(e) => setMealType(e.target.value)}
@@ -372,26 +372,27 @@ export default function EditDishPage() {
             </select>
           </div>
           <div>
-            <label className={`${labelClasses} flex items-center gap-2`}>
-              <Clock className="h-4 w-4 text-stone-400" /> Prep Time
+            <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-12">
+              <Clock className="h-4 w-4 text-stone-500" /> Prep Time
             </label>
             <div className="relative">
-              <input
+              <input id="dish-field-12"
                 type="number"
+                inputMode="numeric"
                 min={0}
                 placeholder="45"
                 className={inputClasses}
                 value={prepTime}
                 onChange={(e) => setPrepTime(e.target.value)}
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-400">min</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-500">min</span>
             </div>
           </div>
           <div>
-            <label className={`${labelClasses} flex items-center gap-2`}>
-              <Users className="h-4 w-4 text-stone-400" /> Servings
+            <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-13">
+              <Users className="h-4 w-4 text-stone-500" /> Servings
             </label>
-            <input
+            <input id="dish-field-13"
               type="number"
               min={1}
               placeholder="4"
@@ -412,9 +413,9 @@ export default function EditDishPage() {
              <button
                type="button"
                onClick={() => setDietCategory("Veg")}
-               className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.98] ${
+               className={`flex-1 min-h-11 rounded-lg text-sm font-bold transition-all active:scale-[0.98] ${
                   dietCategory === "Veg" 
-                    ? "bg-emerald-500 text-white shadow-md"
+                    ? "bg-emerald-600 text-white shadow-md"
                     : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700"
                }`}
              >
@@ -423,7 +424,7 @@ export default function EditDishPage() {
              <button
                type="button"
                onClick={() => setDietCategory("Both")}
-               className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.98] ${
+               className={`flex-1 min-h-11 rounded-lg text-sm font-bold transition-all active:scale-[0.98] ${
                   dietCategory === "Both" 
                     ? "bg-stone-800 text-white shadow-md dark:bg-stone-200 dark:text-stone-900"
                     : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700"
@@ -434,7 +435,7 @@ export default function EditDishPage() {
              <button
                type="button"
                onClick={() => setDietCategory("Non-Veg")}
-               className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all active:scale-[0.98] ${
+               className={`flex-1 min-h-11 rounded-lg text-sm font-bold transition-all active:scale-[0.98] ${
                   dietCategory === "Non-Veg" 
                     ? "bg-rose-600 text-white shadow-md"
                     : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700"
@@ -446,10 +447,10 @@ export default function EditDishPage() {
         </div>
 
         <div>
-           <label className={`${labelClasses} flex items-center gap-2`}>
-            <Tags className="h-4 w-4 text-stone-400" /> Tags
+           <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-14">
+            <Tags className="h-4 w-4 text-stone-500" /> Tags
           </label>
-          <input
+          <input id="dish-field-14"
             placeholder="e.g. spicy, vegan, quick (comma separated)"
             className={inputClasses}
             value={tags}
@@ -458,8 +459,8 @@ export default function EditDishPage() {
         </div>
 
         <div>
-           <label className={labelClasses}>Instructions</label>
-            <textarea
+           <label className={labelClasses} htmlFor="dish-field-3">Instructions</label>
+            <textarea id="dish-field-3"
               className={`${inputClasses} font-mono text-xs sm:text-sm`}
               rows={8}
               value={instructions}
@@ -504,9 +505,9 @@ export default function EditDishPage() {
                     type="button"
                     key={ing.id}
                     onClick={() => toggleIngredient(ing.id)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 border ${
+                    className={`min-h-11 rounded-full px-4 text-sm font-semibold transition-all active:scale-95 border ${
                       selected
-                        ? "bg-emerald-500 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
+                        ? "bg-emerald-600 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
                         : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
                     }`}
                   >
@@ -535,14 +536,14 @@ export default function EditDishPage() {
                         <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
                           {ing.name}
                         </span>
-                        <label className="flex items-center gap-2 text-xs font-medium text-stone-500 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
+                        <label className="-my-2 flex min-h-11 items-center gap-2 px-1 text-sm font-medium text-stone-600 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
                           <input
                             type="checkbox"
                             checked={sel.is_optional}
                             onChange={(e) =>
                               updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
                             }
-                            className="rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                            className="h-5 w-5 rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
                           />
                           Optional
                         </label>
@@ -550,7 +551,7 @@ export default function EditDishPage() {
                       <div className="flex flex-wrap items-center gap-2">
                          <input
                           placeholder="Display Text (e.g. '2 cups diced')"
-                          className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                          className="w-full sm:flex-1 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                           value={sel.quantity}
                           onChange={(e) =>
                             updateIngredient(sel.ingredient_id, "quantity", e.target.value)
@@ -561,8 +562,9 @@ export default function EditDishPage() {
                               type="number"
                               min={0}
                               step="any"
+                                    inputMode="decimal"
                               placeholder="Amt"
-                              className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                              className="w-20 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                               value={sel.amount ?? ""}
                               onChange={(e) =>
                                 updateIngredient(
@@ -574,7 +576,7 @@ export default function EditDishPage() {
                             />
                             <input
                               placeholder="Unit"
-                              className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                              className="w-24 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                               value={sel.unit}
                               onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
                             />
@@ -598,7 +600,7 @@ export default function EditDishPage() {
           <button
             type="submit"
             disabled={saving}
-            className="group flex w-full items-center justify-center gap-2 rounded-full mb-8 bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-500 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+            className="group flex w-full items-center justify-center gap-2 rounded-full mb-8 bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-700 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-700"
           >
             {saving ? (
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />

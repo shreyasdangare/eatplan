@@ -250,7 +250,7 @@ export default function NewDishPage() {
       </div>
 
       {/* Import Accordion */}
-      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : "shadow-none border-stone-200/40"}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "magic" ? "manual" : "magic")}
@@ -265,7 +265,7 @@ export default function NewDishPage() {
               <p className="mt-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">Extract from URL or screenshot</p>
             </div>
           </div>
-          <ChevronDown className={`h-5 w-5 text-stone-400 transition-transform ${expandedSection === "magic" ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-5 w-5 text-stone-500 transition-transform ${expandedSection === "magic" ? "rotate-180" : ""}`} />
         </button>
         
         {expandedSection === "magic" && (
@@ -277,7 +277,7 @@ export default function NewDishPage() {
               <div className="flex flex-col">
                 <div className="mb-4">
                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
-                    <Search className="h-4 w-4 text-stone-400" />
+                    <Search className="h-4 w-4 text-stone-500" />
                     From Name
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
@@ -288,6 +288,8 @@ export default function NewDishPage() {
                   <input
                     type="text"
                     placeholder="e.g. Pasta Carbonara"
+                    aria-label="Dish name to generate"
+                    enterKeyHint="go"
                     className={inputClasses}
                     value={importName}
                     onChange={(e) => setImportName(e.target.value)}
@@ -296,7 +298,7 @@ export default function NewDishPage() {
                   <button
                     type="submit"
                     disabled={!!importingType || !importName.trim()}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 min-h-12 px-4 text-base font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
                      {importingType === "name" ? "Generating…" : "Generate Recipe"}
                   </button>
@@ -307,7 +309,7 @@ export default function NewDishPage() {
               <div className="flex flex-col">
                 <div className="mb-4">
                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
-                    <LinkIcon className="h-4 w-4 text-stone-400" />
+                    <LinkIcon className="h-4 w-4 text-stone-500" />
                     From URL or YouTube
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
@@ -317,6 +319,11 @@ export default function NewDishPage() {
                 <form onSubmit={handleImport} className="mt-auto space-y-3">
                   <input
                     type="url"
+                    inputMode="url"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    enterKeyHint="go"
+                    aria-label="Recipe URL"
                     placeholder="https://..."
                     className={inputClasses}
                     value={importUrl}
@@ -326,7 +333,7 @@ export default function NewDishPage() {
                   <button
                     type="submit"
                     disabled={!!importingType || !importUrl.trim()}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 min-h-12 px-4 text-base font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
                      {importingType === "url" ? "Importing…" : "Extract Recipe"}
                   </button>
@@ -337,7 +344,7 @@ export default function NewDishPage() {
               <div className="flex flex-col">
                 <div className="mb-4">
                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
-                    <Camera className="h-4 w-4 text-stone-400" />
+                    <Camera className="h-4 w-4 text-stone-500" />
                     From Screenshot
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
@@ -348,6 +355,7 @@ export default function NewDishPage() {
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
+                    aria-label="Recipe screenshot"
                     className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-200 file:px-4 file:py-1.5 file:font-semibold file:text-stone-700 hover:file:bg-stone-300 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-400 dark:file:bg-stone-700 dark:file:text-stone-300 dark:hover:file:bg-stone-600"
                     onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
                     disabled={!!importingType}
@@ -355,7 +363,7 @@ export default function NewDishPage() {
                   <button
                     type="submit"
                     disabled={!!importingType || !importScreenshotFile}
-                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 min-h-12 px-4 text-base font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
                     {importingType === "screenshot" ? "Importing…" : "Scan Image"}
                   </button>
@@ -380,14 +388,14 @@ export default function NewDishPage() {
 
       <div className="flex items-center gap-4 py-2 px-6">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
-        <span className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 dark:text-stone-500">
+        <span className="text-xs font-extrabold uppercase tracking-widest text-stone-500 dark:text-stone-400">
           OR
         </span>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
       </div>
 
       {/* Manual Accordion */}
-      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "shadow-none border-stone-200/40"}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "manual" ? "magic" : "manual")}
@@ -402,7 +410,7 @@ export default function NewDishPage() {
               <p className="mt-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">Fill out recipe details yourself</p>
             </div>
           </div>
-          <ChevronDown className={`h-5 w-5 text-stone-400 transition-transform ${expandedSection === "manual" ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-5 w-5 text-stone-500 transition-transform ${expandedSection === "manual" ? "rotate-180" : ""}`} />
         </button>
 
         {expandedSection === "manual" && (
@@ -413,8 +421,8 @@ export default function NewDishPage() {
                {/* Basic Info */}
                <div className="space-y-5">
                  <div>
-                   <label className={labelClasses}>Recipe Name</label>
-                   <input
+                   <label className={labelClasses} htmlFor="dish-field-1">Recipe Name</label>
+                   <input id="dish-field-1"
                      required
                      placeholder="e.g. Nonna's Spaghetti Bolognese"
                      className={inputClasses}
@@ -423,10 +431,10 @@ export default function NewDishPage() {
                    />
                  </div>
                  <div>
-                   <label className={labelClasses}>
-                     Description <span className="text-stone-400 font-normal">(Optional)</span>
+                   <label className={labelClasses} htmlFor="dish-field-2">
+                     Description <span className="text-stone-500 font-normal">(Optional)</span>
                    </label>
-                   <textarea
+                   <textarea id="dish-field-2"
                      placeholder="A brief summary of this delicious dish..."
                      className={`${inputClasses} resize-none`}
                      rows={3}
@@ -439,10 +447,10 @@ export default function NewDishPage() {
                {/* Metadata Grid */}
                <div className="grid gap-5 sm:grid-cols-3">
                  <div>
-                   <label className={`${labelClasses} flex items-center gap-2`}>
-                     <ChefHat className="h-4 w-4 text-stone-400" /> Meal Type
+                   <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-11">
+                     <ChefHat className="h-4 w-4 text-stone-500" /> Meal Type
                    </label>
-                   <select
+                   <select id="dish-field-11"
                      className={inputClasses}
                      value={mealType}
                      onChange={(e) => setMealType(e.target.value)}
@@ -453,27 +461,29 @@ export default function NewDishPage() {
                    </select>
                  </div>
                  <div>
-                   <label className={`${labelClasses} flex items-center gap-2`}>
-                     <Clock className="h-4 w-4 text-stone-400" /> Prep Time
+                   <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-12">
+                     <Clock className="h-4 w-4 text-stone-500" /> Prep Time
                    </label>
                    <div className="relative">
-                     <input
+                     <input id="dish-field-12"
                        type="number"
+                       inputMode="numeric"
                        min={0}
                        placeholder="45"
                        className={inputClasses}
                        value={prepTime}
                        onChange={(e) => setPrepTime(e.target.value)}
                      />
-                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-400">min</span>
+                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-500">min</span>
                    </div>
                  </div>
                  <div>
-                   <label className={`${labelClasses} flex items-center gap-2`}>
-                     <Users className="h-4 w-4 text-stone-400" /> Servings
+                   <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-13">
+                     <Users className="h-4 w-4 text-stone-500" /> Servings
                    </label>
-                   <input
+                   <input id="dish-field-13"
                      type="number"
+                     inputMode="numeric"
                      min={1}
                      placeholder="4"
                      className={inputClasses}
@@ -484,10 +494,10 @@ export default function NewDishPage() {
                </div>
 
                <div>
-                 <label className={`${labelClasses} flex items-center gap-2`}>
-                   <Tags className="h-4 w-4 text-stone-400" /> Tags
+                 <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-14">
+                   <Tags className="h-4 w-4 text-stone-500" /> Tags
                  </label>
-                 <input
+                 <input id="dish-field-14"
                    placeholder="e.g. spicy, vegan, quick (comma separated)"
                    className={inputClasses}
                    value={tags}
@@ -531,9 +541,9 @@ export default function NewDishPage() {
                            type="button"
                            key={ing.id}
                            onClick={() => toggleIngredient(ing.id)}
-                           className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 border ${
+                           className={`min-h-11 rounded-full px-4 text-sm font-semibold transition-all active:scale-95 border ${
                              selected
-                               ? "bg-emerald-500 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
+                               ? "bg-emerald-600 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
                                : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
                            }`}
                          >
@@ -562,14 +572,14 @@ export default function NewDishPage() {
                                <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
                                  {ing.name}
                                </span>
-                               <label className="flex items-center gap-2 text-xs font-medium text-stone-500 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
+                               <label className="-my-2 flex min-h-11 items-center gap-2 px-1 text-sm font-medium text-stone-600 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
                                  <input
                                    type="checkbox"
                                    checked={sel.is_optional}
                                    onChange={(e) =>
                                      updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
                                    }
-                                   className="rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                                   className="h-5 w-5 rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
                                  />
                                  Optional
                                </label>
@@ -577,7 +587,7 @@ export default function NewDishPage() {
                              <div className="flex flex-wrap items-center gap-2">
                                 <input
                                  placeholder="Display Text (e.g. '2 cups diced')"
-                                 className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                 className="w-full sm:flex-1 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                  value={sel.quantity}
                                  onChange={(e) =>
                                    updateIngredient(sel.ingredient_id, "quantity", e.target.value)
@@ -588,8 +598,9 @@ export default function NewDishPage() {
                                      type="number"
                                      min={0}
                                      step="any"
+                                    inputMode="decimal"
                                      placeholder="Amt"
-                                     className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-20 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.amount ?? ""}
                                      onChange={(e) =>
                                        updateIngredient(
@@ -601,7 +612,7 @@ export default function NewDishPage() {
                                    />
                                    <input
                                      placeholder="Unit"
-                                     className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-24 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.unit}
                                      onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
                                    />
@@ -619,7 +630,7 @@ export default function NewDishPage() {
                  <button
                    type="submit"
                    disabled={loading}
-                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-500 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-700 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-700"
                  >
                    {loading ? (
                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />

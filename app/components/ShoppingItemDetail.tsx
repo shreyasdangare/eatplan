@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { ShoppingTileItem } from "./ShoppingTile";
+import { BottomSheet } from "./ui/BottomSheet";
 
 type ShoppingItemDetailProps = {
   item: ShoppingTileItem | null;
@@ -69,113 +70,103 @@ export function ShoppingItemDetail({
     }
   };
 
+  const fieldCls =
+    "w-full rounded-xl border border-stone-300 bg-white px-3 py-3 text-base text-stone-900 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100";
+  const labelCls = "mb-1.5 block text-sm font-semibold text-stone-700 dark:text-stone-200";
+
   return (
-    <>
-      <div
-        className="fixed inset-0 z-40 bg-black/40 dark:bg-black/60"
-        aria-hidden
-        onClick={onClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="shopping-item-detail-title"
-        className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-auto rounded-t-2xl border border-t border-stone-200 bg-white shadow-lg dark:border-stone-700 dark:bg-stone-900"
-      >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-stone-200 bg-white px-4 py-3 dark:border-stone-700 dark:bg-stone-900">
-          <h2
-            id="shopping-item-detail-title"
-            className="text-sm font-semibold text-amber-900 dark:text-amber-100"
-          >
-            {name}
-          </h2>
+    <BottomSheet
+      open
+      onClose={onClose}
+      title={name}
+      footer={
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-full p-1.5 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="min-h-12 rounded-full border border-red-300 bg-white px-5 text-base font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:bg-stone-800 dark:text-red-300 dark:hover:bg-red-950/30"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            {deleting ? "…" : "Remove"}
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="min-h-12 flex-1 rounded-full bg-orange-600 text-base font-bold text-white hover:bg-orange-700 disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Save"}
           </button>
         </div>
-
-        <div className="space-y-4 p-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-amber-800 dark:text-amber-200">
-              Quantity
-            </label>
-            <input
-              type="text"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="e.g. 2 liters, 500g"
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-medium text-amber-800 dark:text-amber-200">
-              Priority
-            </label>
-            <div className="flex gap-2">
-              {(
-                [
-                  { value: "normal" as const, label: "Normal" },
-                  { value: "urgent" as const, label: "Urgent" },
-                  { value: "if_convenient" as const, label: "If convenient" },
-                ] as const
-              ).map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setUrgency(opt.value)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium ${
-                    urgency === opt.value
-                      ? "bg-orange-500 text-white dark:bg-orange-600"
-                      : "bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-700 dark:text-stone-300 dark:hover:bg-stone-600"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-xs font-medium text-amber-800 dark:text-amber-200">
-              Notes
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional notes"
-              rows={2}
-              className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-            />
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving}
-              className="flex-1 rounded-full bg-orange-500 py-2.5 text-sm font-semibold text-white hover:bg-orange-400 disabled:opacity-50 dark:bg-orange-600 dark:hover:bg-orange-500"
-            >
-              {saving ? "Saving…" : "Save"}
-            </button>
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={deleting}
-              className="rounded-full border border-red-300 bg-white py-2.5 px-4 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-800 dark:bg-stone-800 dark:text-red-300 dark:hover:bg-red-950/30 disabled:opacity-50"
-            >
-              {deleting ? "…" : "Remove"}
-            </button>
-          </div>
+      }
+    >
+      <form
+        className="space-y-5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void handleSave();
+        }}
+      >
+        <div>
+          <label htmlFor="shopping-item-qty" className={labelCls}>
+            Quantity
+          </label>
+          <input
+            id="shopping-item-qty"
+            type="text"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder="e.g. 2 liters, 500g"
+            autoComplete="off"
+            enterKeyHint="done"
+            className={fieldCls}
+          />
         </div>
-      </div>
-    </>
+
+        <fieldset>
+          <legend className={labelCls}>Priority</legend>
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Priority">
+            {(
+              [
+                { value: "normal" as const, label: "Normal" },
+                { value: "urgent" as const, label: "Urgent" },
+                { value: "if_convenient" as const, label: "If convenient" },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={urgency === opt.value}
+                onClick={() => setUrgency(opt.value)}
+                className={`min-h-11 rounded-full px-2 text-sm font-semibold ${
+                  urgency === opt.value
+                    ? opt.value === "urgent"
+                      ? "bg-red-600 text-white"
+                      : "bg-orange-600 text-white"
+                    : "bg-stone-100 text-stone-800 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <div>
+          <label htmlFor="shopping-item-notes" className={labelCls}>
+            Notes
+          </label>
+          <textarea
+            id="shopping-item-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Optional notes"
+            rows={2}
+            className={fieldCls}
+          />
+        </div>
+      </form>
+    </BottomSheet>
   );
 }

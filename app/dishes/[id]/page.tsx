@@ -6,7 +6,7 @@ import { DeleteDishButton } from "./DeleteDishButton";
 import { DishImageUpload } from "./DishImageUpload";
 import { PortionScaling } from "./PortionScaling";
 import { MissingIngredients } from "./MissingIngredients";
-import { ChefHat, ChevronLeft, Clock, Pencil, Trash2, Utensils } from "lucide-react";
+import { ChefHat, ChevronLeft, Clock, Pencil, Utensils } from "lucide-react";
 
 interface PageProps {
   params: Promise<{
@@ -68,17 +68,6 @@ export default async function DishDetailPage({ params }: PageProps) {
 
   return (
     <article className="pb-16 max-w-5xl mx-auto">
-      {/* Top Nav Overlay (Back Button) */}
-      <div className="absolute top-4 left-4 z-50 sm:top-6 sm:left-6">
-        <Link
-          href="/recipes"
-          className="group flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/20 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all hover:bg-black/40 hover:scale-105 active:scale-95"
-          aria-label="Back to recipes"
-        >
-          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:-translate-x-1" />
-        </Link>
-      </div>
-
       {/* Hero – content scrolls over this */}
       <div className="relative -mx-4 sm:-mx-6 lg:-mx-8">
         <div className="relative aspect-4/3 w-full overflow-hidden bg-stone-200 dark:bg-stone-800 sm:aspect-21/9">
@@ -87,6 +76,13 @@ export default async function DishDetailPage({ params }: PageProps) {
             imageUrl={imageUrl}
             variant="hero"
           />
+          <Link
+            href="/recipes"
+            className="group absolute left-4 top-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/60 active:scale-95 sm:left-6 sm:top-6 sm:h-12 sm:w-12"
+            aria-label="Back to recipes"
+          >
+            <ChevronLeft className="h-6 w-6 transition-transform group-hover:-translate-x-0.5" aria-hidden />
+          </Link>
           {/* Subtle gradient overlay for the overlapping header */}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/60 to-transparent pointer-events-none" aria-hidden />
         </div>
@@ -118,13 +114,13 @@ export default async function DishDetailPage({ params }: PageProps) {
               <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-stone-600 dark:text-stone-400">
                 {dish.prep_time_minutes != null && (
                   <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-stone-400 dark:text-stone-500" />
+                    <Clock className="h-5 w-5 text-stone-500 dark:text-stone-400" />
                     <span>{dish.prep_time_minutes} min prep</span>
                   </div>
                 )}
                 {servings != null && servings > 0 && (
                   <div className="flex items-center gap-2">
-                    <Utensils className="h-5 w-5 text-stone-400 dark:text-stone-500" />
+                    <Utensils className="h-5 w-5 text-stone-500 dark:text-stone-400" />
                     <span>Serves {servings}</span>
                   </div>
                 )}
@@ -137,11 +133,11 @@ export default async function DishDetailPage({ params }: PageProps) {
 
               <Link
                 href={`/dishes/${dish.id}/cook`}
-                className="group flex flex-1 xl:w-full min-h-[56px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl hover:-translate-y-0.5 active:scale-95 dark:bg-orange-500 dark:hover:bg-orange-400"
+                className="group flex flex-1 xl:w-full min-h-[56px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-base font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl hover:-translate-y-0.5 active:scale-95 dark:bg-orange-600 dark:hover:bg-orange-700"
               >
                 <ChefHat className="h-5 w-5 transition-transform group-hover:scale-110" />
                 <span>Start Cooking</span>
-                <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight leading-none">Coming Soon</span>
+
               </Link>
 
               <div className="flex w-full xl:w-auto items-center gap-3">
@@ -152,9 +148,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <Pencil className="h-4 w-4" />
                   <span>Edit</span>
                 </Link>
-                <div className="shrink-0 flex items-center justify-center rounded-full bg-white/50 p-2 shadow-xs border border-stone-200/50 dark:bg-stone-800/50 dark:border-stone-700/50">
-                  <DeleteDishButton id={dish.id as string} />
-                </div>
+                <DeleteDishButton id={dish.id as string} />
               </div>
             </div>
           </div>
@@ -233,7 +227,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                 </div>
                 <div className="rounded-4xl border border-dashed border-stone-300 bg-stone-50/50 p-8 text-center dark:border-stone-700 dark:bg-stone-800/30">
                   <p className="text-stone-500 dark:text-stone-400 font-medium">No instructions provided.</p>
-                  <Link href={`/dishes/${dish.id}/edit`} className="mt-2 inline-block font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
+                  <Link href={`/dishes/${dish.id}/edit`} className="mt-2 inline-flex min-h-11 items-center font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
                     Add instructions →
                   </Link>
                 </div>

@@ -25,7 +25,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
-  themeColor: "#ea580c",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0a09" },
+  ],
 };
 
 export default async function RootLayout({
@@ -41,14 +44,15 @@ export default async function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="EatPlan" />
       </head>
       <body>
         <ThemeProvider>
           <Suspense fallback={null}>
             <AuthCodeExchange />
           </Suspense>
-          <div className="mx-auto flex min-h-dvh min-w-0 max-w-4xl flex-col px-4 py-3 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
-            <header className="relative z-50 mb-4 sm:mb-6 rounded-2xl glass-panel px-3 py-2 sm:px-4 sm:py-3 sticky top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
+          <div className="mx-auto flex min-h-dvh min-w-0 max-w-4xl flex-col px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
+            <header className="site-header relative z-50 mb-4 rounded-2xl glass-panel px-3 py-1.5 sm:px-4 sm:py-3 sticky top-[max(0.5rem,env(safe-area-inset-top))] sm:mb-8 lg:mb-10 transition-all duration-300">
               <div className="flex items-center justify-between gap-2">
                 <HeaderTitle tagline={tagline} />
                 <div className="flex items-center gap-2">
@@ -86,7 +90,7 @@ export default async function RootLayout({
                     </a>
                     <div
                       title="Coming Soon"
-                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-400 cursor-not-allowed gap-2"
+                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-500 cursor-not-allowed gap-2"
                     >
                       Cook?
                       {/* <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight leading-none">Coming Soon</span> */}
@@ -103,7 +107,7 @@ export default async function RootLayout({
               </div>
             </header>
             <InstallPrompt />
-            <main className="flex-1 pb-24 sm:pb-8 min-h-0 lg:pb-12">{children}</main>
+            <main id="main" className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-8 min-h-0 lg:pb-12">{children}</main>
             <MobileNav />
           </div>
         </ThemeProvider>

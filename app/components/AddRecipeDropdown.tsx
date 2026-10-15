@@ -22,7 +22,7 @@ export function AddRecipeDropdown() {
     <div className="relative inline-block text-left" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="group inline-flex shrink-0 min-h-[48px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl active:scale-95 dark:bg-orange-500 dark:hover:bg-orange-400"
+        className="group inline-flex shrink-0 min-h-[48px] items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-black hover:shadow-xl active:scale-95 dark:bg-orange-600 dark:hover:bg-orange-700"
       >
         <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" aria-hidden />
         <span>Add recipe</span>
@@ -37,7 +37,7 @@ export function AddRecipeDropdown() {
               onClick={() => setOpen(false)}
               className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-stone-700 hover:bg-orange-50 hover:text-orange-600 dark:text-stone-200 dark:hover:bg-stone-700 dark:hover:text-orange-400"
             >
-              <Wand2 className="h-4 w-4 text-stone-400 group-hover:text-orange-500" />
+              <Wand2 className="h-4 w-4 text-stone-500 group-hover:text-orange-500" />
               Auto Import Magic
             </Link>
             <div className="h-px w-full bg-stone-100 dark:bg-stone-700/50" />
@@ -46,7 +46,7 @@ export function AddRecipeDropdown() {
               onClick={() => setOpen(false)}
               className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-stone-700 hover:bg-orange-50 hover:text-orange-600 dark:text-stone-200 dark:hover:bg-stone-700 dark:hover:text-orange-400"
             >
-              <PenLine className="h-4 w-4 text-stone-400 group-hover:text-orange-500" />
+              <PenLine className="h-4 w-4 text-stone-500 group-hover:text-orange-500" />
               Enter Manually
             </Link>
           </div>

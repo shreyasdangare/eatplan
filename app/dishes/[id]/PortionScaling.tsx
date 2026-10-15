@@ -66,8 +66,9 @@ export function PortionScaling({
             max={20}
             value={desired}
             onChange={(e) => setDesired(Number(e.target.value))}
-            className="flex-1 h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer dark:bg-stone-700 accent-orange-500 hover:accent-orange-600 transition-all"
-            aria-label="Adjust servings"
+            className="range-touch flex-1 cursor-pointer"
+            aria-label="Servings"
+            aria-valuetext={`${desired} servings`}
           />
           <div className="flex shrink-0 min-w-12 items-center justify-center rounded-xl bg-stone-100 px-3 py-1.5 font-mono text-lg font-bold text-stone-800 dark:bg-stone-800 dark:text-stone-200">
             {desired}
@@ -134,7 +135,7 @@ function IngredientList({
                 <span className="text-base font-medium text-stone-600 dark:text-stone-400 flex items-center">
                   <TranslatedIngredient name={di.ingredients?.name ?? "Unknown ingredient"} />
                 </span>
-                <span className="shrink-0 rounded-lg bg-stone-100/30 px-3 py-1 font-mono text-sm font-medium text-stone-500 dark:bg-stone-800/30 dark:text-stone-500">
+                <span className="shrink-0 rounded-lg bg-stone-100/30 px-3 py-1 font-mono text-sm font-medium text-stone-500 dark:bg-stone-800/30 dark:text-stone-400">
                   {renderQty(di)}
                 </span>
               </li>

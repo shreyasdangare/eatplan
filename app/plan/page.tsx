@@ -126,7 +126,7 @@ function SortableDishPill({
           type="button"
           {...attributes}
           {...listeners}
-          className="relative z-10 shrink-0 cursor-grab rounded-sm p-0.5 text-stone-400 hover:text-stone-600 active:cursor-grabbing dark:text-stone-500 dark:hover:text-stone-300 touch-none"
+          className="relative z-10 shrink-0 cursor-grab rounded-sm p-0.5 text-stone-500 hover:text-stone-600 active:cursor-grabbing dark:text-stone-400 dark:hover:text-stone-300 touch-none"
           aria-label="Reorder"
         >
           <GripVertical className="h-3.5 w-3.5" />
@@ -136,7 +136,7 @@ function SortableDishPill({
       <span
         className={`relative z-10 min-w-0 flex-1 truncate text-[15px] font-bold tracking-tight ${
           prepared
-            ? "text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600"
+            ? "text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600"
             : "text-stone-800 dark:text-stone-200"
         }`}
         title={dishName}
@@ -156,7 +156,7 @@ function SortableDishPill({
         <button
           type="button"
           onClick={onRemove}
-          className="relative z-10 shrink-0 rounded-full p-1 text-stone-400 opacity-0 transition-all hover:bg-red-100/80 hover:text-red-600 group-hover/pill:opacity-100 dark:text-stone-500 dark:hover:bg-red-900/40 dark:hover:text-red-400"
+          className="relative z-10 shrink-0 rounded-full p-1 text-stone-500 opacity-0 transition-all hover:bg-red-100/80 hover:text-red-600 group-hover/pill:opacity-100 dark:text-stone-400 dark:hover:bg-red-900/40 dark:hover:text-red-400"
           aria-label="Remove"
         >
           <X className="h-3.5 w-3.5" />
@@ -190,7 +190,7 @@ function InlineAddDish({
   return (
     <div className="relative mt-1">
       <div className="flex items-center gap-1.5 rounded-lg border border-orange-300/60 bg-white dark:bg-stone-900 dark:border-orange-600/40 px-2.5 py-1.5 shadow-xs">
-        <Search className="h-3.5 w-3.5 text-stone-400 shrink-0" />
+        <Search className="h-3.5 w-3.5 text-stone-500 shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -205,14 +205,14 @@ function InlineAddDish({
           placeholder="Type recipe name…"
           className="flex-1 bg-transparent text-sm font-medium text-stone-800 placeholder:text-stone-400 outline-hidden dark:text-stone-200 min-w-0"
         />
-        <button onClick={onClose} className="shrink-0 rounded-full p-0.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300">
+        <button onClick={onClose} className="shrink-0 rounded-full p-0.5 text-stone-500 hover:text-stone-600 dark:hover:text-stone-300">
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
       {query && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-40 overflow-y-auto rounded-xl border border-stone-200 bg-white shadow-lg dark:border-stone-700 dark:bg-stone-900 scrollbar-hide">
           {filtered.length === 0 ? (
-            <p className="px-3 py-2 text-xs text-stone-400">No recipes found</p>
+            <p className="px-3 py-2 text-xs text-stone-500">No recipes found</p>
           ) : (
             filtered.map((d) => (
               <button
@@ -283,7 +283,7 @@ function DroppableSlot({
           </SortableContext>
         ) : !showInlineAdd ? (
           <div className="relative z-10 flex h-full items-center justify-center opacity-0 transition-opacity group-hover/slot:opacity-100">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+            <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">
               Drop here
             </span>
           </div>
@@ -305,7 +305,7 @@ function DroppableSlot({
               <button
                 type="button"
                 onClick={() => setShowInlineAdd(true)}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-400 opacity-0 transition-all hover:bg-orange-50 hover:text-orange-600 group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-500"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-500 opacity-0 transition-all hover:bg-orange-50 hover:text-orange-600 group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-400"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add
@@ -724,7 +724,7 @@ export default function PlanPage() {
               </h3>
               
               <div className="relative max-w-xs flex-1 transition-all focus-within:max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
                 <input
                   type="text"
                   placeholder="Search recipes..."
@@ -735,7 +735,7 @@ export default function PlanPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
                   >
                     <X className="h-3 w-3" strokeWidth={3} />
                   </button>
@@ -773,7 +773,7 @@ export default function PlanPage() {
                   onClick={() => setDietFilter(diet)}
                   className={`px-3 py-1.5 text-[13px] font-bold rounded-full transition-all active:scale-[0.98] ${
                     dietFilter === diet 
-                      ? diet === "Veg" ? "bg-emerald-500 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
+                      ? diet === "Veg" ? "bg-emerald-600 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
                       : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
                   }`}
                 >
@@ -907,7 +907,7 @@ export default function PlanPage() {
                 <h4 className="text-2xl font-extrabold tracking-tight">
                   {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long" })}
                 </h4>
-                <p className="text-[13px] font-semibold text-stone-400 dark:text-stone-500 mb-1">
+                <p className="text-[13px] font-semibold text-stone-500 dark:text-stone-400 mb-1">
                   {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
                 </p>
               </div>
@@ -920,7 +920,7 @@ export default function PlanPage() {
 
                  return (
                    <div key={slot} className="flex gap-3">
-                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-400 dark:text-stone-500 ring-stone-200/80 dark:ring-stone-700/80'} shadow-xs mt-0.5`}>
+                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-500 dark:text-stone-400 ring-stone-200/80 dark:ring-stone-700/80'} shadow-xs mt-0.5`}>
                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
                      </div>
                      
@@ -944,7 +944,7 @@ export default function PlanPage() {
                                  <span
                                    className={`truncate text-[15px] font-bold tracking-tight ${
                                      isPrepared
-                                       ? "text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600"
+                                       ? "text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600"
                                        : "text-stone-800 dark:text-stone-200"
                                    }`}
                                  >
@@ -962,7 +962,7 @@ export default function PlanPage() {
                                    <button
                                      type="button"
                                      onClick={() => removeDishFromSlot(entry.id)}
-                                     className="shrink-0 -mr-1.5 rounded-full p-1.5 text-stone-400 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
+                                     className="shrink-0 -mr-2.5 flex h-11 w-11 items-center justify-center rounded-full text-stone-500 transition-all hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-red-500 active:scale-95"
                                      aria-label="Remove recipe"
                                    >
                                      <X className="h-4 w-4" strokeWidth={2.5} />
@@ -1025,7 +1025,8 @@ export default function PlanPage() {
                    setActiveFilter("All");
                    setMobileSlotOpen(null);
                  }} 
-                 className="rounded-full bg-stone-200/80 p-2 text-stone-600 hover:bg-stone-300 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors shrink-0"
+                 aria-label="Close"
+                 className="flex h-11 w-11 items-center justify-center rounded-full bg-stone-200/80 text-stone-600 hover:bg-stone-300 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors shrink-0"
               >
                 <X className="h-5 w-5" strokeWidth={3} />
               </button>
@@ -1034,9 +1035,12 @@ export default function PlanPage() {
             {/* Sticky Search & Filter Header */}
             <div className="px-6 pb-2 sticky top-0 z-10 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-xl pt-2">
                <div className="relative mb-3">
-                  <Search className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" strokeWidth={2.5} />
+                  <Search className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-500" strokeWidth={2.5} />
                   <input
-                    type="text"
+                    type="search"
+                    aria-label="Search recipes"
+                    enterKeyHint="search"
+                    autoComplete="off"
                     placeholder="Search recipes..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -1045,7 +1049,8 @@ export default function PlanPage() {
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-300 p-1 text-stone-600 dark:bg-stone-700 dark:text-stone-300"
+                      aria-label="Clear search"
+                      className="tap absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-300 p-1 text-stone-600 dark:bg-stone-700 dark:text-stone-300"
                     >
                       <X className="h-3 w-3" strokeWidth={3} />
                     </button>
@@ -1059,9 +1064,9 @@ export default function PlanPage() {
                      <button
                        key={diet}
                        onClick={() => setDietFilter(diet)}
-                       className={`flex-1 px-3 py-2 text-[14px] font-bold rounded-full transition-all active:scale-[0.98] ${
+                       className={`flex-1 min-h-11 px-3 text-[14px] font-bold rounded-full transition-all active:scale-[0.98] ${
                          dietFilter === diet 
-                           ? diet === "Veg" ? "bg-emerald-500 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
+                           ? diet === "Veg" ? "bg-emerald-600 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
                            : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
                        }`}
                      >
@@ -1074,10 +1079,10 @@ export default function PlanPage() {
                      <button
                        key={f}
                        onClick={() => setActiveFilter(f)}
-                       className={`shrink-0 rounded-full px-4 py-1.5 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
+                       className={`shrink-0 min-h-11 rounded-full px-4 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
                          activeFilter === f
                            ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-xs"
-                           : "bg-transparent border-stone-200/60 text-stone-500 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:border-stone-600/80"
+                           : "bg-transparent border-stone-200/60 text-stone-600 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:border-stone-600/80"
                        }`}
                      >
                        {f}
@@ -1090,12 +1095,12 @@ export default function PlanPage() {
             <div className="flex-1 overflow-y-auto px-6 pb-12 space-y-2.5 scrollbar-hide">
               {dishes.length === 0 ? (
                  <div className="flex flex-col items-center justify-center py-12 opacity-70">
-                    <Utensils className="h-12 w-12 text-stone-300 dark:text-stone-600 mb-4" />
+                    <Utensils className="h-12 w-12 text-stone-300 dark:text-stone-400 mb-4" />
                     <p className="text-[17px] font-bold text-stone-500 dark:text-stone-400">No recipes available.</p>
                  </div>
               ) : filteredDishes.length === 0 ? (
                  <div className="flex flex-col items-center justify-center py-12 opacity-70">
-                    <Search className="h-12 w-12 text-stone-300 dark:text-stone-600 mb-4" strokeWidth={2} />
+                    <Search className="h-12 w-12 text-stone-300 dark:text-stone-400 mb-4" strokeWidth={2} />
                     <p className="text-[17px] font-bold text-stone-500 dark:text-stone-400">No recipes found.</p>
                  </div>
               ) : (
@@ -1111,7 +1116,7 @@ export default function PlanPage() {
                      className="group flex w-full items-center justify-between gap-4 rounded-3xl border-none bg-white px-5 py-4 text-left shadow-xs active:scale-[0.97] active:bg-orange-50 transition-all dark:bg-stone-900 dark:active:bg-orange-950/40"
                    >
                      <span className="truncate text-[17px] font-bold tracking-tight text-stone-800 dark:text-stone-200 group-active:text-orange-700 dark:group-active:text-orange-400">{dish.name}</span>
-                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-5 w-5" strokeWidth={3} /></div>
+                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-5 w-5" strokeWidth={3} /></div>
                    </button>
                  ))
               )}

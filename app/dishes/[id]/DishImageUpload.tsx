@@ -87,7 +87,7 @@ export function DishImageUpload({
           ) : (
             <div className="flex flex-col items-center gap-3 transition-transform group-hover:scale-105">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-xs dark:bg-stone-800">
-                <ImagePlus className="h-8 w-8 text-stone-400 group-hover:text-orange-500 transition-colors" />
+                <ImagePlus className="h-8 w-8 text-stone-500 group-hover:text-orange-500 transition-colors" />
               </div>
               <div>
                 <span className="block text-base font-semibold text-stone-700 dark:text-stone-200 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">

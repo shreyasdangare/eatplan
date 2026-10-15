@@ -119,7 +119,7 @@ export async function WeeklyPlanOverview() {
               className={`relative flex flex-col overflow-hidden rounded-4xl glass-panel transition-all duration-300 hover:shadow-xl ${
                 dayData.isToday
                   ? "bg-white/80 dark:bg-stone-800/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] ring-1 ring-orange-500/30 dark:ring-orange-500/40"
-                  : "bg-white/40 dark:bg-stone-800/40 shadow-xs border border-stone-200/50 dark:border-stone-700/50 opacity-95 hover:opacity-100"
+                  : "bg-white/40 dark:bg-stone-800/40 shadow-xs border border-stone-200/50 dark:border-stone-700/50"
               }`}
             >
               {/* Card Header */}
@@ -166,12 +166,12 @@ export async function WeeklyPlanOverview() {
                           </div>
                           
                           <div className="relative z-10 flex min-w-0 flex-1 flex-col pb-0.5">
-                            <span className={`truncate text-[15px] font-semibold tracking-tight ${isPrepared ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-900 dark:text-stone-100'}`}>
+                            <span className={`truncate text-[15px] font-semibold tracking-tight ${isPrepared ? 'text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600' : 'text-stone-900 dark:text-stone-100'}`}>
                               <Link href={`/dishes/${entry.dishes.id}`} className="hover:underline hover:text-orange-600 dark:hover:text-orange-400">
                                 {dishName}
                               </Link>
                             </span>
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 mt-0.5">
+                            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mt-0.5">
                               {slot}
                             </span>
                           </div>
@@ -189,13 +189,13 @@ export async function WeeklyPlanOverview() {
                     })}
                   </div>
                 ) : (
-                  <div className="flex flex-1 min-h-[140px] flex-col items-center justify-center gap-3 rounded-3xl bg-stone-50/50 dark:bg-stone-900/30 border border-dashed border-stone-200/80 dark:border-stone-700/80 text-center opacity-80 hover:opacity-100 transition-opacity">
+                  <div className="flex flex-1 min-h-[140px] flex-col items-center justify-center gap-3 rounded-3xl bg-stone-50/50 dark:bg-stone-900/30 border border-dashed border-stone-200/80 dark:border-stone-700/80 text-center">
                     <div className="rounded-2xl bg-white p-3 shadow-xs ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50">
-                      <CalendarPlus className="h-5 w-5 text-stone-400 dark:text-stone-500" strokeWidth={2.5} />
+                      <CalendarPlus className="h-5 w-5 text-stone-500 dark:text-stone-400" strokeWidth={2.5} />
                     </div>
                     <div>
                       <p className="text-[13px] font-semibold text-stone-600 dark:text-stone-300">Nothing planned</p>
-                      <a href={`/plan?date=${dayData.dateStr}`} className="mt-1 inline-block text-[11px] font-bold uppercase tracking-wider text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 active:scale-95 transition-transform">
+                      <a href={`/plan?date=${dayData.dateStr}`} className="mt-1 inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold text-orange-700 bg-orange-50 dark:bg-orange-500/10 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 active:scale-95 transition-transform">
                         Add a meal →
                       </a>
                     </div>

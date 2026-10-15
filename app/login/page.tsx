@@ -135,7 +135,7 @@ function LoginForm() {
 
       <div className="flex items-center gap-4">
         <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
-        <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">or</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">or</span>
         <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
       </div>
 
@@ -214,7 +214,7 @@ function LoginForm() {
       </form>
       <p className="text-center text-sm text-stone-600 dark:text-stone-400">
         Don&apos;t have an account?{" "}
-        <Link href={`/signup?next=${encodeURIComponent(next)}`} className="text-orange-700 hover:underline dark:text-orange-400">
+        <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-semibold text-orange-700 underline underline-offset-2 dark:text-orange-400">
           Sign up
         </Link>
       </p>

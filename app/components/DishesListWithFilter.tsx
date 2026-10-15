@@ -83,18 +83,21 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
         {/* Top Row: Search and Actions */}
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative max-w-md flex-1 transition-all focus-within:max-w-lg">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
             <input
-              type="text"
+              type="search"
               placeholder="Search recipes..."
+              aria-label="Search recipes"
+              enterKeyHint="search"
+              autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2.5 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
+              className="min-h-12 w-full rounded-full border border-stone-200/60 bg-stone-100/50 pl-9 pr-11 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                className="absolute right-0.5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
                 aria-label="Clear search"
               >
                 <X className="h-3 w-3" strokeWidth={3} />
@@ -113,9 +116,9 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
           <button
             type="button"
             onClick={() => setShowFavoritesOnly((v) => !v)}
-            className={`group flex min-h-[40px] items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition-all ${
+            className={`group flex min-h-11 items-center gap-2 rounded-full border px-4 py-1.5 font-semibold transition-all ${
               showFavoritesOnly
-                ? "border-rose-500 bg-rose-500 text-white shadow-md dark:border-rose-600 dark:bg-rose-600"
+                ? "border-rose-500 bg-rose-600 text-white shadow-md dark:border-rose-600 dark:bg-rose-600"
                 : "border-stone-200/50 bg-white/50 text-stone-600 hover:bg-rose-50 hover:text-rose-600 active:scale-95 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:bg-rose-900/30 dark:hover:text-rose-400"
             }`}
           >
@@ -134,7 +137,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                 onClick={() => setDietFilter(diet)}
                 className={`px-3 py-1.5 text-[13px] font-bold rounded-full transition-all active:scale-[0.98] ${
                   dietFilter === diet 
-                    ? diet === "Veg" ? "bg-emerald-500 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
+                    ? diet === "Veg" ? "bg-emerald-600 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
                     : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
                 }`}
               >
@@ -152,7 +155,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`shrink-0 min-h-[40px] rounded-full border px-4 py-1.5 text-sm font-medium transition-all active:scale-95 ${
+                className={`shrink-0 min-h-11 rounded-full border px-4 py-1.5 text-sm font-medium transition-all active:scale-95 ${
                   selectedTags.has(tag)
                     ? "border-stone-800 bg-stone-800 text-white shadow-md dark:border-stone-200 dark:bg-stone-200 dark:text-stone-900"
                     : "border-stone-200/50 bg-white/50 text-stone-600 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:border-stone-600 dark:hover:bg-stone-700 dark:hover:text-stone-100"
@@ -172,7 +175,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                 setDietFilter(defaultVegOnly ? "Veg" : "Both");
                 setSearchQuery("");
               }}
-              className="flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-500 hover:bg-stone-200/50 hover:text-stone-800 active:scale-95 transition-all dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:text-stone-200"
+              className="flex min-h-11 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-stone-500 hover:bg-stone-200/50 hover:text-stone-800 active:scale-95 transition-all dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:text-stone-200"
             >
               <X size={16} />
               Clear
@@ -194,7 +197,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                 setSelectedTags(new Set());
                 setShowFavoritesOnly(false);
               }}
-              className="mt-3 font-semibold text-orange-600 hover:underline dark:text-orange-400"
+              className="mt-3 min-h-11 px-4 font-semibold text-orange-700 hover:underline dark:text-orange-400"
             >
               Clear filters
             </button>
@@ -215,7 +218,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                       className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/card:scale-110"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-stone-300 transition-transform duration-500 group-hover/card:scale-110 dark:text-stone-600">
+                    <div className="flex h-full w-full items-center justify-center text-stone-300 transition-transform duration-500 group-hover/card:scale-110 dark:text-stone-400">
                       <UtensilsCrossed size={48} strokeWidth={1.5} />
                     </div>
                   )}
