@@ -95,3 +95,12 @@ Every phase is its own commit, so revert that commit. The migrations include rol
   - Pages that still need a manual look: /recipes, /dishes/[id] (plus edit, new, cook), /plan, /shopping-list, /pantry, /what-can-i-cook, /admin, /settings/household, /settings/feedback.
 - **ESLint 10**: blocked. `eslint-plugin-react` (pulled in by `eslint-config-next`) only declares support up to ESLint 9.
 - **TypeScript 7**: blocked. `typescript-eslint` requires `typescript <6.1`.
+- **Tailwind 4 visual review (2026-10-15):** compared all pages at 390px and 1280px in light and dark mode against prod (TW3), using pixel diffs plus a manual look. Compat fixes in `app/globals.css`:
+  - v3 placeholder color and `cursor: pointer` on buttons;
+  - v3 absolute line-heights for `text-*`, which fixes 16px inputs/textareas growing about 3px;
+  - v3 `space-y` semantics, which fixes the /plan offset on mobile;
+  - `glass-panel` emitted after core utilities, so it wins conflicts as in v3.
+
+  Remaining diffs are intentional or improvements:
+  - textareas now actually get the 16px anti-iOS-zoom font size;
+  - hover styles no longer stick after a tap on touch devices.
