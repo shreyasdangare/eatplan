@@ -161,3 +161,26 @@ textarea {
   stroke-dashoffset: 24;
   animation: buy-checkmark 350ms ease-out 50ms forwards;
 }
+
+/* Tailwind v3 space-y semantics. v4 changed space-y-* from "margin-top on every child except
+   the first" to "margin-bottom on every child except the last". That shifted layouts whose
+   first/last children are display:none (e.g. desktop-only blocks on /plan). Neutralise the v4
+   margin with zero specificity (children's own mb-* still win), then re-apply the v3 rule.
+   Values = the space-y-* sizes used in app/. Add new ones here or prefer flex + gap. */
+@layer utilities {
+  :where([class*="space-y-"] > :not(:last-child)) { margin-bottom: 0; }
+  .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 1); }
+  .space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 1.5); }
+  .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 2); }
+  .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 2.5); }
+  .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 3); }
+  .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 4); }
+  .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 5); }
+  .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 6); }
+  .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 8); }
+  .space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 10); }
+  .space-y-12 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 12); }
+  @media (width >= 64rem) {
+    .lg\:space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 10); }
+  }
+}
