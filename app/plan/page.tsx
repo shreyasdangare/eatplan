@@ -1,4 +1,5 @@
 "use client";
+import { imageVariant } from "@/lib/imageSrc";
 
 import {
   DndContext,
@@ -1297,7 +1298,7 @@ export default function PlanPage() {
                     >
                       {dish.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element -- tiny thumbnail
-                        <img src={dish.image_url} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-xl object-cover" />
+                        <img src={imageVariant(dish.image_url, 250) ?? dish.image_url} alt="" loading="lazy" decoding="async" className="h-11 w-11 shrink-0 rounded-xl object-cover" />
                       ) : (
                         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-stone-200 text-stone-500 dark:bg-stone-700 dark:text-stone-300">
                           <Utensils className="h-5 w-5" aria-hidden />

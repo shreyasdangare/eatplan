@@ -1,4 +1,5 @@
 "use client";
+import { responsiveImage } from "@/lib/imageSrc";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -52,7 +53,10 @@ export function DishImageUpload({
       {imageUrl ? (
         <div className={wrapperClass}>
           <img
-            src={imageUrl}
+            {...responsiveImage(imageUrl)}
+            sizes="(min-width: 768px) 768px, 100vw"
+            fetchPriority="high"
+            decoding="async"
             alt="Dish"
             className={imageClass}
           />

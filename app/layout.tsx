@@ -11,6 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { MobileNav } from "./components/MobileNav";
 import { Toaster } from "./components/ui/Toast";
+import { ServiceWorker } from "./components/ServiceWorker";
 import { getSession } from "@/lib/supabaseServerClient";
 import { getTranslatedTagline } from "@/lib/taglines";
 
@@ -111,6 +112,7 @@ export default async function RootLayout({
             <main id="main" className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-8 min-h-0 lg:pb-12">{children}</main>
             <MobileNav />
             <Toaster />
+            <ServiceWorker />
           </div>
         </ThemeProvider>
         <SpeedInsights />
