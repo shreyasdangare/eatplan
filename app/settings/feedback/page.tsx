@@ -62,7 +62,7 @@ export default function FeedbackPage() {
         </p>
       </div>
 
-      <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-sm">
+      <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs">
         <form onSubmit={submitFeedback} className="space-y-4">
            <div>
              <label htmlFor="feedback_message" className="mb-2 block text-sm font-semibold text-stone-700 dark:text-stone-300">
@@ -75,7 +75,7 @@ export default function FeedbackPage() {
                placeholder="What's on your mind? Did you encounter an issue? Any feature requests?"
                required
                rows={6}
-               className="w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm shadow-inner focus:outline-none focus:ring-2 focus:border-orange-500 focus:ring-orange-500/20 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 transition-all placeholder:text-stone-400"
+               className="w-full resize-none rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm shadow-inner focus:outline-hidden focus:ring-2 focus:border-orange-500 focus:ring-orange-500/20 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 transition-all placeholder:text-stone-400"
              />
            </div>
            

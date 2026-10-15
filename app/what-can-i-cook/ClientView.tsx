@@ -131,7 +131,7 @@ export function WhatCanICookClient() {
         <button
           type="submit"
           disabled={loading || selected.length === 0}
-          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-sm disabled:opacity-50 hover:bg-lime-400 dark:bg-lime-600 dark:hover:bg-lime-500"
+          className="w-full rounded-full bg-lime-500 px-4 py-2 text-sm font-semibold text-lime-950 shadow-xs disabled:opacity-50 hover:bg-lime-400 dark:bg-lime-600 dark:hover:bg-lime-500"
         >
           {loading ? "Finding dishes…" : "Find dishes"}
         </button>

@@ -29,7 +29,7 @@ async function DishesList() {
       console.error("[recipes] Supabase dishes error:", error);
     }
     return (
-      <div className="space-y-2 rounded-[2rem] border border-red-200 bg-red-50/80 p-6 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
+      <div className="space-y-2 rounded-4xl border border-red-200 bg-red-50/80 p-6 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
         <p className="font-semibold text-base">Failed to load dishes. Please try again.</p>
         {process.env.NODE_ENV === "development" && (
           <p className="font-mono text-xs text-red-600 dark:text-red-400">{message}</p>
@@ -56,9 +56,9 @@ export default function RecipesPage() {
       
       <Suspense fallback={
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="aspect-[4/3] animate-pulse rounded-[2rem] bg-stone-200/50 dark:bg-stone-800/50" />
-          <div className="aspect-[4/3] animate-pulse rounded-[2rem] bg-stone-200/50 dark:bg-stone-800/50 hidden sm:block" />
-          <div className="aspect-[4/3] animate-pulse rounded-[2rem] bg-stone-200/50 dark:bg-stone-800/50 hidden lg:block" />
+          <div className="aspect-4/3 animate-pulse rounded-4xl bg-stone-200/50 dark:bg-stone-800/50" />
+          <div className="aspect-4/3 animate-pulse rounded-4xl bg-stone-200/50 dark:bg-stone-800/50 hidden sm:block" />
+          <div className="aspect-4/3 animate-pulse rounded-4xl bg-stone-200/50 dark:bg-stone-800/50 hidden lg:block" />
         </div>
       }>
         <DishesList />

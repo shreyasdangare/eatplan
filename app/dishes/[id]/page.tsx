@@ -81,19 +81,19 @@ export default async function DishDetailPage({ params }: PageProps) {
 
       {/* Hero – content scrolls over this */}
       <div className="relative -mx-4 sm:-mx-6 lg:-mx-8">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-200 dark:bg-stone-800 sm:aspect-[21/9]">
+        <div className="relative aspect-4/3 w-full overflow-hidden bg-stone-200 dark:bg-stone-800 sm:aspect-21/9">
           <DishImageUpload
             dishId={dish.id as string}
             imageUrl={imageUrl}
             variant="hero"
           />
           {/* Subtle gradient overlay for the overlapping header */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" aria-hidden />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/60 to-transparent pointer-events-none" aria-hidden />
         </div>
 
         {/* Overlapping Header Card */}
         <div className="px-4 sm:px-8 lg:px-12 relative z-10 -mt-20 sm:-mt-28">
-          <div className="flex flex-col gap-6 rounded-[2rem] glass-panel p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl">
+          <div className="flex flex-col gap-6 rounded-4xl glass-panel p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {dish.meal_type && (
@@ -104,7 +104,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                 {dish.tags && dish.tags.length > 0 && dish.tags.map((tag: string) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-stone-200/50 bg-white/50 px-3 py-1 text-xs font-semibold text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 backdrop-blur-sm"
+                    className="rounded-full border border-stone-200/50 bg-white/50 px-3 py-1 text-xs font-semibold text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 backdrop-blur-xs"
                   >
                     {tag}
                   </span>
@@ -152,7 +152,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <Pencil className="h-4 w-4" />
                   <span>Edit</span>
                 </Link>
-                <div className="shrink-0 flex items-center justify-center rounded-full bg-white/50 p-2 shadow-sm border border-stone-200/50 dark:bg-stone-800/50 dark:border-stone-700/50">
+                <div className="shrink-0 flex items-center justify-center rounded-full bg-white/50 p-2 shadow-xs border border-stone-200/50 dark:bg-stone-800/50 dark:border-stone-700/50">
                   <DeleteDishButton id={dish.id as string} />
                 </div>
               </div>
@@ -210,11 +210,11 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <h2 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
                     Instructions
                   </h2>
-                  <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-700" />
+                  <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-700" />
                 </div>
                 <div className="prose prose-stone dark:prose-invert prose-lg max-w-none text-stone-700 dark:text-stone-300 leading-relaxed font-medium">
                   {/* Here we might assume instructions could be markdown later, but for now we just render pre-line text nicely */}
-                  <div className="rounded-[2rem] glass-panel p-6 sm:p-8 shadow-sm space-y-4">
+                  <div className="rounded-4xl glass-panel p-6 sm:p-8 shadow-xs space-y-4">
                     {instructions.split('\n').filter(line => line.trim() !== '').map((line, idx) => (
                       <p key={idx} className="text-stone-700 dark:text-stone-300">
                         {line}
@@ -229,9 +229,9 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <h2 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
                     Instructions
                   </h2>
-                  <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-700" />
+                  <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-700" />
                 </div>
-                <div className="rounded-[2rem] border border-dashed border-stone-300 bg-stone-50/50 p-8 text-center dark:border-stone-700 dark:bg-stone-800/30">
+                <div className="rounded-4xl border border-dashed border-stone-300 bg-stone-50/50 p-8 text-center dark:border-stone-700 dark:bg-stone-800/30">
                   <p className="text-stone-500 dark:text-stone-400 font-medium">No instructions provided.</p>
                   <Link href={`/dishes/${dish.id}/edit`} className="mt-2 inline-block font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
                     Add instructions →

@@ -30,7 +30,7 @@ export function AddRecipeDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white p-1.5 shadow-2xl ring-1 ring-black/5 focus:outline-none dark:bg-stone-800 dark:ring-white/10 z-50 animate-in fade-in slide-in-from-top-2">
+        <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white p-1.5 shadow-2xl ring-1 ring-black/5 focus:outline-hidden dark:bg-stone-800 dark:ring-white/10 z-50 animate-in fade-in slide-in-from-top-2">
           <div className="py-1 space-y-1">
             <Link
               href="/dishes/new?mode=magic"

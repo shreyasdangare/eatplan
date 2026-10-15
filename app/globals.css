@@ -1,6 +1,63 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Tailwind v3 used absolute (rem) line-heights for text-* sizes; v4 uses ratios relative to
+   the font size. Elements that override font-size (e.g. 16px inputs to stop iOS zoom) grew
+   taller under v4, so pin the v3 values. */
+@theme {
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+}
+
+/* Tailwind v3 compatibility (see https://tailwindcss.com/docs/upgrade-guide):
+   v4 sets buttons to cursor:default and placeholders to currentColor at 50% opacity. */
+@layer base {
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+
+/* Plain selector (the upgrade tool turned this into a `dark` utility, which only
+   emits when the class name is detected in source). */
+@layer base {
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-stone-700/80 border-transparent bg-clip-padding;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-stone-600;
+  }
+}
 
 @layer base {
   body {
@@ -12,19 +69,17 @@
   }
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-}
-
-/* The original body styles are replaced by the @layer base block */
-/* The original .dark body styles are replaced by the @layer base block */
-
 @layer utilities {
-  .glass-panel {
-    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
+  /* The original body styles are replaced by the @layer base block */
+  /* The original .dark body styles are replaced by the @layer base block */
+}
+
+@layer utilities {
   /* Custom Premium Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
@@ -36,11 +91,7 @@ html {
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-stone-300/80 rounded-full border-[2px] border-solid border-transparent bg-clip-padding hover:bg-stone-400 dark:bg-stone-700/80 dark:hover:bg-stone-500;
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    @apply bg-stone-700/80 border-transparent bg-clip-padding hover:bg-stone-600;
+    @apply bg-stone-300/80 rounded-full border-2 border-solid border-transparent bg-clip-padding hover:bg-stone-400 dark:bg-stone-700/80 dark:hover:bg-stone-500;
   }
 
   /* Remove arrows from number inputs */
@@ -106,4 +157,37 @@ textarea {
   stroke-dasharray: 24;
   stroke-dashoffset: 24;
   animation: buy-checkmark 350ms ease-out 50ms forwards;
+}
+
+/* Tailwind v3 space-y semantics. v4 changed space-y-* from "margin-top on every child except
+   the first" to "margin-bottom on every child except the last". That shifted layouts whose
+   first/last children are display:none (e.g. desktop-only blocks on /plan). Neutralise the v4
+   margin with zero specificity (children's own mb-* still win), then re-apply the v3 rule.
+   Values = the space-y-* sizes used in app/. Add new ones here or prefer flex + gap. */
+@layer utilities {
+  :where([class*="space-y-"] > :not(:last-child)) { margin-bottom: 0; }
+  .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 1); }
+  .space-y-1\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 1.5); }
+  .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 2); }
+  .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 2.5); }
+  .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 3); }
+  .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 4); }
+  .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 5); }
+  .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 6); }
+  .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 8); }
+  .space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 10); }
+  .space-y-12 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 12); }
+  @media (width >= 64rem) {
+    .lg\:space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 10); }
+  }
+}
+
+/* glass-panel as a plain class in the utilities layer (not @utility), so it is emitted after
+   Tailwind's generated utilities and wins conflicts (bg/shadow/border/blur) the way it did
+   in v3. As an @utility, v4 sorted it before core utilities, so e.g. shadow-2xl and bg-white/80
+   on the dish detail card started overriding it. */
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
+  }
 }

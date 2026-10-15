@@ -90,7 +90,7 @@ export default function HouseholdSettings() {
 
       <div className="space-y-8">
         {/* Current Household Info */}
-        <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-sm ring-1 ring-stone-200/50 dark:ring-stone-700/50">
+        <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
           <h2 className="text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-6">
             Your Household
           </h2>
@@ -136,7 +136,7 @@ export default function HouseholdSettings() {
         </section>
 
         {/* Join Household */}
-        <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-sm ring-1 ring-stone-200/50 dark:ring-stone-700/50">
+        <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-2">
             <LinkIcon className="h-5 w-5 text-stone-400" /> Join Existing Household
           </h2>
@@ -151,13 +151,13 @@ export default function HouseholdSettings() {
                value={joinCode}
                onChange={(e) => setJoinCode(e.target.value)}
                placeholder="Paste household code here..."
-               className="flex-1 rounded-2xl border-0 bg-white px-4 py-3.5 text-sm ring-1 ring-inset ring-stone-200 placeholder:text-stone-400 focus:ring-2 focus:ring-inset focus:ring-orange-500 dark:bg-stone-900 dark:text-white dark:ring-stone-700 dark:focus:ring-orange-500 shadow-sm"
+               className="flex-1 rounded-2xl border-0 bg-white px-4 py-3.5 text-sm ring-1 ring-inset ring-stone-200 placeholder:text-stone-400 focus:ring-2 focus:ring-inset focus:ring-orange-500 dark:bg-stone-900 dark:text-white dark:ring-stone-700 dark:focus:ring-orange-500 shadow-xs"
                required
              />
              <button
                type="submit"
                disabled={joining}
-               className="rounded-2xl bg-stone-900 px-6 py-3.5 text-sm font-semibold text-white shadow-sm hover:bg-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+               className="rounded-2xl bg-stone-900 px-6 py-3.5 text-sm font-semibold text-white shadow-xs hover:bg-stone-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
              >
                {joining ? "Joining..." : "Join"}
              </button>

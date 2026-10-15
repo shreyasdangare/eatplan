@@ -44,7 +44,7 @@ export function PortionScaling({
   return (
     <section className="space-y-6">
       {/* Slider */}
-      <div className="rounded-[2rem] glass-panel p-6 shadow-sm">
+      <div className="rounded-4xl glass-panel p-6 shadow-xs">
         <div className="flex items-center gap-3 mb-4">
            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-stone-800 dark:text-orange-500">
              <Scale className="h-5 w-5" />
@@ -69,7 +69,7 @@ export function PortionScaling({
             className="flex-1 h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer dark:bg-stone-700 accent-orange-500 hover:accent-orange-600 transition-all"
             aria-label="Adjust servings"
           />
-          <div className="flex shrink-0 min-w-[3rem] items-center justify-center rounded-xl bg-stone-100 px-3 py-1.5 font-mono text-lg font-bold text-stone-800 dark:bg-stone-800 dark:text-stone-200">
+          <div className="flex shrink-0 min-w-12 items-center justify-center rounded-xl bg-stone-100 px-3 py-1.5 font-mono text-lg font-bold text-stone-800 dark:bg-stone-800 dark:text-stone-200">
             {desired}
           </div>
         </div>
@@ -97,7 +97,7 @@ function IngredientList({
             <h2 className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
               Ingredients
             </h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-700" />
+            <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-700" />
           </div>
           <ul className="flex flex-col gap-2">
             {required.map((di) => (
@@ -123,7 +123,7 @@ function IngredientList({
             <h2 className="text-lg font-bold tracking-tight text-stone-500 dark:text-stone-400">
               Optional
             </h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-stone-200 to-transparent dark:from-stone-800" />
+            <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-800" />
           </div>
           <ul className="flex flex-col gap-2">
             {optional.map((di) => (

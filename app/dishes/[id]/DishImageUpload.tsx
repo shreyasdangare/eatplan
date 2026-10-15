@@ -44,7 +44,7 @@ export function DishImageUpload({
   const isHero = variant === "hero";
   const imageClass = isHero
     ? "h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-    : "h-48 w-full rounded-[2rem] object-cover shadow-sm transition-transform duration-500 hover:scale-[1.02]";
+    : "h-48 w-full rounded-4xl object-cover shadow-xs transition-transform duration-500 hover:scale-[1.02]";
   const wrapperClass = isHero ? "relative h-full w-full group overflow-hidden" : "relative group";
 
   return (
@@ -76,7 +76,7 @@ export function DishImageUpload({
           className={
             isHero
               ? "group flex h-full min-h-[300px] w-full cursor-pointer flex-col items-center justify-center bg-stone-100/50 p-6 text-center text-stone-500 transition-all hover:bg-stone-200/50 dark:bg-stone-800/50 dark:text-stone-400 dark:hover:bg-stone-700/50"
-              : "group flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-[2rem] border-2 border-dashed border-stone-300 bg-stone-50/50 p-6 text-center transition-all hover:border-orange-400 hover:bg-orange-50 dark:border-stone-700 dark:bg-stone-900/30 dark:hover:border-orange-500 dark:hover:bg-stone-800/50"
+              : "group flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-4xl border-2 border-dashed border-stone-300 bg-stone-50/50 p-6 text-center transition-all hover:border-orange-400 hover:bg-orange-50 dark:border-stone-700 dark:bg-stone-900/30 dark:hover:border-orange-500 dark:hover:bg-stone-800/50"
           }
         >
           {uploading ? (
@@ -86,7 +86,7 @@ export function DishImageUpload({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 transition-transform group-hover:scale-105">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm dark:bg-stone-800">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-xs dark:bg-stone-800">
                 <ImagePlus className="h-8 w-8 text-stone-400 group-hover:text-orange-500 transition-colors" />
               </div>
               <div>

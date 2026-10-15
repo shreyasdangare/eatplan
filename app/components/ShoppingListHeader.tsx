@@ -107,7 +107,7 @@ export function ShoppingListHeader({
         <div className="flex items-center gap-1.5">
           <Link
             href="/"
-            className="rounded-full bg-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
+            className="rounded-full bg-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-xs hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
           >
             Home
           </Link>

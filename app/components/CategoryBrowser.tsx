@@ -91,7 +91,7 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
                         key={ing.id}
                         type="button"
                         onClick={() => onAddItem({ ingredient_id: ing.id })}
-                        className="rounded border border-orange-200 bg-white px-1.5 py-0.5 text-[11px] text-amber-900 hover:bg-orange-100 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+                        className="rounded-sm border border-orange-200 bg-white px-1.5 py-0.5 text-[11px] text-amber-900 hover:bg-orange-100 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
                       >
                         {ing.name}
                       </button>

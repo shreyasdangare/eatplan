@@ -47,7 +47,7 @@ export default async function RootLayout({
           <Suspense fallback={null}>
             <AuthCodeExchange />
           </Suspense>
-          <div className="mx-auto flex min-h-[100dvh] min-w-0 max-w-4xl flex-col px-4 py-3 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
+          <div className="mx-auto flex min-h-dvh min-w-0 max-w-4xl flex-col px-4 py-3 sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
             <header className="relative z-50 mb-4 sm:mb-6 rounded-2xl glass-panel px-3 py-2 sm:px-4 sm:py-3 sticky top-2 sm:mb-8 lg:mb-10 transition-all duration-300">
               <div className="flex items-center justify-between gap-2">
                 <HeaderTitle tagline={tagline} />

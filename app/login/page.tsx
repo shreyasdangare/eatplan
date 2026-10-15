@@ -122,7 +122,7 @@ function LoginForm() {
         type="button"
         onClick={handleGoogleSignIn}
         disabled={googleLoading}
-        className="flex w-full min-h-[44px] items-center justify-center gap-3 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-sm transition hover:bg-stone-50 active:scale-[0.98] disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700"
+        className="flex w-full min-h-[44px] items-center justify-center gap-3 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-xs transition hover:bg-stone-50 active:scale-[0.98] disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -151,7 +151,7 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>
         <div>
@@ -165,7 +165,7 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>
         {error && (
@@ -194,7 +194,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full min-h-[44px] rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800 active:opacity-90 disabled:opacity-50 dark:bg-stone-700 dark:hover:bg-stone-600"
+          className="w-full min-h-[44px] rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white shadow-xs transition hover:bg-stone-800 active:opacity-90 disabled:opacity-50 dark:bg-stone-700 dark:hover:bg-stone-600"
         >
           {loading ? "Signing in…" : "Log in"}
         </button>
@@ -206,7 +206,7 @@ function LoginForm() {
               setEmail("test@eatplan.com");
               setPassword("tester");
             }}
-            className="w-full min-h-[44px] rounded-xl bg-orange-100 px-4 py-3 text-sm font-medium text-orange-900 shadow-sm transition hover:bg-orange-200 active:opacity-90 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/60 mt-2"
+            className="w-full min-h-[44px] rounded-xl bg-orange-100 px-4 py-3 text-sm font-medium text-orange-900 shadow-xs transition hover:bg-orange-200 active:opacity-90 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/60 mt-2"
           >
             Bypass Login (Test User)
           </button>

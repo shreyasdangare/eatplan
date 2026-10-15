@@ -17,7 +17,7 @@ export function MobileNav() {
 
   return (
     <nav 
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-[100] glass-panel border-t border-stone-200/60 dark:border-stone-800/60 shadow-[0_-10px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_-5px_30px_rgba(0,0,0,0.3)] transition-transform duration-300"
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-100 glass-panel border-t border-stone-200/60 dark:border-stone-800/60 shadow-[0_-10px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_-5px_30px_rgba(0,0,0,0.3)] transition-transform duration-300"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="flex h-16 items-center justify-around px-1">
@@ -30,7 +30,7 @@ export function MobileNav() {
             return (
               <li
                 key={item.href}
-                className={`flex flex-col items-center justify-center min-w-[4rem] h-full gap-1 transition-all opacity-60 cursor-not-allowed ${
+                className={`flex flex-col items-center justify-center min-w-16 h-full gap-1 transition-all opacity-60 cursor-not-allowed ${
                   isActive 
                     ? `${item.activeColor} font-bold` 
                     : "text-stone-500 font-medium"
@@ -41,7 +41,7 @@ export function MobileNav() {
                     isActive ? `${item.activeBg} scale-110` : "bg-transparent"
                   }`}
                 >
-                  <Icon className={`h-5 w-5 ${isActive ? "opacity-100" : "opacity-80 drop-shadow-sm"}`} strokeWidth={isActive ? 2.5 : 2} />
+                  <Icon className={`h-5 w-5 ${isActive ? "opacity-100" : "opacity-80 drop-shadow-xs"}`} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
                 <div className="flex flex-col items-center mt-0.5">
                   <span className="text-[7px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter leading-none">Coming</span>
@@ -55,7 +55,7 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center min-w-[4rem] h-full gap-1 transition-all active:scale-95 ${
+              className={`flex flex-col items-center justify-center min-w-16 h-full gap-1 transition-all active:scale-95 ${
                 isActive 
                   ? `${item.activeColor} font-bold` 
                   : "text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-200 font-medium"
@@ -66,7 +66,7 @@ export function MobileNav() {
                   isActive ? `${item.activeBg} scale-110` : "bg-transparent hover:bg-stone-100 dark:hover:bg-stone-800"
                 }`}
               >
-                <Icon className={`h-5 w-5 ${isActive ? "opacity-100" : "opacity-80 drop-shadow-sm"}`} strokeWidth={isActive ? 2.5 : 2} />
+                <Icon className={`h-5 w-5 ${isActive ? "opacity-100" : "opacity-80 drop-shadow-xs"}`} strokeWidth={isActive ? 2.5 : 2} />
               </div>
               <span className="text-[10px] leading-none tracking-tight">
                 {item.label}
