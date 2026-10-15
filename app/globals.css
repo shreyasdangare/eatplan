@@ -47,9 +47,6 @@
   }
 }
 
-@utility glass-panel {
-  @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
-}
 
 /* Plain selector (the upgrade tool turned this into a `dark` utility, which only
    emits when the class name is detected in source). */
@@ -182,5 +179,15 @@ textarea {
   .space-y-12 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 12); }
   @media (width >= 64rem) {
     .lg\:space-y-10 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--spacing) * 10); }
+  }
+}
+
+/* glass-panel as a plain class in the utilities layer (not @utility), so it is emitted after
+   Tailwind's generated utilities and wins conflicts (bg/shadow/border/blur) the way it did
+   in v3. As an @utility, v4 sorted it before core utilities, so e.g. shadow-2xl and bg-white/80
+   on the dish detail card started overriding it. */
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
   }
 }
