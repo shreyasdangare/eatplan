@@ -63,7 +63,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
 
   if (!dishes.length) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-[2rem] glass-panel p-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-4xl glass-panel p-12 text-center">
         <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-stone-800 dark:text-orange-500">
           <UtensilsCrossed size={32} />
         </div>
@@ -89,7 +89,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
               placeholder="Search recipes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2.5 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
+              className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2.5 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
             />
             {searchQuery && (
               <button
@@ -134,7 +134,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                 onClick={() => setDietFilter(diet)}
                 className={`px-3 py-1.5 text-[13px] font-bold rounded-full transition-all active:scale-[0.98] ${
                   dietFilter === diet 
-                    ? diet === "Veg" ? "bg-emerald-500 text-white shadow-sm" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-sm" : "bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100"
+                    ? diet === "Veg" ? "bg-emerald-500 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
                     : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
                 }`}
               >
@@ -184,7 +184,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
       {/* Grid */}
       <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredDishes.length === 0 ? (
-          <li className="col-span-full flex min-h-[200px] flex-col items-center justify-center rounded-[2rem] border border-dashed border-stone-300 bg-stone-50/50 text-center dark:border-stone-700 dark:bg-stone-800/30">
+          <li className="col-span-full flex min-h-[200px] flex-col items-center justify-center rounded-4xl border border-dashed border-stone-300 bg-stone-50/50 text-center dark:border-stone-700 dark:bg-stone-800/30">
             <p className="text-base font-medium text-stone-600 dark:text-stone-400">
               No recipes match your current filters.
             </p>
@@ -204,9 +204,9 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
             <li key={dish.id} className="group/card relative">
               <Link
                 href={`/dishes/${dish.id}`}
-                className="block overflow-hidden rounded-[2rem] glass-panel transition-all duration-500 hover:-translate-y-1 hover:shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)]"
+                className="block overflow-hidden rounded-4xl glass-panel transition-all duration-500 hover:-translate-y-1 hover:shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)]"
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100 dark:bg-stone-800">
+                <div className="relative aspect-4/3 w-full overflow-hidden bg-stone-100 dark:bg-stone-800">
                   {dish.image_url ? (
                     <img
                       src={dish.image_url}
@@ -221,7 +221,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                   )}
                   {/* Subtle vignette / gradient overlay */}
                   <div
-                    className="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/20 to-transparent opacity-80 transition-opacity duration-300 group-hover/card:opacity-95"
+                    className="absolute inset-0 bg-linear-to-t from-stone-900/90 via-stone-900/20 to-transparent opacity-80 transition-opacity duration-300 group-hover/card:opacity-95"
                     aria-hidden
                   />
                   

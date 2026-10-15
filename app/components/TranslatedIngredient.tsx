@@ -47,14 +47,14 @@ export function TranslatedIngredient({ name }: TranslatedIngredientProps) {
     <span className="inline-flex items-center flex-wrap gap-1.5 align-middle">
       <span>{name}</span>
       {translation ? (
-        <span className="text-amber-600 dark:text-amber-400 font-medium italic text-sm bg-amber-50 dark:bg-amber-900/30 px-1.5 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-700/50 shadow-sm whitespace-nowrap">
+        <span className="text-amber-600 dark:text-amber-400 font-medium italic text-sm bg-amber-50 dark:bg-amber-900/30 px-1.5 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-700/50 shadow-xs whitespace-nowrap">
           {translation}
         </span>
       ) : (
         <button
           onClick={handleTranslate}
           disabled={isLoading}
-          className="inline-flex items-center justify-center p-1 rounded-md text-stone-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:opacity-50"
+          className="inline-flex items-center justify-center p-1 rounded-md text-stone-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-amber-500/50 disabled:opacity-50"
           title="Translate ingredient to local language"
           aria-label={`Translate ${name}`}
         >

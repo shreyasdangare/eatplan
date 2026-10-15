@@ -116,10 +116,10 @@ export async function WeeklyPlanOverview() {
           return (
             <div
               key={dayData.dateStr}
-              className={`relative flex flex-col overflow-hidden rounded-[2rem] glass-panel transition-all duration-300 hover:shadow-xl ${
+              className={`relative flex flex-col overflow-hidden rounded-4xl glass-panel transition-all duration-300 hover:shadow-xl ${
                 dayData.isToday
                   ? "bg-white/80 dark:bg-stone-800/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] ring-1 ring-orange-500/30 dark:ring-orange-500/40"
-                  : "bg-white/40 dark:bg-stone-800/40 shadow-sm border border-stone-200/50 dark:border-stone-700/50 opacity-95 hover:opacity-100"
+                  : "bg-white/40 dark:bg-stone-800/40 shadow-xs border border-stone-200/50 dark:border-stone-700/50 opacity-95 hover:opacity-100"
               }`}
             >
               {/* Card Header */}
@@ -140,7 +140,7 @@ export async function WeeklyPlanOverview() {
               {/* Card Body */}
               <div className="flex-1 px-5 pb-5 flex flex-col">
                 {hasAnyMeals ? (
-                  <div className="flex flex-col overflow-hidden rounded-[1.5rem] bg-stone-50/80 dark:bg-stone-900/50 ring-1 ring-stone-200/60 dark:ring-stone-700/60 divide-y divide-stone-200/60 dark:divide-stone-700/60 shadow-inner">
+                  <div className="flex flex-col overflow-hidden rounded-3xl bg-stone-50/80 dark:bg-stone-900/50 ring-1 ring-stone-200/60 dark:ring-stone-700/60 divide-y divide-stone-200/60 dark:divide-stone-700/60 shadow-inner">
                     {slots.map((slot) => {
                       const entry = dayPlan[slot];
                       if (!entry?.dishes?.name) return null;
@@ -158,10 +158,10 @@ export async function WeeklyPlanOverview() {
                              />
                           )}
                           {entry.dishes.image_url && (
-                             <div className="absolute z-0 inset-0 bg-gradient-to-r from-stone-50/90 via-stone-50/60 to-stone-50/90 dark:from-stone-900/90 dark:via-stone-900/60 dark:to-stone-900/90" />
+                             <div className="absolute z-0 inset-0 bg-linear-to-r from-stone-50/90 via-stone-50/60 to-stone-50/90 dark:from-stone-900/90 dark:via-stone-900/60 dark:to-stone-900/90" />
                           )}
                           {/* Left Icon Container */}
-                          <div className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-white shadow-sm ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50 ${isPrepared ? 'text-emerald-500 dark:text-emerald-400' : 'text-stone-500 dark:text-stone-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors'}`}>
+                          <div className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.85rem] bg-white shadow-xs ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50 ${isPrepared ? 'text-emerald-500 dark:text-emerald-400' : 'text-stone-500 dark:text-stone-400 group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors'}`}>
                             <Icon className="h-5 w-5" strokeWidth={2.5} />
                           </div>
                           
@@ -179,7 +179,7 @@ export async function WeeklyPlanOverview() {
                           {/* Right Indicator */}
                           <div className="relative z-10">
                             {isPrepared ? (
-                              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400 shadow-sm rounded-full bg-white dark:bg-stone-900" />
+                              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-400 shadow-xs rounded-full bg-white dark:bg-stone-900" />
                             ) : (
                               <div className="h-5 w-5 shrink-0 rounded-full border-2 border-stone-200 dark:border-stone-700 transition-colors group-hover:border-stone-500 dark:group-hover:border-stone-400 bg-white/50 dark:bg-stone-800/50" />
                             )}
@@ -189,8 +189,8 @@ export async function WeeklyPlanOverview() {
                     })}
                   </div>
                 ) : (
-                  <div className="flex flex-1 min-h-[140px] flex-col items-center justify-center gap-3 rounded-[1.5rem] bg-stone-50/50 dark:bg-stone-900/30 border border-dashed border-stone-200/80 dark:border-stone-700/80 text-center opacity-80 hover:opacity-100 transition-opacity">
-                    <div className="rounded-[1rem] bg-white p-3 shadow-sm ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50">
+                  <div className="flex flex-1 min-h-[140px] flex-col items-center justify-center gap-3 rounded-3xl bg-stone-50/50 dark:bg-stone-900/30 border border-dashed border-stone-200/80 dark:border-stone-700/80 text-center opacity-80 hover:opacity-100 transition-opacity">
+                    <div className="rounded-2xl bg-white p-3 shadow-xs ring-1 ring-stone-200/50 dark:bg-stone-800 dark:ring-stone-700/50">
                       <CalendarPlus className="h-5 w-5 text-stone-400 dark:text-stone-500" strokeWidth={2.5} />
                     </div>
                     <div>

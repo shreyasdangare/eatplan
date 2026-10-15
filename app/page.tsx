@@ -84,7 +84,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div className="flex flex-col gap-4">
           {isFirstVisit && <MarkHomeVisited />}
 
-          <section className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-4 sm:p-5 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
+          <section className="relative overflow-hidden rounded-3xl sm:rounded-4xl border border-white/40 bg-linear-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-4 sm:p-5 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto">
               <Logo className="mb-2 sm:mb-3 h-12 w-12 sm:h-16 sm:w-16 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2" />
               <h2 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-4xl">
@@ -93,12 +93,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <p className="mt-1 text-base sm:text-lg font-medium tracking-wide text-orange-600 dark:text-orange-400">
                 {tagline}
               </p>
-              <div className="mt-4 rounded-full bg-white/60 px-5 py-2 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-stone-700/50">
+              <div className="mt-4 rounded-full bg-white/60 px-5 py-2 text-sm font-semibold text-orange-950 dark:bg-stone-900/60 dark:text-orange-200 shadow-xs backdrop-blur-md border border-white/20 dark:border-stone-700/50">
                 👋 {welcomePrefix} <span className="font-bold">Chef {chefName}!</span>
               </div>
               
               {!user?.native_language && (
-                <div className="mt-3 rounded-xl bg-orange-100/80 px-4 py-2 text-sm font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border border-orange-200/50 dark:border-orange-800/30 shadow-sm flex items-center justify-between gap-4">
+                <div className="mt-3 rounded-xl bg-orange-100/80 px-4 py-2 text-sm font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border border-orange-200/50 dark:border-orange-800/30 shadow-xs flex items-center justify-between gap-4">
                   You haven&apos;t set your Mother Tongue yet. Go to <Link href="/settings" className="text-orange-600 dark:text-orange-400 font-bold hover:underline">Settings</Link> to configure it for personalized messages!
                 </div>
               )}
@@ -108,7 +108,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div className="absolute bottom-[-50%] left-[-10%] h-[150px] w-[150px] rounded-full bg-rose-400/20 mix-blend-multiply blur-2xl transition-transform duration-1000 ease-in-out delay-75 group-hover:scale-110 dark:bg-rose-500/10 dark:mix-blend-screen" aria-hidden />
           </section>
 
-          <Suspense fallback={<div className="h-48 rounded-[1.5rem] glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
+          <Suspense fallback={<div className="h-48 rounded-3xl glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
             <WeeklyPlanOverview />
           </Suspense>
         </div>
@@ -117,7 +117,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {!user && (
         <>
           {/* Hero */}
-          <section className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-5 py-10 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
+          <section className="relative overflow-hidden rounded-4xl sm:rounded-[2.5rem] border border-white/40 bg-linear-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 px-5 py-10 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] backdrop-blur-3xl dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80 dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] sm:px-12 sm:py-20 lg:py-24 group">
             <div className="relative z-10 flex flex-col items-center text-center mx-auto max-w-2xl">
               <Logo className="mb-4 sm:mb-6 h-20 w-20 shrink-0 drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2 sm:h-40 sm:w-40" />
               <h2 className="text-4xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-6xl lg:text-7xl">
@@ -138,7 +138,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     Open your digital cookbook
                     <span className="transition-transform group-hover/btn:translate-x-1">→</span>
                   </span>
-                  <div className="absolute inset-0 z-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+                  <div className="absolute inset-0 z-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
                 </Link>
               </div>
             </div>
@@ -157,11 +157,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {/* Features */}
           <section className="mx-auto w-full max-w-5xl">
             <div className="mb-8 flex items-center gap-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
               <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
                 Everything you need
               </h3>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
             </div>
 
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -171,10 +171,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   <li key={f.href} className="flex">
                     <Link
                       href={f.href}
-                      className="group flex w-full flex-col overflow-hidden rounded-[2rem] glass-panel p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]"
+                      className="group flex w-full flex-col overflow-hidden rounded-4xl glass-panel p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]"
                     >
                       <div
-                        className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-inner transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${f.accent} bg-gradient-to-br from-white/20 to-transparent`}
+                        className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-inner transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${f.accent} bg-linear-to-br from-white/20 to-transparent`}
                       >
                         <Icon className="h-6 w-6" strokeWidth={2.5} />
                       </div>

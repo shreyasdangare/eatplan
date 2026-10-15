@@ -230,7 +230,7 @@ export default function NewDishPage() {
     }
   };
 
-  const inputClasses = "w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 shadow-sm transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800";
+  const inputClasses = "w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 shadow-xs transition-all focus:border-orange-500 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800";
   const labelClasses = "mb-1.5 block text-sm font-bold text-stone-700 dark:text-stone-300";
 
   return (
@@ -250,7 +250,7 @@ export default function NewDishPage() {
       </div>
 
       {/* Import Accordion */}
-      <div className={`overflow-hidden rounded-[2rem] glass-panel transition-all ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "magic" ? "manual" : "magic")}
@@ -296,7 +296,7 @@ export default function NewDishPage() {
                   <button
                     type="submit"
                     disabled={!!importingType || !importName.trim()}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
                      {importingType === "name" ? "Generating…" : "Generate Recipe"}
                   </button>
@@ -326,7 +326,7 @@ export default function NewDishPage() {
                   <button
                     type="submit"
                     disabled={!!importingType || !importUrl.trim()}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
                      {importingType === "url" ? "Importing…" : "Extract Recipe"}
                   </button>
@@ -355,7 +355,7 @@ export default function NewDishPage() {
                   <button
                     type="submit"
                     disabled={!!importingType || !importScreenshotFile}
-                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
+                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
                   >
                     {importingType === "screenshot" ? "Importing…" : "Scan Image"}
                   </button>
@@ -379,15 +379,15 @@ export default function NewDishPage() {
       </div>
 
       <div className="flex items-center gap-4 py-2 px-6">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
         <span className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 dark:text-stone-500">
           OR
         </span>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
       </div>
 
       {/* Manual Accordion */}
-      <div className={`overflow-hidden rounded-[2rem] glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "manual" ? "magic" : "manual")}
@@ -533,7 +533,7 @@ export default function NewDishPage() {
                            onClick={() => toggleIngredient(ing.id)}
                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 border ${
                              selected
-                               ? "bg-emerald-500 text-white border-emerald-600 shadow-sm dark:bg-emerald-600 dark:border-emerald-500"
+                               ? "bg-emerald-500 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
                                : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
                            }`}
                          >
@@ -556,7 +556,7 @@ export default function NewDishPage() {
                          return (
                            <div
                              key={sel.ingredient_id}
-                             className="group flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800 dark:hover:border-orange-500"
+                             className="group flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-xs transition-all hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800 dark:hover:border-orange-500"
                            >
                              <div className="flex items-center justify-between">
                                <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
@@ -569,7 +569,7 @@ export default function NewDishPage() {
                                    onChange={(e) =>
                                      updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
                                    }
-                                   className="rounded border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                                   className="rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
                                  />
                                  Optional
                                </label>
@@ -577,7 +577,7 @@ export default function NewDishPage() {
                              <div className="flex flex-wrap items-center gap-2">
                                 <input
                                  placeholder="Display Text (e.g. '2 cups diced')"
-                                 className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                 className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                  value={sel.quantity}
                                  onChange={(e) =>
                                    updateIngredient(sel.ingredient_id, "quantity", e.target.value)
@@ -589,7 +589,7 @@ export default function NewDishPage() {
                                      min={0}
                                      step="any"
                                      placeholder="Amt"
-                                     className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.amount ?? ""}
                                      onChange={(e) =>
                                        updateIngredient(
@@ -601,7 +601,7 @@ export default function NewDishPage() {
                                    />
                                    <input
                                      placeholder="Unit"
-                                     className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.unit}
                                      onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
                                    />

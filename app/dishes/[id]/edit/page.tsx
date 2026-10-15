@@ -300,7 +300,7 @@ export default function EditDishPage() {
     );
   }
 
-  const inputClasses = "w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 shadow-sm transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800";
+  const inputClasses = "w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 shadow-xs transition-all focus:border-orange-500 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800";
   const labelClasses = "mb-1.5 block text-sm font-bold text-stone-700 dark:text-stone-300";
 
   return (
@@ -321,13 +321,13 @@ export default function EditDishPage() {
         </div>
         <Link
           href={`/dishes/${id}`}
-          className="flex items-center gap-2 rounded-full border border-stone-200/80 bg-white/50 px-4 py-2 text-sm font-bold text-stone-600 shadow-sm transition-all hover:bg-stone-50 dark:border-stone-700/80 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:bg-stone-800"
+          className="flex items-center gap-2 rounded-full border border-stone-200/80 bg-white/50 px-4 py-2 text-sm font-bold text-stone-600 shadow-xs transition-all hover:bg-stone-50 dark:border-stone-700/80 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:bg-stone-800"
         >
            Cancel
         </Link>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 rounded-[2rem] glass-panel p-6 sm:p-8">
+      <form onSubmit={handleSubmit} className="space-y-8 rounded-4xl glass-panel p-6 sm:p-8">
         
         {/* Basic Info */}
         <div className="space-y-5">
@@ -408,7 +408,7 @@ export default function EditDishPage() {
           <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-3">
              Classify this explicitly to ensure your filters work flawlessly!
           </p>
-          <div className="flex items-center gap-2 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-stone-200 dark:bg-stone-800 dark:ring-stone-700">
+          <div className="flex items-center gap-2 rounded-xl bg-white p-1.5 shadow-xs ring-1 ring-stone-200 dark:bg-stone-800 dark:ring-stone-700">
              <button
                type="button"
                onClick={() => setDietCategory("Veg")}
@@ -506,7 +506,7 @@ export default function EditDishPage() {
                     onClick={() => toggleIngredient(ing.id)}
                     className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 border ${
                       selected
-                        ? "bg-emerald-500 text-white border-emerald-600 shadow-sm dark:bg-emerald-600 dark:border-emerald-500"
+                        ? "bg-emerald-500 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
                         : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
                     }`}
                   >
@@ -529,7 +529,7 @@ export default function EditDishPage() {
                   return (
                     <div
                       key={sel.ingredient_id}
-                      className="group flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800 dark:hover:border-orange-500"
+                      className="group flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-xs transition-all hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800 dark:hover:border-orange-500"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
@@ -542,7 +542,7 @@ export default function EditDishPage() {
                             onChange={(e) =>
                               updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
                             }
-                            className="rounded border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                            className="rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
                           />
                           Optional
                         </label>
@@ -550,7 +550,7 @@ export default function EditDishPage() {
                       <div className="flex flex-wrap items-center gap-2">
                          <input
                           placeholder="Display Text (e.g. '2 cups diced')"
-                          className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                          className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                           value={sel.quantity}
                           onChange={(e) =>
                             updateIngredient(sel.ingredient_id, "quantity", e.target.value)
@@ -562,7 +562,7 @@ export default function EditDishPage() {
                               min={0}
                               step="any"
                               placeholder="Amt"
-                              className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                              className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                               value={sel.amount ?? ""}
                               onChange={(e) =>
                                 updateIngredient(
@@ -574,7 +574,7 @@ export default function EditDishPage() {
                             />
                             <input
                               placeholder="Unit"
-                              className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                              className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                               value={sel.unit}
                               onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
                             />

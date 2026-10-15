@@ -69,7 +69,7 @@ export function MissingIngredients({ dishIngredients }: Props) {
   if (dishIngredients.length === 0) return null;
 
   return (
-    <div className="rounded-2xl glass-panel p-5 shadow-sm space-y-4">
+    <div className="rounded-2xl glass-panel p-5 shadow-xs space-y-4">
       <div className="flex items-center gap-3">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-stone-800 dark:text-orange-500">
           <Package className="h-4 w-4" />
@@ -87,7 +87,7 @@ export function MissingIngredients({ dishIngredients }: Props) {
       {/* Progress bar */}
       <div className="h-2 w-full rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-lime-500 to-lime-400 transition-all duration-500"
+          className="h-full rounded-full bg-linear-to-r from-lime-500 to-lime-400 transition-all duration-500"
           style={{
             width: `${dishIngredients.length > 0 ? (inPantry.length / dishIngredients.length) * 100 : 0}%`,
           }}

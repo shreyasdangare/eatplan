@@ -239,7 +239,7 @@ export default function PantryPage() {
         </div>
         <Link
           href="/"
-          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
+          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-xs hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
         >
           Home
         </Link>
@@ -263,7 +263,7 @@ export default function PantryPage() {
         />
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:items-center text-xs w-full">
           <div className="flex items-center gap-2 flex-1 relative group">
-            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-[3.5rem] sm:min-w-0">Amount</label>
+            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-14 sm:min-w-0">Amount</label>
             <input
               type="number"
               step="any"
@@ -271,17 +271,17 @@ export default function PantryPage() {
               placeholder="e.g. 2"
               value={addAmount}
               onChange={(e) => setAddAmount(e.target.value)}
-              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-none transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-sm"
+              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-hidden transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-xs"
             />
           </div>
           <div className="flex items-center gap-2 flex-1 relative group">
-            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-[3.5rem] sm:min-w-0">Unit</label>
+            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-14 sm:min-w-0">Unit</label>
             <input
               type="text"
               placeholder="e.g. kg"
               value={addUnit}
               onChange={(e) => setAddUnit(e.target.value)}
-              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-none transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-sm"
+              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-hidden transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-xs"
             />
           </div>
         </div>
@@ -323,7 +323,7 @@ export default function PantryPage() {
                     return (
                       <li
                         key={item.ingredient_id}
-                        className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs shadow-sm dark:bg-stone-700 dark:text-stone-200"
+                        className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs shadow-xs dark:bg-stone-700 dark:text-stone-200"
                       >
                         <span className="font-medium">{name}</span>
                         {isEditing ? (
@@ -335,14 +335,14 @@ export default function PantryPage() {
                               placeholder="Amount"
                               value={editAmount}
                               onChange={(e) => setEditAmount(e.target.value)}
-                              className="w-16 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                              className="w-16 rounded-sm border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
                             />
                             <input
                               type="text"
                               placeholder="Unit"
                               value={editUnit}
                               onChange={(e) => setEditUnit(e.target.value)}
-                              className="w-14 rounded border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+                              className="w-14 rounded-sm border border-orange-200 px-1.5 py-0.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
                             />
                             <button
                               type="button"

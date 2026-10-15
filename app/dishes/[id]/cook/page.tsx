@@ -11,7 +11,7 @@ export default function CookModePage() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 pb-12 text-center">
       <div className="relative">
-        <div className="flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-orange-100 via-amber-50 to-orange-100 shadow-lg dark:from-stone-800 dark:via-stone-800 dark:to-stone-700">
+        <div className="flex h-24 w-24 items-center justify-center rounded-4xl bg-linear-to-br from-orange-100 via-amber-50 to-orange-100 shadow-lg dark:from-stone-800 dark:via-stone-800 dark:to-stone-700">
           <ChefHat className="h-12 w-12 text-orange-500 dark:text-orange-400" />
         </div>
         <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 shadow-md">

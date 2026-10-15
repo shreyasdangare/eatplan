@@ -34,7 +34,7 @@ type AdminData = {
 
 function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string | number; color: string }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-stone-200/60 bg-white/70 p-5 shadow-sm backdrop-blur-md transition-all hover:shadow-md dark:border-stone-700/60 dark:bg-stone-900/60">
+    <div className="flex items-center gap-4 rounded-2xl border border-stone-200/60 bg-white/70 p-5 shadow-xs backdrop-blur-md transition-all hover:shadow-md dark:border-stone-700/60 dark:bg-stone-900/60">
       <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${color}`}>
         <Icon className="h-6 w-6 text-white" strokeWidth={2.5} />
       </div>
@@ -132,7 +132,7 @@ export default function AdminPage() {
         </div>
         <button
           onClick={fetchData}
-          className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white/80 px-4 py-2.5 text-sm font-bold text-stone-700 shadow-sm transition-all hover:bg-stone-50 active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200"
+          className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white/80 px-4 py-2.5 text-sm font-bold text-stone-700 shadow-xs transition-all hover:bg-stone-50 active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200"
         >
           <RefreshCw className="h-4 w-4" />
           Refresh
@@ -148,7 +148,7 @@ export default function AdminPage() {
       </div>
 
       {/* LLM Usage Chart */}
-      <div className="rounded-2xl border border-stone-200/60 bg-white/70 p-6 shadow-sm backdrop-blur-md dark:border-stone-700/60 dark:bg-stone-900/60">
+      <div className="rounded-2xl border border-stone-200/60 bg-white/70 p-6 shadow-xs backdrop-blur-md dark:border-stone-700/60 dark:bg-stone-900/60">
         <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">LLM Calls — Last 30 Days</h2>
         <div className="flex items-end gap-[3px] h-32 overflow-hidden">
           {chartDays.map((day) => (
@@ -173,7 +173,7 @@ export default function AdminPage() {
       </div>
 
       {/* Users Table */}
-      <div className="rounded-2xl border border-stone-200/60 bg-white/70 shadow-sm backdrop-blur-md dark:border-stone-700/60 dark:bg-stone-900/60 overflow-hidden">
+      <div className="rounded-2xl border border-stone-200/60 bg-white/70 shadow-xs backdrop-blur-md dark:border-stone-700/60 dark:bg-stone-900/60 overflow-hidden">
         <div className="px-6 py-4 border-b border-stone-200/50 dark:border-stone-700/50">
           <h2 className="text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">Users</h2>
         </div>

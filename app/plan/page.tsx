@@ -51,7 +51,7 @@ function DraggableDish({ dish }: { dish: Dish }) {
       className={`group/tray relative shrink-0 cursor-grab overflow-hidden rounded-full border w-[150px] h-[46px] text-[16px] font-bold transition-all active:scale-[0.98] active:cursor-grabbing ${
         isDragging
           ? "border-orange-400 ring-2 ring-orange-400 shadow-xl opacity-0"
-          : "border-stone-200/60 shadow-sm hover:border-orange-300 hover:shadow-md dark:border-stone-700/60"
+          : "border-stone-200/60 shadow-xs hover:border-orange-300 hover:shadow-md dark:border-stone-700/60"
       }`}
     >
       {/* Blurred background image */}
@@ -106,7 +106,7 @@ function SortableDishPill({
       className={`group/pill relative flex items-center gap-1.5 overflow-hidden rounded-xl border px-3 py-2 transition-all ${
         prepared
           ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
-          : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm"
+          : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-xs"
       }`}
     >
       {/* Blurred background image if not prepared */}
@@ -126,7 +126,7 @@ function SortableDishPill({
           type="button"
           {...attributes}
           {...listeners}
-          className="relative z-10 shrink-0 cursor-grab rounded p-0.5 text-stone-400 hover:text-stone-600 active:cursor-grabbing dark:text-stone-500 dark:hover:text-stone-300 touch-none"
+          className="relative z-10 shrink-0 cursor-grab rounded-sm p-0.5 text-stone-400 hover:text-stone-600 active:cursor-grabbing dark:text-stone-500 dark:hover:text-stone-300 touch-none"
           aria-label="Reorder"
         >
           <GripVertical className="h-3.5 w-3.5" />
@@ -189,7 +189,7 @@ function InlineAddDish({
 
   return (
     <div className="relative mt-1">
-      <div className="flex items-center gap-1.5 rounded-lg border border-orange-300/60 bg-white dark:bg-stone-900 dark:border-orange-600/40 px-2.5 py-1.5 shadow-sm">
+      <div className="flex items-center gap-1.5 rounded-lg border border-orange-300/60 bg-white dark:bg-stone-900 dark:border-orange-600/40 px-2.5 py-1.5 shadow-xs">
         <Search className="h-3.5 w-3.5 text-stone-400 shrink-0" />
         <input
           ref={inputRef}
@@ -203,7 +203,7 @@ function InlineAddDish({
             }
           }}
           placeholder="Type recipe name…"
-          className="flex-1 bg-transparent text-sm font-medium text-stone-800 placeholder:text-stone-400 outline-none dark:text-stone-200 min-w-0"
+          className="flex-1 bg-transparent text-sm font-medium text-stone-800 placeholder:text-stone-400 outline-hidden dark:text-stone-200 min-w-0"
         />
         <button onClick={onClose} className="shrink-0 rounded-full p-0.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300">
           <X className="h-3.5 w-3.5" />
@@ -257,10 +257,10 @@ function DroppableSlot({
   const allPrepared = entries.length > 0 && entries.every((e) => isMealPast(date, slot));
 
   return (
-    <td className="min-w-[10rem] border-b border-stone-200/50 p-2 align-top dark:border-stone-700/50 group/slot">
+    <td className="min-w-40 border-b border-stone-200/50 p-2 align-top dark:border-stone-700/50 group/slot">
       <div
         ref={setNodeRef}
-        className={`relative flex min-h-[5.5rem] flex-col rounded-[1.25rem] border-2 p-2.5 transition-all duration-300 ${
+        className={`relative flex min-h-22 flex-col rounded-[1.25rem] border-2 p-2.5 transition-all duration-300 ${
           isOver
             ? "scale-[1.02] border-orange-400 bg-orange-50 shadow-md dark:border-orange-500/80 dark:bg-orange-900/30"
             : allPrepared && entries.length > 0
@@ -701,7 +701,7 @@ export default function PlanPage() {
                 <button
                   type="button"
                   onClick={() => setWeekStart(getWeekStart(new Date()))}
-                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-sm transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
+                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-xs transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
                 >
                   This Week
                 </button>
@@ -712,7 +712,7 @@ export default function PlanPage() {
                     next.setDate(next.getDate() + 7);
                     setWeekStart(getWeekStart(next));
                   }}
-                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-sm transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
+                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-xs transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
                 >
                   Next Week
                 </button>
@@ -730,7 +730,7 @@ export default function PlanPage() {
                   placeholder="Search recipes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
+                  className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
                 />
                 {searchQuery && (
                   <button
@@ -757,7 +757,7 @@ export default function PlanPage() {
                   onClick={() => setActiveFilter(f)}
                   className={`shrink-0 rounded-full px-4 py-1.5 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
                     activeFilter === f
-                      ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-sm"
+                      ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-xs"
                       : "bg-transparent border-stone-200/60 text-stone-600 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50"
                   }`}
                 >
@@ -773,7 +773,7 @@ export default function PlanPage() {
                   onClick={() => setDietFilter(diet)}
                   className={`px-3 py-1.5 text-[13px] font-bold rounded-full transition-all active:scale-[0.98] ${
                     dietFilter === diet 
-                      ? diet === "Veg" ? "bg-emerald-500 text-white shadow-sm" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-sm" : "bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100"
+                      ? diet === "Veg" ? "bg-emerald-500 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
                       : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
                   }`}
                 >
@@ -808,12 +808,12 @@ export default function PlanPage() {
         </div>
 
         {/* Desktop Only: Calendar Grid */}
-        <div className="hidden sm:block overflow-hidden rounded-[2.5rem] glass-panel shadow-sm mt-4">
+        <div className="hidden sm:block overflow-hidden rounded-[2.5rem] glass-panel shadow-xs mt-4">
           <div className="overflow-x-auto pb-2 scrollbar-thin">
-            <table className="w-full min-w-[40rem] border-collapse text-left">
+            <table className="w-full min-w-160 border-collapse text-left">
               <thead>
                 <tr className="border-b border-stone-200/50 dark:border-stone-700/50">
-                  <th className="sticky left-0 z-20 min-w-[6rem] border-b border-r border-stone-200/50 bg-stone-50/50 p-4 text-xs font-bold uppercase tracking-widest text-stone-500 backdrop-blur-xl dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-400">
+                  <th className="sticky left-0 z-20 min-w-24 border-b border-r border-stone-200/50 bg-stone-50/50 p-4 text-xs font-bold uppercase tracking-widest text-stone-500 backdrop-blur-xl dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-400">
                     Day
                   </th>
                   {SLOTS.map((s) => {
@@ -821,7 +821,7 @@ export default function PlanPage() {
                     return (
                       <th
                         key={s}
-                        className="min-w-0 border-b border-stone-200/50 bg-stone-50/30 p-4 text-xs font-bold uppercase tracking-widest text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/30 dark:text-stone-400 sm:min-w-[10rem]"
+                        className="min-w-0 border-b border-stone-200/50 bg-stone-50/30 p-4 text-xs font-bold uppercase tracking-widest text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/30 dark:text-stone-400 sm:min-w-40"
                       >
                         <span className="flex items-center gap-2">
                           <Icon className="h-4 w-4" aria-hidden />
@@ -840,7 +840,7 @@ export default function PlanPage() {
                   >
                     <th
                       scope="row"
-                      className="sticky left-0 z-10 min-w-[6rem] border-r border-stone-200/50 bg-white/50 p-4 text-left backdrop-blur-xl transition-colors group-hover:bg-stone-50/80 dark:border-stone-700/50 dark:bg-stone-900/50 dark:group-hover:bg-stone-800/80"
+                      className="sticky left-0 z-10 min-w-24 border-r border-stone-200/50 bg-white/50 p-4 text-left backdrop-blur-xl transition-colors group-hover:bg-stone-50/80 dark:border-stone-700/50 dark:bg-stone-900/50 dark:group-hover:bg-stone-800/80"
                     >
                       <div className="flex flex-col">
                         <span className="text-sm font-extrabold text-stone-900 dark:text-stone-50">
@@ -887,7 +887,7 @@ export default function PlanPage() {
                    style={{ backgroundImage: `url(${activeDish.image_url})` }}
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
               <div className="relative z-10 px-3 py-2 text-center">
                  <span className="text-sm font-bold text-white drop-shadow-md line-clamp-2 leading-tight">
                    {activeDish.name}
@@ -901,7 +901,7 @@ export default function PlanPage() {
       {/* Mobile Only: Vertical Stacked Designer List */}
       <div className="sm:hidden flex flex-col gap-5 mt-2">
         {weekDates.map((date) => (
-          <div key={date} className="flex flex-col overflow-hidden rounded-[2rem] glass-panel bg-white/60 dark:bg-stone-900/40 outline outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all">
+          <div key={date} className="flex flex-col overflow-hidden rounded-4xl glass-panel bg-white/60 dark:bg-stone-900/40 outline-solid outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all">
             <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-stone-200/40 dark:border-stone-700/40">
               <div className="flex items-end gap-2 text-stone-900 dark:text-stone-50">
                 <h4 className="text-2xl font-extrabold tracking-tight">
@@ -920,7 +920,7 @@ export default function PlanPage() {
 
                  return (
                    <div key={slot} className="flex gap-3">
-                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-400 dark:text-stone-500 ring-stone-200/80 dark:ring-stone-700/80'} shadow-sm mt-0.5`}>
+                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-400 dark:text-stone-500 ring-stone-200/80 dark:ring-stone-700/80'} shadow-xs mt-0.5`}>
                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
                      </div>
                      
@@ -938,7 +938,7 @@ export default function PlanPage() {
                                  className={`flex items-center justify-between gap-2 rounded-xl border px-3.5 h-[46px] transition-colors ${
                                    isPrepared
                                      ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
-                                     : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-sm"
+                                     : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-xs"
                                  }`}
                                >
                                  <span
@@ -995,7 +995,7 @@ export default function PlanPage() {
 
       {/* Mobile Recipe Selection Bottom Sheet/Modal */}
       {mobileSlotOpen && (
-        <div className="sm:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-stone-900/40 backdrop-blur-sm dark:bg-black/80 transition-opacity outline-none animate-in fade-in duration-200 pb-[env(safe-area-inset-bottom)]">
+        <div className="sm:hidden fixed inset-0 z-200 flex flex-col justify-end bg-stone-900/40 backdrop-blur-xs dark:bg-black/80 transition-opacity outline-hidden animate-in fade-in duration-200 pb-[env(safe-area-inset-bottom)]">
           {/* Close backdrop hit area */}
           <div className="absolute inset-0 z-0" onClick={() => {
             setSearchQuery("");
@@ -1040,7 +1040,7 @@ export default function PlanPage() {
                     placeholder="Search recipes..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-2xl border-none bg-stone-200/60 dark:bg-stone-800/60 py-3 pl-[42px] pr-10 text-[17px] font-medium text-stone-900 placeholder:text-stone-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:text-stone-100 dark:focus:bg-stone-900 transition-all shadow-inner"
+                    className="w-full rounded-2xl border-none bg-stone-200/60 dark:bg-stone-800/60 py-3 pl-[42px] pr-10 text-[17px] font-medium text-stone-900 placeholder:text-stone-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-orange-500/50 dark:text-stone-100 dark:focus:bg-stone-900 transition-all shadow-inner"
                   />
                   {searchQuery && (
                     <button
@@ -1061,7 +1061,7 @@ export default function PlanPage() {
                        onClick={() => setDietFilter(diet)}
                        className={`flex-1 px-3 py-2 text-[14px] font-bold rounded-full transition-all active:scale-[0.98] ${
                          dietFilter === diet 
-                           ? diet === "Veg" ? "bg-emerald-500 text-white shadow-sm" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-sm" : "bg-white text-stone-800 shadow-sm dark:bg-stone-700 dark:text-stone-100"
+                           ? diet === "Veg" ? "bg-emerald-500 text-white shadow-xs" : diet === "Non-Veg" ? "bg-rose-600 text-white shadow-xs" : "bg-white text-stone-800 shadow-xs dark:bg-stone-700 dark:text-stone-100"
                            : "text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
                        }`}
                      >
@@ -1076,7 +1076,7 @@ export default function PlanPage() {
                        onClick={() => setActiveFilter(f)}
                        className={`shrink-0 rounded-full px-4 py-1.5 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
                          activeFilter === f
-                           ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-sm"
+                           ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-xs"
                            : "bg-transparent border-stone-200/60 text-stone-500 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50 dark:hover:border-stone-600/80"
                        }`}
                      >
@@ -1108,7 +1108,7 @@ export default function PlanPage() {
                         setSearchQuery("");
                         setMobileSlotOpen(null);
                      }}
-                     className="group flex w-full items-center justify-between gap-4 rounded-[1.5rem] border-none bg-white px-5 py-4 text-left shadow-sm active:scale-[0.97] active:bg-orange-50 transition-all dark:bg-stone-900 dark:active:bg-orange-950/40"
+                     className="group flex w-full items-center justify-between gap-4 rounded-3xl border-none bg-white px-5 py-4 text-left shadow-xs active:scale-[0.97] active:bg-orange-50 transition-all dark:bg-stone-900 dark:active:bg-orange-950/40"
                    >
                      <span className="truncate text-[17px] font-bold tracking-tight text-stone-800 dark:text-stone-200 group-active:text-orange-700 dark:group-active:text-orange-400">{dish.name}</span>
                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-active:bg-orange-200 dark:group-active:bg-orange-900/50 group-active:text-orange-600 dark:group-active:text-orange-400 transition-colors"><Plus className="h-5 w-5" strokeWidth={3} /></div>

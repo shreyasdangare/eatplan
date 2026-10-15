@@ -206,7 +206,7 @@ export function IngredientAutocompleteInput({
         <div className="relative flex items-center">
           <Search className="absolute left-3.5 h-4 w-4 text-stone-400" />
           <input
-            className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 pl-10 pr-4 py-3 text-sm text-stone-900 shadow-sm transition-all focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800 disabled:opacity-60"
+            className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 pl-10 pr-4 py-3 text-sm text-stone-900 shadow-xs transition-all focus:border-orange-500 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800 disabled:opacity-60"
             placeholder={placeholder}
             value={value}
             onChange={(e) => {
