@@ -2,6 +2,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tailwind v3 used absolute (rem) line-heights for text-* sizes; v4 uses ratios relative to
+   the font size. Elements that override font-size (e.g. 16px inputs to stop iOS zoom) grew
+   taller under v4, so pin the v3 values. */
+@theme {
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+}
+
 /* Tailwind v3 compatibility (see https://tailwindcss.com/docs/upgrade-guide):
    v4 sets buttons to cursor:default and placeholders to currentColor at 50% opacity. */
 @layer base {
