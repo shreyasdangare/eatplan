@@ -5,7 +5,7 @@ import { getSession } from "@/lib/supabaseServerClient";
 import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
 import { MarkHomeVisited } from "./components/MarkHomeVisited";
 import { WeeklyPlanOverview } from "./components/WeeklyPlanOverview";
-import { BookOpen, CalendarHeart, ShoppingCart, Archive, Sparkles } from "lucide-react";
+import { BookOpen, CalendarHeart, ShoppingCart, Sparkles } from "lucide-react";
 
 const features = [
   {
@@ -28,13 +28,6 @@ const features = [
     description: "Automatic generation. Pick recipes and get one combined, categorized grocery list.",
     accent: "bg-rose-500",
     icon: ShoppingCart,
-  },
-  {
-    href: "/pantry",
-    title: "Pantry",
-    description: "Ingredients you always have. Used automatically when you search for what to cook.",
-    accent: "bg-lime-500",
-    icon: Archive,
   },
   {
     href: "/what-can-i-cook",

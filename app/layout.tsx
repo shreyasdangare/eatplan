@@ -84,13 +84,6 @@ export default async function RootLayout({
                     >
                       List
                     </a>
-                    <a
-                      href="/pantry"
-                      title="Ingredients you always have at home"
-                      className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-lime-500/10 hover:text-lime-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-lime-500/20 dark:hover:text-lime-300"
-                    >
-                      Pantry
-                    </a>
                     <div
                       title="Coming Soon"
                       className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-500 dark:text-stone-400 cursor-not-allowed gap-2"

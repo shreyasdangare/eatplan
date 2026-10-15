@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, CalendarHeart, ShoppingCart, Archive } from "lucide-react";
+import { Home, BookOpen, CalendarHeart, ShoppingCart } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: Home, exact: true },
   { href: "/recipes", label: "Recipes", icon: BookOpen, also: ["/dishes"] },
   { href: "/plan", label: "Plan", icon: CalendarHeart },
   { href: "/shopping-list", label: "List", icon: ShoppingCart },
-  { href: "/pantry", label: "Pantry", icon: Archive },
 ] as const;
 
 /** Hidden on auth pages so the sign-in form gets the whole screen. */
