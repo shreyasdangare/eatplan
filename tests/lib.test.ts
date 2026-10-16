@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { isMealPast } from "@/lib/isMealPast";
 import { getCategoryEmoji, getCategoryDisplayName, getItemEmoji, inferCategoryFromName } from "@/lib/categoryEmoji";
-import { getTranslatedTagline, getTranslatedWelcome } from "@/lib/taglines";
+import { getTranslatedTagline } from "@/lib/taglines";
 
 describe("isMealPast", () => {
   afterEach(() => vi.useRealTimers());
@@ -39,17 +39,11 @@ describe("taglines", () => {
     expect(getTranslatedTagline()).toBe("What to eat?");
     expect(getTranslatedTagline("Hindi")).toBe("क्या खाएं?");
     expect(getTranslatedTagline("klingon")).toBe("What to eat?");
-    expect(getTranslatedWelcome("en", true)).toBe("Welcome,");
   });
 });
 
-import { initialOf, languageToLocale } from "../lib/taglines";
+import { initialOf } from "../lib/taglines";
 describe("home greeting helpers", () => {
-  it("maps languages to locales", () => {
-    expect(languageToLocale("Marathi")).toBe("mr-IN");
-    expect(languageToLocale("hi")).toBe("hi-IN");
-    expect(languageToLocale(undefined)).toBe("en-GB");
-  });
   it("takes the first grapheme", () => {
     expect(initialOf("shreyas")).toBe("S");
     expect(initialOf("श्रेयस")).toBe("श्रे");

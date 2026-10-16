@@ -43,7 +43,7 @@ type HomePageProps = {
   searchParams: Promise<{ error?: string; error_code?: string }>;
 };
 
-import { getTranslatedTagline, getTranslatedWelcome, initialOf, languageToLocale } from "@/lib/taglines";
+import { getTranslatedTagline, initialOf } from "@/lib/taglines";
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { user } = await getSession();
@@ -53,10 +53,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const preferred = user?.preferred_name?.trim();
   const chefName = preferred || user?.email?.split("@")[0] || "Chef";
   const isFirstVisit = user ? !user.has_visited_home : false;
-  const welcomePrefix = getTranslatedWelcome(user?.native_language, isFirstVisit);
+  const welcomePrefix = isFirstVisit ? "Welcome," : "Welcome back,";
   const tagline = getTranslatedTagline(user?.native_language);
-  const locale = languageToLocale(user?.native_language);
-  const todayLabel = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: await getUserTimeZone() }).format(new Date());
+  const todayLabel = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: await getUserTimeZone() }).format(new Date());
 
   return (
     <div className="flex flex-col gap-6 pt-1 lg:gap-8">
