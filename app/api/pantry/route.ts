@@ -17,6 +17,10 @@ export async function GET() {
     .select("ingredient_id, amount, unit")
     .eq("household_id", householdId);
 
+  // Pantry is hidden and its table isn't in this database yet: treat as an empty pantry, not a 500.
+  if (error && (error.code === "42P01" || error.code === "PGRST205")) {
+    return NextResponse.json({ items: [], ingredient_ids: [] });
+  }
   if (error) {
     console.error("Error fetching pantry", error);
     return NextResponse.json(

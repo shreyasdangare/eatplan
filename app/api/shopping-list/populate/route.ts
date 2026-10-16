@@ -1,3 +1,4 @@
+import { addDays, toISODate, weekStartOf } from "@/lib/dates";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
@@ -22,23 +23,22 @@ export async function POST(req: NextRequest) {
   let to = body?.to;
 
   if (!from || !to) {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-    const weekStart = new Date(now);
-    weekStart.setDate(diff);
-    weekStart.setHours(0, 0, 0, 0);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    from = weekStart.toISOString().slice(0, 10);
-    to = weekEnd.toISOString().slice(0, 10);
+    const weekStart = weekStartOf(new Date());
+    from = toISODate(weekStart);
+    to = toISODate(addDays(weekStart, 6));
   }
 
-  const dishIds = await getDishIdsFromDateRange(auth.user.id, from, to);
+  const dishIds = await getDishIdsFromDateRange(householdId, from, to);
   const lines = await aggregateIngredientsFromDishes(dishIds);
 
   if (lines.length === 0) {
-    return NextResponse.json({ added: 0, items: [], from, to });
+    return NextResponse.json({
+      added: 0,
+      items: [],
+      from,
+      to,
+      message: dishIds.length === 0 ? "No meals planned in these dates" : "Planned recipes have no ingredients yet",
+    });
   }
 
   const { data: existing } = await supabaseServer

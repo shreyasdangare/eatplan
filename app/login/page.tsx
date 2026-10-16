@@ -155,9 +155,14 @@ function LoginForm() {
           />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-            Password
-          </label>
+          <div className="mb-1 flex items-center justify-between">
+            <label htmlFor="password" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
+              Password
+            </label>
+            <Link href="/forgot-password" className="text-sm text-orange-600 dark:text-orange-400">
+              Forgot password?
+            </Link>
+          </div>
           <input
             id="password"
             type="password"
@@ -168,8 +173,10 @@ function LoginForm() {
             className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
           />
         </div>
-        {error && (
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        {(error || searchParams.get("error") === "auth_callback_failed") && (
+          <p className="text-sm text-red-600 dark:text-red-400">
+            {error ?? "That link is invalid or has expired, or was opened in a different browser. Please log in or request a new link."}
+          </p>
         )}
         {showResendHint && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2 dark:border-amber-800 dark:bg-amber-950/50">

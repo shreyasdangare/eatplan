@@ -132,7 +132,7 @@ export async function WeeklyPlanOverview() {
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">{label}</span>
                   <span className="block text-base font-semibold text-stone-700 dark:text-stone-200">
-                    {past ? "Skipped" : "Pick a recipe"}
+                    {past ? "Nothing planned" : "Pick a recipe"}
                   </span>
                 </span>
                 <span className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-orange-100 px-3 text-sm font-bold text-orange-800 transition-colors group-hover:bg-orange-600 group-hover:text-white dark:bg-orange-500/15 dark:text-orange-200" aria-hidden>
