@@ -65,8 +65,9 @@ export function AuthLinks() {
           href="/settings"
           className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 transition-all hover:scale-110 active:scale-95"
           title="Account Settings"
+          aria-label="Settings"
         >
-          <Settings className="h-5 w-5" />
+          <Settings className="h-5 w-5" aria-hidden />
         </Link>
       </div>
     );

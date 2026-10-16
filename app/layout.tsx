@@ -4,6 +4,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { HeaderTitle } from "./components/HeaderTitle";
+import { SiteHeader } from "./components/SiteHeader";
 import { AuthLinks } from "./components/AuthLinks";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { AuthCodeExchange } from "./components/AuthCodeExchange";
@@ -55,7 +56,7 @@ export default async function RootLayout({
             <AuthCodeExchange />
           </Suspense>
           <div className="mx-auto flex min-h-dvh min-w-0 max-w-4xl flex-col px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:max-w-6xl lg:px-10 lg:py-6">
-            <header className="site-header relative z-50 mb-4 rounded-2xl glass-panel px-3 py-1.5 sm:px-4 sm:py-3 sticky top-[max(0.5rem,env(safe-area-inset-top))] sm:mb-8 lg:mb-10 transition-all duration-300">
+            <SiteHeader signedIn={!!user}>
               <div className="flex items-center justify-between gap-2">
                 <HeaderTitle tagline={tagline} />
                 <div className="flex items-center gap-2">
@@ -101,7 +102,7 @@ export default async function RootLayout({
                   </div>
                 </div>
               </div>
-            </header>
+            </SiteHeader>
             <InstallPrompt />
             <main id="main" className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-8 min-h-0 lg:pb-12">{children}</main>
             <MobileNav />

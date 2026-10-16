@@ -2,10 +2,11 @@ import Link from "next/link";
 import { Logo } from "./components/Logo";
 import { Suspense } from "react";
 import { getSession } from "@/lib/supabaseServerClient";
+import { getUserTimeZone } from "@/lib/userTimeZone";
 import { ClearAuthErrorUrl } from "./components/ClearAuthErrorUrl";
 import { MarkHomeVisited } from "./components/MarkHomeVisited";
 import { WeeklyPlanOverview } from "./components/WeeklyPlanOverview";
-import { BookOpen, CalendarHeart, ShoppingCart, Sparkles } from "lucide-react";
+import { BookOpen, CalendarHeart, ShoppingCart, Sparkles, Mic, Settings } from "lucide-react";
 
 const features = [
   {
@@ -42,21 +43,23 @@ type HomePageProps = {
   searchParams: Promise<{ error?: string; error_code?: string }>;
 };
 
-import { getTranslatedTagline, getTranslatedWelcome } from "@/lib/taglines";
+import { getTranslatedTagline, getTranslatedWelcome, initialOf, languageToLocale } from "@/lib/taglines";
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { user } = await getSession();
   const params = await searchParams;
   const expiredLink =
     params?.error === "access_denied" && params?.error_code === "otp_expired";
-  const chefName =
-    user?.preferred_name?.trim() || user?.email?.split("@")[0] || "Chef";
+  const preferred = user?.preferred_name?.trim();
+  const chefName = preferred || user?.email?.split("@")[0] || "Chef";
   const isFirstVisit = user ? !user.has_visited_home : false;
   const welcomePrefix = getTranslatedWelcome(user?.native_language, isFirstVisit);
   const tagline = getTranslatedTagline(user?.native_language);
+  const locale = languageToLocale(user?.native_language);
+  const todayLabel = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: await getUserTimeZone() }).format(new Date());
 
   return (
-    <div className="flex flex-col gap-6 lg:gap-8">
+    <div className="flex flex-col gap-6 pt-1 lg:gap-8">
       <Suspense fallback={null}>
         <ClearAuthErrorUrl />
       </Suspense>
@@ -74,44 +77,68 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       )}
       {user && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {isFirstVisit && <MarkHomeVisited />}
 
-          <section className="relative overflow-hidden rounded-3xl sm:rounded-4xl border border-white/40 bg-linear-to-br from-orange-200/60 via-amber-100/50 to-rose-100/60 p-4 sm:p-6 shadow-[0_20px_40px_-15px_rgba(234,88,12,0.15)] dark:border-stone-700/50 dark:from-stone-800/80 dark:via-stone-800/60 dark:to-stone-700/80">
-            <div className="flex items-center gap-3">
-              <Logo aria-hidden className="h-11 w-11 shrink-0 drop-shadow-lg sm:h-14 sm:w-14" />
+          {/* Greeting row: replaces the header card on phones (no empty bar with a lone gear). */}
+          <header className="flex items-center gap-3 pt-2 motion-safe:animate-[rise_380ms_cubic-bezier(0.2,0.8,0.2,1)_both]">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
+                {welcomePrefix.replace(/,\s*$/, "")}
+              </p>
+              <h1 className={`${chefName.length > 22 ? "text-[1.35rem]" : "text-[1.65rem]"} font-extrabold leading-tight tracking-tight text-stone-900 text-balance wrap-break-word dark:text-stone-50 sm:text-3xl`}>
+                {preferred ? chefName : `Chef ${chefName}`}
+              </h1>
+            </div>
+            <Link
+              href="/settings"
+              aria-label="Settings"
+              className="group relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-orange-500 to-rose-500 text-lg font-bold text-white shadow-md ring-4 ring-white transition-transform active:scale-95 dark:ring-stone-900"
+            >
+              <span aria-hidden className="leading-none">{initialOf(chefName)}</span>
+              <span aria-hidden className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-stone-700 shadow-sm ring-1 ring-stone-200 dark:bg-stone-800 dark:text-stone-200 dark:ring-stone-700">
+                <Settings className="h-3 w-3" strokeWidth={2.5} />
+              </span>
+            </Link>
+          </header>
+
+          <section
+            aria-labelledby="home-question"
+            className="relative overflow-hidden rounded-3xl border border-orange-200/70 bg-linear-to-br from-orange-100 via-amber-50 to-rose-50 p-4 shadow-[0_16px_36px_-18px_rgba(234,88,12,0.35)] motion-safe:animate-[rise_420ms_60ms_cubic-bezier(0.2,0.8,0.2,1)_both] dark:border-stone-700/70 dark:from-stone-800 dark:via-stone-900 dark:to-stone-800 dark:shadow-none sm:rounded-4xl sm:p-6"
+          >
+            <div aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-orange-300/30 blur-2xl dark:bg-orange-500/10" />
+            <div className="relative flex items-center gap-3">
+              <Logo aria-hidden className="h-11 w-11 shrink-0 drop-shadow-md" />
               <div className="min-w-0">
-                <h1 className="truncate text-xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-2xl">
-                  {welcomePrefix} Chef {chefName}!
-                </h1>
-                <p className="text-sm font-semibold text-orange-800 dark:text-orange-300">{tagline}</p>
+                <h2 id="home-question" className="text-xl font-extrabold leading-snug tracking-tight text-stone-900 dark:text-stone-50">
+                  {tagline}
+                </h2>
+                <p className="text-sm font-medium text-orange-800 dark:text-orange-300">{todayLabel}</p>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              <Link
-                href="/plan?add=1"
-                className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl bg-orange-600 px-2 text-center text-sm font-bold text-white shadow-md active:scale-95"
-              >
-                <CalendarHeart className="h-5 w-5" aria-hidden />
-                Plan a meal
-              </Link>
-              <Link
-                href="/shopping-list"
-                className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl bg-white/80 px-2 text-center text-sm font-bold text-stone-900 shadow-xs active:scale-95 dark:bg-stone-900/70 dark:text-stone-50"
-              >
-                <ShoppingCart className="h-5 w-5" aria-hidden />
-                Shopping list
-              </Link>
-              <Link
-                href="/dishes/new"
-                className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl bg-white/80 px-2 text-center text-sm font-bold text-stone-900 shadow-xs active:scale-95 dark:bg-stone-900/70 dark:text-stone-50"
-              >
-                <BookOpen className="h-5 w-5" aria-hidden />
-                Add recipe
-              </Link>
-            </div>
+            <ul className="relative mt-4 grid grid-cols-3 gap-2">
+              {[
+                { href: "/shopping-list", label: "Groceries", icon: ShoppingCart, primary: true },
+                { href: "/dishes/new", label: "Add recipe", icon: BookOpen },
+                { href: "/dishes/new?mode=voice", label: "Speak it", icon: Mic },
+              ].map(({ href, label, icon: Icon, primary }) => (
+                <li key={href} className="flex">
+                  <Link
+                    href={href}
+                    className={`flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-1.5 rounded-2xl px-1 text-center text-[13px] font-bold leading-none whitespace-nowrap transition-transform active:scale-95 ${
+                      primary
+                        ? "bg-orange-600 text-white shadow-md shadow-orange-600/25 hover:bg-orange-700"
+                        : "bg-white/85 text-stone-900 shadow-xs ring-1 ring-stone-900/5 hover:bg-white dark:bg-stone-900/70 dark:text-stone-50 dark:ring-white/10"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden />
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
             {!user?.native_language && (
-              <p className="mt-3 text-sm font-medium text-orange-950 dark:text-orange-100">
+              <p className="relative mt-3 text-sm font-medium text-orange-950 dark:text-orange-100">
                 Set your mother tongue in{" "}
                 <Link href="/settings" className="inline-flex min-h-11 items-center font-bold underline underline-offset-2">
                   Settings
@@ -121,7 +148,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             )}
           </section>
 
-          <Suspense fallback={<div className="h-48 rounded-3xl glass-panel animate-pulse mx-auto w-full max-w-5xl" />}>
+          <Suspense fallback={<div className="h-64 w-full rounded-3xl glass-panel motion-safe:animate-pulse" />}>
             <WeeklyPlanOverview />
           </Suspense>
         </div>
@@ -211,8 +238,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       )}
 
       {/* Footer line */}
-      <div className="mt-8 pb-4 flex justify-center">
-        <p className="rounded-full glass-panel px-4 py-2 text-xs font-semibold tracking-wider text-stone-500 dark:text-stone-400">
+      <div className="flex justify-center pb-2">
+        <p className="px-4 py-1 text-xs font-semibold tracking-wider text-stone-500 dark:text-stone-400">
           A MEAL PLANNER BY PP 🇮🇳
         </p>
       </div>

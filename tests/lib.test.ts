@@ -42,3 +42,17 @@ describe("taglines", () => {
     expect(getTranslatedWelcome("en", true)).toBe("Welcome,");
   });
 });
+
+import { initialOf, languageToLocale } from "../lib/taglines";
+describe("home greeting helpers", () => {
+  it("maps languages to locales", () => {
+    expect(languageToLocale("Marathi")).toBe("mr-IN");
+    expect(languageToLocale("hi")).toBe("hi-IN");
+    expect(languageToLocale(undefined)).toBe("en-GB");
+  });
+  it("takes the first grapheme", () => {
+    expect(initialOf("shreyas")).toBe("S");
+    expect(initialOf("श्रेयस")).toBe("श्रे");
+    expect(initialOf("  ")).toBe("?");
+  });
+});
