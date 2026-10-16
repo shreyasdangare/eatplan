@@ -21,6 +21,7 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts: [
       { name: "Shopping list", short_name: "List", url: "/shopping-list", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
       { name: "This week's plan", short_name: "Plan", url: "/plan", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
+      { name: "Speak a recipe", short_name: "Speak", url: "/dishes/new?mode=voice", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
       { name: "Add a recipe", short_name: "Add recipe", url: "/dishes/new", icons: [{ src: "/icon-192.png", sizes: "192x192" }] },
     ],
     // Share a recipe link from any app straight into the importer (Android).

@@ -6,7 +6,8 @@ import {
   IngredientAutocompleteInput,
   IngredientOption
 } from "../../components/IngredientAutocompleteInput";
-import { Link as LinkIcon, Camera, Plus, Save, ChefHat, Clock, Users, Tags, Wand2, PenLine, ChevronDown, ClipboardPaste } from "lucide-react";
+import { VoiceRecipeSheet } from "../../components/VoiceRecipeSheet";
+import { Link as LinkIcon, Camera, Plus, Save, ChefHat, Clock, Users, Tags, Wand2, PenLine, ChevronDown, ClipboardPaste, Mic } from "lucide-react";
 
 type Ingredient = {
   id: string;
@@ -41,6 +42,7 @@ export default function NewDishPage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [newIngredientName, setNewIngredientName] = useState("");
   const [addingIngredient, setAddingIngredient] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   const ingredientOptions: IngredientOption[] = useMemo(
     () => ingredients.map((ing) => ({ id: ing.id, name: ing.name })),
@@ -52,6 +54,7 @@ export default function NewDishPage() {
     if (params.get("mode") === "manual") {
       setExpandedSection("manual");
     }
+    if (params.get("mode") === "voice") setVoiceOpen(true);
     // Web Share Target / deep link: /dishes/new?url=… (or text=… containing a link)
     const shared = params.get("url") || params.get("text") || params.get("title");
     if (shared) {
@@ -276,7 +279,7 @@ export default function NewDishPage() {
           </div>
           <div>
             <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Import magic</h2>
-            <p className="text-sm text-stone-600 dark:text-stone-300">Paste a recipe or YouTube link, or just type a dish name.</p>
+            <p className="text-sm text-stone-600 dark:text-stone-300">Paste a link, type a dish name, speak it or scan a photo.</p>
           </div>
         </div>
         <form onSubmit={handleSmartImport} className="space-y-3">
@@ -336,6 +339,15 @@ export default function NewDishPage() {
           <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
         </div>
 
+        <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => setVoiceOpen(true)}
+          disabled={!!importingType}
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-orange-600 bg-orange-50 px-4 text-base font-bold text-orange-800 transition-all active:scale-[0.98] disabled:opacity-60 dark:border-orange-500 dark:bg-orange-500/10 dark:text-orange-200"
+        >
+          <Mic className="h-5 w-5" aria-hidden /> Speak a recipe
+        </button>
         <label
           className={`flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-stone-300 bg-white/70 px-4 text-base font-bold text-stone-800 transition-all active:scale-[0.98] dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-100 ${
             importingType ? "pointer-events-none opacity-60" : ""
@@ -346,7 +358,7 @@ export default function NewDishPage() {
           ) : (
             <Camera className="h-5 w-5" aria-hidden />
           )}
-          {importingType === "screenshot" ? "Scanning photo…" : "Scan a photo or screenshot"}
+          {importingType === "screenshot" ? "Scanning photo…" : "Scan a photo"}
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/heic"
@@ -359,6 +371,7 @@ export default function NewDishPage() {
             disabled={!!importingType}
           />
         </label>
+        </div>
 
         {importingType && (
           <p className="mt-3 text-center text-sm text-stone-600 dark:text-stone-300" role="status">
@@ -631,6 +644,7 @@ export default function NewDishPage() {
           </div>
         )}
       </div>
+      <VoiceRecipeSheet open={voiceOpen} onClose={() => setVoiceOpen(false)} />
     </section>
   );
 }

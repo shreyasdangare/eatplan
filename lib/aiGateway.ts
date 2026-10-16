@@ -10,6 +10,9 @@ export const RECIPE_MODEL =
   process.env.AI_GATEWAY_RECIPE_MODEL?.trim() || "google/gemini-3-flash";
 export const RECIPE_VIDEO_MODEL =
   process.env.AI_GATEWAY_RECIPE_VIDEO_MODEL?.trim() || "google/gemini-3.5-flash-lite";
+/** Audio in, recipe JSON out (Speak a recipe). Cheap Gemini flash-lite that accepts audio file parts. */
+export const RECIPE_AUDIO_MODEL =
+  process.env.AI_GATEWAY_RECIPE_AUDIO_MODEL?.trim() || "google/gemini-3.1-flash-lite";
 export const TRANSLATE_MODEL =
   process.env.AI_GATEWAY_TRANSLATE_MODEL?.trim() || "google/gemini-2.5-flash";
 
