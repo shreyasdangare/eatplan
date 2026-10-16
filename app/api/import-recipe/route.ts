@@ -5,6 +5,7 @@ import { requireAuth } from "@/lib/supabaseServerClient";
 import { getHouseholdId } from "@/lib/getHouseholdId";
 import { fetchImageUrlForRecipe } from "@/lib/recipeImages";
 import { logLlmUsage } from "@/lib/logLlmUsage";
+import { normalizeRecipe } from "@/lib/voiceRecipe";
 import { gatewayJson, RECIPE_MODEL, RECIPE_VIDEO_MODEL, type GatewayTokens } from "@/lib/aiGateway";
 
 type ExtractedIngredient = {
@@ -19,6 +20,7 @@ type ExtractedRecipe = {
   description?: string;
   ingredients?: ExtractedIngredient[];
   servings?: number;
+  prep_time_minutes?: number;
   instructions?: string;
 };
 
@@ -254,7 +256,7 @@ async function saveExtractedRecipe(
       name: recipe.name.trim(),
       description: recipe.description?.trim() || null,
       meal_type: "both",
-      prep_time_minutes: null,
+      prep_time_minutes: recipe.prep_time_minutes ?? null,
       tags: [],
       servings: recipe.servings ?? null,
       instructions: recipe.instructions?.trim() || null,
@@ -352,8 +354,26 @@ export async function POST(req: NextRequest) {
       );
     }
   } else {
-    const body = (await req.json().catch(() => ({}))) as { url?: string; recipeName?: string };
+    const body = (await req.json().catch(() => ({}))) as { url?: string; recipeName?: string; recipe?: unknown };
     const { url, recipeName } = body;
+
+    // Pre-parsed recipe (e.g. reviewed after "Speak a recipe"): validate and save, no model call.
+    if (body.recipe !== undefined) {
+      let reviewed: ExtractedRecipe;
+      try {
+        reviewed = normalizeRecipe(body.recipe);
+      } catch (e) {
+        return NextResponse.json({ error: e instanceof Error ? e.message : "Invalid recipe" }, { status: 400 });
+      }
+      try {
+        const imageUrl = await fetchImageUrlForRecipe(reviewed.name).catch(() => null);
+        const saved = await saveExtractedRecipe(reviewed, householdId, imageUrl);
+        return NextResponse.json(saved, { status: 201 });
+      } catch (e) {
+        console.error("Save reviewed recipe error", e);
+        return NextResponse.json({ error: e instanceof Error ? e.message : "Failed to create dish" }, { status: 500 });
+      }
+    }
 
     if (recipeName && typeof recipeName === "string") {
       try {
