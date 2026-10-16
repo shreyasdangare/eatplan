@@ -3,7 +3,6 @@ import { supabaseServer } from "@/lib/supabaseServer";
 import { getHouseholdId } from "@/lib/getHouseholdId";
 import Link from "next/link";
 import { Sun, Utensils, Moon, Plus, Check, ChevronRight, CalendarDays } from "lucide-react";
-import { isMealPast } from "@/lib/isMealPast";
 import { imageVariant } from "@/lib/imageSrc";
 import { getUserTimeZone } from "@/lib/userTimeZone";
 
@@ -34,13 +33,22 @@ function upcoming(timeZone: string) {
   return { today, tomorrow, todayLabel: label(today, { weekday: "short", day: "numeric", month: "short" }), tomorrowLabel: label(tomorrow, { weekday: "short" }) };
 }
 
+const SLOT_ENDS_AT: Record<Slot, number> = { breakfast: 11, lunch: 15, dinner: 22 };
+
+/** Has today's slot passed, judged on the user's clock (same cut-offs as lib/isMealPast). */
+function slotPast(slot: Slot, timeZone: string): boolean {
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", hourCycle: "h23" }).format(new Date()));
+  return hour >= SLOT_ENDS_AT[slot];
+}
+
 export async function WeeklyPlanOverview() {
   const { user } = await getSession();
   if (!user) return null;
   const householdId = await getHouseholdId(user.id);
   if (!householdId) return null;
 
-  const { today, tomorrow, todayLabel, tomorrowLabel } = upcoming(await getUserTimeZone());
+  const timeZone = await getUserTimeZone();
+  const { today, tomorrow, todayLabel, tomorrowLabel } = upcoming(timeZone);
   const { data, error } = await supabaseServer
     .from("meal_plans")
     .select("id, date, slot_type, dish_id, dishes ( id, name, image_url )")
@@ -81,7 +89,7 @@ export async function WeeklyPlanOverview() {
       <ul className="overflow-hidden rounded-3xl border border-stone-200/80 bg-white shadow-[0_8px_28px_-18px_rgba(0,0,0,0.25)] divide-y divide-stone-100 dark:divide-stone-800 dark:border-stone-800 dark:bg-stone-900">
         {SLOTS.map(({ key, label, icon: Icon }) => {
           const entry = todayPlan[key];
-          const past = isMealPast(today, key);
+          const past = slotPast(key, timeZone);
           if (entry?.dishes) {
             const thumb = entry.dishes.image_url ? imageVariant(entry.dishes.image_url, 250) ?? entry.dishes.image_url : null;
             return (
