@@ -21,9 +21,16 @@ export function AuthCodeExchange() {
 
     setStatus("exchanging");
     getSupabaseClient()
-      .then((supabase) => supabase.auth.exchangeCodeForSession(code))
-      .then(({ error }) => {
-        if (error) {
+      .then(async (supabase) => {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) return true;
+        // The browser client may already have exchanged the code itself (detectSessionInUrl),
+        // which makes our second exchange fail even though the user is now signed in.
+        const { data } = await supabase.auth.getUser();
+        return !!data.user;
+      })
+      .then((signedIn) => {
+        if (!signedIn) {
           setStatus("error");
           return;
         }
