@@ -1,4 +1,5 @@
 "use client";
+import { responsiveImage } from "@/lib/imageSrc";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -52,12 +53,15 @@ export function DishImageUpload({
       {imageUrl ? (
         <div className={wrapperClass}>
           <img
-            src={imageUrl}
+            {...responsiveImage(imageUrl)}
+            sizes="(min-width: 768px) 768px, 100vw"
+            fetchPriority="high"
+            decoding="async"
             alt="Dish"
             className={imageClass}
           />
           <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
-          <label className={`absolute cursor-pointer flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-black hover:scale-105 active:scale-95 shadow-lg border border-white/20 z-20 ${
+          <label className={`absolute cursor-pointer flex min-h-11 items-center gap-2 rounded-full bg-black/60 px-4 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-black hover:scale-105 active:scale-95 shadow-lg border border-white/20 z-20 ${
             isHero ? "top-4 right-4 sm:top-6 sm:right-6" : "bottom-4 right-4"
           }`}>
             <Camera className="h-4 w-4" />
@@ -87,7 +91,7 @@ export function DishImageUpload({
           ) : (
             <div className="flex flex-col items-center gap-3 transition-transform group-hover:scale-105">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-xs dark:bg-stone-800">
-                <ImagePlus className="h-8 w-8 text-stone-400 group-hover:text-orange-500 transition-colors" />
+                <ImagePlus className="h-8 w-8 text-stone-500 dark:text-stone-400 group-hover:text-orange-500 transition-colors" />
               </div>
               <div>
                 <span className="block text-base font-semibold text-stone-700 dark:text-stone-200 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">

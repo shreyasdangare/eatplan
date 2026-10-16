@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { CalendarPlus, Copy } from "lucide-react";
 
 type IngredientOption = { id: string; name: string };
 
 type ShoppingListHeaderProps = {
   onAddFromMealPlan: () => void;
   onCopyList: () => void;
-  onAddItem: (item: { ingredient_id?: string; custom_name?: string; quantity?: string; category?: string }) => void;
+  onAddItem: (item: { ingredient_id?: string; custom_name?: string; quantity?: string; category?: string; name?: string }) => void;
   toBuyCount: number;
   populateLoading?: boolean;
 };
@@ -76,7 +76,7 @@ export function ShoppingListHeader({
   const handleSelect = useCallback(
     (ing: IngredientOption | null, customName?: string) => {
       if (ing) {
-        onAddItem({ ingredient_id: ing.id, custom_name: undefined });
+        onAddItem({ ingredient_id: ing.id, custom_name: undefined, name: ing.name });
       } else if (customName) {
         onAddItem({ custom_name: customName.trim() });
       }
@@ -100,32 +100,28 @@ export function ShoppingListHeader({
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-          List
-        </h2>
-        <div className="flex items-center gap-1.5">
-          <Link
-            href="/"
-            className="rounded-full bg-orange-500 px-2.5 py-1 text-xs font-semibold text-white shadow-xs hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
-          >
-            Home
-          </Link>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
+          Shopping list
+        </h1>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onAddFromMealPlan}
             disabled={populateLoading}
-            className="rounded-full bg-amber-200 px-2.5 py-1 text-xs font-medium text-amber-900 hover:bg-amber-300 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700 disabled:opacity-50"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-amber-100 px-4 text-sm font-semibold text-amber-900 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-100 dark:hover:bg-amber-800/60 disabled:opacity-50"
           >
-            {populateLoading ? "…" : "Meal plan"}
+            <CalendarPlus className="h-4 w-4" aria-hidden />
+            {populateLoading ? "Adding…" : "From plan"}
           </button>
           {toBuyCount > 0 && (
             <button
               type="button"
               onClick={onCopyList}
-              className="rounded-full bg-amber-200 px-2.5 py-1 text-xs font-medium text-amber-900 hover:bg-amber-300 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700"
+              aria-label="Copy list to clipboard"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-800 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700"
             >
-              Copy
+              <Copy className="h-4 w-4" aria-hidden />
             </button>
           )}
         </div>
@@ -141,18 +137,27 @@ export function ShoppingListHeader({
           }}
           onFocus={() => searchValue.trim() && setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search or add item…"
-          className="w-full rounded-lg border border-orange-200 bg-white px-2.5 py-2 text-sm placeholder:text-amber-400 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-500"
+          placeholder="Add an item, e.g. milk"
+          aria-label="Search or add item"
+          role="combobox"
+          aria-controls="shopping-add-results"
           aria-autocomplete="list"
           aria-expanded={open && (searchResults.length > 0 || showCreateNew)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          enterKeyHint="done"
+          className="min-h-12 w-full rounded-xl border border-orange-200 bg-white px-3.5 text-base placeholder:text-stone-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-400"
         />
         {open && (searchResults.length > 0 || showCreateNew) && (
           <ul
+            id="shopping-add-results"
             role="listbox"
-            className="absolute z-20 mt-1 max-h-48 w-full overflow-auto rounded-xl border border-orange-200 bg-white shadow-lg dark:border-stone-600 dark:bg-stone-800"
+            className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-orange-200 bg-white shadow-lg dark:border-stone-600 dark:bg-stone-800"
           >
             {searching && searchResults.length === 0 && (
-              <li className="px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
+              <li className="px-3.5 py-2 text-sm text-amber-800 dark:text-amber-200">
                 Searching…
               </li>
             )}
@@ -160,7 +165,8 @@ export function ShoppingListHeader({
               <li
                 key={ing.id}
                 role="option"
-                className="cursor-pointer px-3 py-2 text-sm text-stone-800 hover:bg-orange-50 dark:text-stone-200 dark:hover:bg-stone-700"
+                aria-selected={false}
+                className="flex min-h-11 cursor-pointer items-center px-3.5 text-base text-stone-800 hover:bg-orange-50 dark:text-stone-200 dark:hover:bg-stone-700"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSelect(ing);
@@ -172,7 +178,8 @@ export function ShoppingListHeader({
             {showCreateNew && (
               <li
                 role="option"
-                className="cursor-pointer px-3 py-2 text-sm text-amber-700 hover:bg-orange-50 dark:text-amber-400 dark:hover:bg-stone-700"
+                aria-selected={false}
+                className="flex min-h-11 cursor-pointer items-center px-3.5 text-base font-semibold text-amber-800 hover:bg-orange-50 dark:text-amber-300 dark:hover:bg-stone-700"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSelect(null, searchValue.trim());

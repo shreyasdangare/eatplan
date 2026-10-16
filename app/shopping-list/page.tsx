@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   DndContext,
   DragEndEvent,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -19,6 +20,9 @@ import { ShoppingTile, type ShoppingTileItem } from "@/app/components/ShoppingTi
 import { ShoppingItemDetail } from "@/app/components/ShoppingItemDetail";
 import { ShoppingListHeader } from "@/app/components/ShoppingListHeader";
 import { CategoryBrowser } from "@/app/components/CategoryBrowser";
+import { BottomSheet } from "@/app/components/ui/BottomSheet";
+import { Skeleton, LoadingRegion } from "@/app/components/ui/Skeleton";
+import { toast } from "@/app/components/ui/Toast";
 import { SHOPPING_CATEGORIES, getCategoryEmoji, inferCategoryFromName } from "@/lib/categoryEmoji";
 
 function SortableTile({
@@ -46,15 +50,19 @@ function SortableTile({
     transition,
   };
 
+  // Listeners on the wrapper (long-press anywhere on the tile starts a drag on touch);
+  // a11y attributes on the tile's main button so there is no nested interactive role.
+  const { role: _role, tabIndex: _tabIndex, ...a11y } = attributes;
+  void _role;
+  void _tabIndex;
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...listeners}
-      {...attributes}
-      className={isDragging ? "z-50 opacity-90" : ""}
+      className={`no-callout touch-manipulation ${isDragging ? "relative z-50 scale-[1.03] opacity-95 shadow-xl rounded-xl" : ""}`}
     >
-      <ShoppingTile item={item} onTap={onTap} onOpenDetail={onOpenDetail} animating={animating} />
+      <ShoppingTile item={item} onTap={onTap} onOpenDetail={onOpenDetail} animating={animating} dragAttributes={a11y} disabled={item.id.startsWith("temp-")} />
     </div>
   );
 }
@@ -155,14 +163,20 @@ export default function ShoppingListPage() {
         setToBuy((prev) => [...prev, updatedItem]);
       }
 
+      if (navigator.vibrate) navigator.vibrate(nextStatus === "bought" ? 12 : 6);
       // Persist in background; revert on failure
       fetch(`/api/shopping-list/${item.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus }),
-      }).then((res) => {
-        if (!res.ok) loadList();
-      });
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error();
+        })
+        .catch(() => {
+          toast({ message: "Couldn't sync that change. Refreshing…", tone: "error" });
+          loadList();
+        });
     },
     [loadList]
   );
@@ -176,13 +190,17 @@ export default function ShoppingListPage() {
         notes?: string | null;
       }
     ) => {
+      const apply = (list: ShoppingTileItem[]) => list.map((i) => (i.id === id ? { ...i, ...updates } : i));
+      setToBuy(apply);
+      setBought(apply);
+      setDetailItem(null);
       const res = await fetch(`/api/shopping-list/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
-      });
-      if (res.ok) {
-        setDetailItem(null);
+      }).catch(() => null);
+      if (!res?.ok) {
+        toast({ message: "Couldn't save changes.", tone: "error" });
         loadList();
       }
     },
@@ -191,9 +209,12 @@ export default function ShoppingListPage() {
 
   const handleDeleteItem = useCallback(
     async (id: string) => {
-      const res = await fetch(`/api/shopping-list/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setDetailItem(null);
+      setToBuy((prev) => prev.filter((i) => i.id !== id));
+      setBought((prev) => prev.filter((i) => i.id !== id));
+      setDetailItem(null);
+      const res = await fetch(`/api/shopping-list/${id}`, { method: "DELETE" }).catch(() => null);
+      if (!res?.ok) {
+        toast({ message: "Couldn't remove item.", tone: "error" });
         loadList();
       }
     },
@@ -206,21 +227,46 @@ export default function ShoppingListPage() {
       custom_name?: string;
       quantity?: string;
       category?: string;
+      name?: string;
     }) => {
-      const res = await fetch("/api/shopping-list", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ingredient_id: item.ingredient_id ?? null,
-          custom_name: item.custom_name ?? null,
-          quantity: item.quantity ?? null,
-          category: item.category ?? null,
-          source: "manual",
-        }),
-      });
-      if (res.ok) loadList();
+      // Optimistic: show the tile immediately, swap in the saved row when the API answers.
+      const tempId = `temp-${Date.now()}`;
+      const known = item.ingredient_id ? ingredients.find((i) => i.id === item.ingredient_id) : undefined;
+      const displayName = item.name ?? known?.name ?? item.custom_name ?? "Item";
+      const temp: ShoppingTileItem = {
+        id: tempId,
+        ingredient_id: item.ingredient_id ?? null,
+        custom_name: item.custom_name ?? null,
+        ingredient_name: item.ingredient_id ? displayName : null,
+        quantity: item.quantity ?? null,
+        category: item.category ?? known?.category ?? null,
+        status: "to_buy",
+        source: "manual",
+      };
+      setToBuy((prev) => [...prev, temp]);
+      if (navigator.vibrate) navigator.vibrate(8);
+      try {
+        const res = await fetch("/api/shopping-list", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ingredient_id: item.ingredient_id ?? null,
+            custom_name: item.custom_name ?? null,
+            quantity: item.quantity ?? null,
+            category: item.category ?? null,
+            source: "manual",
+          }),
+        });
+        if (!res.ok) throw new Error();
+        const data = (await res.json()) as { items?: ShoppingTileItem[] };
+        const saved = data.items?.[0];
+        setToBuy((prev) => prev.map((i) => (i.id === tempId && saved ? { ...temp, ...saved } : i)));
+      } catch {
+        setToBuy((prev) => prev.filter((i) => i.id !== tempId));
+        toast({ message: `Couldn't add ${displayName}.`, tone: "error" });
+      }
     },
-    [loadList]
+    [ingredients]
   );
 
   const handleAddFromMealPlan = useCallback(() => {
@@ -238,6 +284,9 @@ export default function ShoppingListPage() {
       if (res.ok) {
         setShowMealPlanModal(false);
         loadList();
+        toast("Meal plan ingredients added");
+      } else {
+        toast({ message: "Couldn't add from the plan.", tone: "error" });
       }
     } finally {
       setPopulateLoading(false);
@@ -284,11 +333,13 @@ export default function ShoppingListPage() {
         return i.quantity ? `${name}: ${i.quantity}` : name;
       })
       .join("\n");
-    if (text) void navigator.clipboard.writeText(text);
+    if (text) void navigator.clipboard.writeText(text).then(() => toast("List copied"), () => toast({ message: "Copy failed", tone: "error" }));
   }, [toBuy]);
 
+  // Mouse: drag after 8px. Touch: long-press (200ms) so normal swipes still scroll the page.
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
   );
 
   const handleDragEnd = useCallback(
@@ -325,19 +376,43 @@ export default function ShoppingListPage() {
       <CategoryBrowser ingredients={ingredients} onAddItem={handleAddItem} />
 
       {loading ? (
-        <p className="text-sm text-amber-700 dark:text-amber-300">Loading…</p>
+        <LoadingRegion label="Loading your shopping list">
+          <div className="space-y-2 rounded-xl border border-orange-200 p-2 dark:border-stone-700">
+            <Skeleton className="h-4 w-32" />
+            <div className="grid grid-cols-2 gap-2">
+              {Array.from({ length: 6 }, (_, i) => (
+                <Skeleton key={i} className="h-[52px]" />
+              ))}
+            </div>
+          </div>
+        </LoadingRegion>
+      ) : toBuy.length === 0 && bought.length === 0 ? (
+        <div className="flex flex-col items-center rounded-3xl border border-dashed border-orange-300 bg-orange-50/60 px-6 py-10 text-center dark:border-stone-700 dark:bg-stone-900/40">
+          <span className="text-4xl" aria-hidden>🛒</span>
+          <h2 className="mt-3 text-lg font-bold text-stone-900 dark:text-stone-50">Your list is empty</h2>
+          <p className="mt-1 max-w-xs text-sm text-stone-700 dark:text-stone-300">
+            Type an item above, or pull in everything you need for this week&apos;s meals.
+          </p>
+          <button
+            type="button"
+            onClick={handleAddFromMealPlan}
+            className="mt-4 min-h-12 rounded-full bg-orange-600 px-6 text-base font-bold text-white active:scale-95"
+          >
+            Add from this week&apos;s plan
+          </button>
+        </div>
       ) : (
         <>
           <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800/80">
-            <h3 className="mb-1.5 px-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
-              To buy{groupByCategory ? " · grouped by aisle" : " · drag to reorder"}
+            <h3 className="mb-2 px-0.5 text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+              To buy{groupByCategory ? " · by aisle" : ""} <span className="font-medium normal-case tracking-normal">· hold &amp; drag to reorder</span>
             </h3>
             {toBuy.length === 0 && bought.length === 0 ? (
-              <p className="py-4 text-center text-xs text-amber-600 dark:text-amber-400">
+              <p className="py-4 text-center text-sm text-amber-800 dark:text-amber-200">
                 Add items above or from meal plan.
               </p>
             ) : toBuy.length === 0 ? (
-              <p className="py-2 text-xs text-amber-600 dark:text-amber-400">
+              <p className="py-2 text-sm text-amber-800 dark:text-amber-200">
                 All done. Tap items below to re-add.
               </p>
             ) : (
@@ -357,7 +432,7 @@ export default function ShoppingListPage() {
                           groups.get(cat)!.push(item);
                         }
                         // Sort groups by SHOPPING_CATEGORIES order
-                        const ordered = [...SHOPPING_CATEGORIES, "Other"].filter((c) => groups.has(c));
+                        const ordered = [...new Set([...SHOPPING_CATEGORIES, "Other"])].filter((c) => groups.has(c));
                         // Include any categories not in SHOPPING_CATEGORIES
                         for (const c of groups.keys()) {
                           if (!ordered.includes(c)) ordered.push(c);
@@ -369,11 +444,11 @@ export default function ShoppingListPage() {
                             <div key={cat}>
                               <div className="mb-1 flex items-center gap-1.5 px-0.5">
                                 <span className="text-sm" aria-hidden>{getCategoryEmoji(cat)}</span>
-                                <span className="text-[11px] font-medium text-amber-800 dark:text-amber-200">
+                                <span className="text-xs font-semibold text-amber-900 dark:text-amber-100">
                                   {cat} ({items.length})
                                 </span>
                               </div>
-                              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
+                              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                                 {items.map((item) => (
                                   <SortableTile
                                     key={item.id}
@@ -390,7 +465,7 @@ export default function ShoppingListPage() {
                       })()}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                       {toBuy.map((item) => (
                         <SortableTile
                           key={item.id}
@@ -410,19 +485,19 @@ export default function ShoppingListPage() {
           {bought.length > 0 && (
             <div className="rounded-lg border border-lime-200 bg-lime-50/50 p-2 dark:border-lime-800 dark:bg-lime-950/30">
               <div className="mb-1.5 flex items-center justify-between px-0.5">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-lime-700 dark:text-lime-300">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-lime-800 dark:text-lime-200">
                   Recently bought · tap to re-add
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowClearModal(true)}
                   disabled={clearingBought}
-                  className="rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-medium text-lime-800 hover:bg-lime-300 disabled:opacity-50 dark:bg-lime-900/60 dark:text-lime-200 dark:hover:bg-lime-800/60"
+                  className="min-h-11 rounded-full bg-lime-200 px-4 text-sm font-semibold text-lime-900 hover:bg-lime-300 disabled:opacity-50 dark:bg-lime-900/60 dark:text-lime-100 dark:hover:bg-lime-800/60"
                 >
                   {clearingBought ? "Clearing…" : "Clear all"}
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                 {bought.map((item) => (
                   <ShoppingTile
                     key={item.id}
@@ -437,108 +512,86 @@ export default function ShoppingListPage() {
         </>
       )}
 
-      {showMealPlanModal && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40 dark:bg-black/60"
-            aria-hidden
-            onClick={() => !populateLoading && setShowMealPlanModal(false)}
-          />
-          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-orange-200 bg-white p-4 shadow-lg dark:border-stone-600 dark:bg-stone-900">
-            <h3 className="mb-3 text-sm font-semibold text-amber-900 dark:text-amber-100">
-              Add from meal plan
-            </h3>
-            <p className="mb-3 text-xs text-amber-700 dark:text-amber-300">
-              Choose a date range. Ingredients from planned meals will be merged into your list.
-            </p>
-            <div className="mb-3 flex gap-2">
-              <input
-                type="date"
-                value={mealPlanFrom}
-                onChange={(e) => setMealPlanFrom(e.target.value)}
-                className="flex-1 rounded-lg border border-orange-200 px-2 py-1.5 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-              />
-              <span className="self-center text-amber-600 dark:text-amber-400">to</span>
-              <input
-                type="date"
-                value={mealPlanTo}
-                onChange={(e) => setMealPlanTo(e.target.value)}
-                className="flex-1 rounded-lg border border-orange-200 px-2 py-1.5 text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={runPopulate}
-                disabled={populateLoading}
-                className="flex-1 rounded-full bg-orange-500 py-2 text-sm font-semibold text-white hover:bg-orange-400 disabled:opacity-50 dark:bg-orange-600"
-              >
-                {populateLoading ? "Adding…" : "Add ingredients"}
-              </button>
-              <button
-                type="button"
-                onClick={() => !populateLoading && setShowMealPlanModal(false)}
-                className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium dark:border-stone-600 dark:text-stone-300"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <BottomSheet
+        open={showMealPlanModal}
+        onClose={() => setShowMealPlanModal(false)}
+        dismissible={!populateLoading}
+        title="Add from meal plan"
+        subtitle="Ingredients from planned meals are merged into your list."
+        footer={
+          <button
+            type="button"
+            onClick={runPopulate}
+            disabled={populateLoading}
+            className="min-h-12 w-full rounded-full bg-orange-600 text-base font-bold text-white hover:bg-orange-700 disabled:opacity-50"
+          >
+            {populateLoading ? "Adding…" : "Add ingredients"}
+          </button>
+        }
+      >
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex flex-col gap-1 text-sm font-semibold text-stone-700 dark:text-stone-200">
+            From
+            <input
+              type="date"
+              value={mealPlanFrom}
+              onChange={(e) => setMealPlanFrom(e.target.value)}
+              className="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-3 text-base dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm font-semibold text-stone-700 dark:text-stone-200">
+            To
+            <input
+              type="date"
+              value={mealPlanTo}
+              onChange={(e) => setMealPlanTo(e.target.value)}
+              className="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-3 text-base dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+            />
+          </label>
+        </div>
+      </BottomSheet>
 
-      {showClearModal && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40 dark:bg-black/60"
-            aria-hidden
-            onClick={() => !clearingBought && setShowClearModal(false)}
-          />
-          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-lime-200 bg-white p-4 shadow-lg dark:border-stone-600 dark:bg-stone-900">
-            <h3 className="mb-2 text-sm font-semibold text-lime-900 dark:text-lime-100">
-              Clear bought items
-            </h3>
-            <p className="mb-3 text-xs text-lime-700 dark:text-lime-300">
-              {bought.filter((i) => i.ingredient_id).length > 0
-                ? `You have ${bought.filter((i) => i.ingredient_id).length} items that can be added to your pantry before clearing.`
-                : "Remove all bought items from the list?"}
-            </p>
-            <div className="flex flex-col gap-2">
-              {bought.filter((i) => i.ingredient_id).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowClearModal(false);
-                    handleClearBought(true);
-                  }}
-                  disabled={clearingBought}
-                  className="w-full rounded-full bg-lime-600 py-2 text-sm font-semibold text-white hover:bg-lime-500 disabled:opacity-50 dark:bg-lime-700 dark:hover:bg-lime-600"
-                >
-                  Add to pantry & clear
-                </button>
-              )}
+      <BottomSheet
+        open={showClearModal}
+        onClose={() => setShowClearModal(false)}
+        dismissible={!clearingBought}
+        title="Clear bought items"
+        subtitle={
+          bought.filter((i) => i.ingredient_id).length > 0
+            ? `${bought.filter((i) => i.ingredient_id).length} items can be added to your pantry before clearing.`
+            : "Remove all bought items from the list?"
+        }
+        footer={
+          <div className="flex flex-col gap-2">
+            {bought.filter((i) => i.ingredient_id).length > 0 && (
               <button
                 type="button"
                 onClick={() => {
                   setShowClearModal(false);
-                  handleClearBought(false);
+                  handleClearBought(true);
                 }}
                 disabled={clearingBought}
-                className="w-full rounded-full border border-stone-300 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
+                className="min-h-12 w-full rounded-full bg-lime-700 text-base font-bold text-white hover:bg-lime-800 disabled:opacity-50"
               >
-                Clear only
+                Add to pantry &amp; clear
               </button>
-              <button
-                type="button"
-                onClick={() => setShowClearModal(false)}
-                className="text-xs text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200"
-              >
-                Cancel
-              </button>
-            </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setShowClearModal(false);
+                handleClearBought(false);
+              }}
+              disabled={clearingBought}
+              className="min-h-12 w-full rounded-full border border-stone-300 text-base font-semibold text-stone-800 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-100 dark:hover:bg-stone-800"
+            >
+              Clear only
+            </button>
           </div>
-        </>
-      )}
+        }
+      >
+        <span className="sr-only">Choose how to clear bought items.</span>
+      </BottomSheet>
 
       <ShoppingItemDetail
         item={detailItem}

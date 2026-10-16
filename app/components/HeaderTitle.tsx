@@ -15,13 +15,13 @@ export function HeaderTitle({ tagline = "काय खायचं?" }: { taglin
   return (
     <Link
       href="/"
-      className="flex items-center gap-2 shrink-0 hover:opacity-90"
+      className="flex min-h-11 items-center gap-2 shrink-0 rounded-xl hover:opacity-90"
     >
-      <Logo className="h-10 w-10 shrink-0 drop-shadow-xs transition-transform group-hover:scale-105" />
+      <Logo aria-hidden className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 drop-shadow-xs transition-transform group-hover:scale-105" />
       <div className="flex flex-col">
-        <h1 className="text-xl font-semibold tracking-tight text-orange-900 dark:text-orange-200 sm:text-2xl leading-tight">
+        <span className="text-xl font-semibold tracking-tight text-orange-900 dark:text-orange-200 sm:text-2xl leading-tight">
           EatPlan
-        </h1>
+        </span>
         <span className="text-xs text-amber-700 dark:text-amber-300">
           {tagline}
         </span>

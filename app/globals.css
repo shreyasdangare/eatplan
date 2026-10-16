@@ -191,3 +191,110 @@ textarea {
     @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
   }
 }
+
+/* ── Mobile / accessibility foundations (mobile overhaul) ───────────────────────────── */
+
+/* Tailwind 4's oklch palette made the 600 tones brighter than v3; as text or as a
+   background behind white text they fall below WCAG AA (4.5:1). Pin the tones we use for
+   text/buttons to AA-safe values. Lighter tints (50–400) are unchanged. */
+@theme {
+  --color-orange-600: #c2410c;
+  --color-orange-700: #9a3412;
+  --color-amber-600: #b45309;
+  --color-amber-700: #92400e;
+  --color-emerald-600: #047857;
+  --color-lime-600: #4d7c0f;
+  --color-lime-700: #3f6212;
+  --color-rose-600: #be123c;
+  --color-red-600: #b91c1c;
+  --color-stone-500: #6b6560;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes toast-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@layer utilities {
+  /* Expand the hit area of a small visual control to 44×44 without changing layout. */
+  .tap {
+    position: relative;
+  }
+  .tap::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+  /* Long-press drag targets: no iOS callout / text selection while holding. */
+  .no-callout {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* While a bottom sheet is open, hide the tab bar so it can never cover sheet actions. */
+html[data-sheet-open] .mobile-tabbar {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Range inputs: a 44px-tall touch track with a large thumb. */
+input[type="range"].range-touch {
+  height: 44px;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="range"].range-touch::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-stone-200);
+}
+.dark input[type="range"].range-touch::-webkit-slider-runnable-track {
+  background: var(--color-stone-700);
+}
+input[type="range"].range-touch::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -10px;
+  border-radius: 9999px;
+  background: var(--color-orange-600);
+  border: 3px solid white;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+}
+input[type="range"].range-touch::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-stone-200);
+}
+input[type="range"].range-touch::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--color-orange-600);
+  border: 3px solid white;
+}

@@ -54,7 +54,7 @@ export function TranslatedIngredient({ name }: TranslatedIngredientProps) {
         <button
           onClick={handleTranslate}
           disabled={isLoading}
-          className="inline-flex items-center justify-center p-1 rounded-md text-stone-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-amber-500/50 disabled:opacity-50"
+          className="inline-flex items-center justify-center p-1 rounded-md text-stone-500 dark:text-stone-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-amber-500/50 disabled:opacity-50"
           title="Translate ingredient to local language"
           aria-label={`Translate ${name}`}
         >

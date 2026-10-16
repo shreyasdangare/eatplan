@@ -100,7 +100,7 @@ export function InstallPrompt() {
           type="button"
           onClick={handleDismiss}
           aria-label="Dismiss install hint"
-          className="absolute right-2 top-1/2 -translate-y-1/2 sm:top-3 sm:right-3 sm:translate-y-0 rounded-full p-1.5 text-stone-400 opacity-70 transition-all hover:bg-stone-100 hover:text-stone-700 hover:opacity-100 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+          className="absolute right-2 top-1/2 -translate-y-1/2 sm:top-3 sm:right-3 sm:translate-y-0 rounded-full p-1.5 text-stone-500 dark:text-stone-400 opacity-70 transition-all hover:bg-stone-100 hover:text-stone-700 hover:opacity-100 dark:hover:bg-stone-800 dark:hover:text-stone-200"
         >
           <X className="h-4 w-4" />
         </button>
@@ -132,14 +132,14 @@ export function InstallPrompt() {
             <button
               type="button"
               onClick={handleAndroidInstall}
-              className="flex-1 rounded-xl bg-orange-500 px-3 py-1.5 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all hover:bg-orange-600 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-500"
+              className="flex-1 rounded-xl bg-orange-600 px-3 py-1.5 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all hover:bg-orange-600 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-700"
             >
               Install
             </button>
             <button
               type="button"
               onClick={handleDismiss}
-              className="hidden sm:block px-4 py-2.5 text-sm font-medium text-stone-500 transition-colors hover:text-stone-800 dark:hover:text-stone-200"
+              className="hidden sm:block px-4 py-2.5 text-sm font-medium text-stone-500 dark:text-stone-400 transition-colors hover:text-stone-800 dark:hover:text-stone-200"
             >
               Later
             </button>

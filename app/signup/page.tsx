@@ -129,7 +129,7 @@ function SignupForm() {
 
       <div className="flex items-center gap-4">
         <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
-        <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">or</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">or</span>
         <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
       </div>
 
@@ -197,7 +197,7 @@ function SignupForm() {
         </div>
         <div>
           <label htmlFor="native_language" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-            Mother Tongue <span className="text-stone-400 dark:text-stone-500 font-normal">Optional</span>
+            Mother Tongue <span className="text-stone-500 dark:text-stone-400 font-normal">Optional</span>
           </label>
           <div className="relative">
             <select
@@ -219,7 +219,7 @@ function SignupForm() {
               <option value="Spanish">Spanish</option>
               <option value="French">French</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500 dark:text-stone-400">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
@@ -237,7 +237,7 @@ function SignupForm() {
       </form>
       <p className="text-center text-sm text-stone-600 dark:text-stone-400">
         Already have an account?{" "}
-        <Link href={`/login?next=${encodeURIComponent(next)}`} className="text-orange-700 hover:underline dark:text-orange-400">
+        <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-orange-700 underline underline-offset-2 dark:text-orange-400">
           Log in
         </Link>
       </p>

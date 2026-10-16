@@ -114,7 +114,7 @@ export function MissingIngredients({ dishIngredients }: Props) {
             className={`flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold transition-all ${
               added
                 ? "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300"
-                : "bg-orange-500 text-white hover:bg-orange-400 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-500"
+                : "bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-700"
             } disabled:opacity-60`}
           >
             {added ? (

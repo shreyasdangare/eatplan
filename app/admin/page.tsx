@@ -122,7 +122,7 @@ export default function AdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link href="/" className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+          <Link href="/" className="rounded-xl p-2 text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
@@ -166,7 +166,7 @@ export default function AdminPage() {
             </div>
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[10px] font-semibold text-stone-400 dark:text-stone-500">
+        <div className="mt-2 flex justify-between text-[10px] font-semibold text-stone-500 dark:text-stone-400">
           <span>{chartDays[0]?.label}</span>
           <span>{chartDays[chartDays.length - 1]?.label}</span>
         </div>

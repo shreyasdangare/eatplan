@@ -77,7 +77,7 @@ export default function HouseholdSettings() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 pb-24 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <Link href="/settings" className="mb-6 inline-block text-sm font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+        <Link href="/settings" className="mb-6 inline-flex min-h-11 items-center text-sm font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
           ← Back to Settings
         </Link>
         <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
@@ -138,7 +138,7 @@ export default function HouseholdSettings() {
         {/* Join Household */}
         <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-2">
-            <LinkIcon className="h-5 w-5 text-stone-400" /> Join Existing Household
+            <LinkIcon className="h-5 w-5 text-stone-500 dark:text-stone-400" /> Join Existing Household
           </h2>
           <p className="text-sm font-medium text-stone-500 dark:text-stone-400 mb-6 max-w-md">
             Got an invite code from your partner? Paste it below to merge your account into their household. 

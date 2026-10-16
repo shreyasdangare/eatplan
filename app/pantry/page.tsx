@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import {
   IngredientAutocompleteInput,
   IngredientOption
@@ -231,18 +230,13 @@ export default function PantryPage() {
           <h2 className="text-base font-semibold tracking-tight text-amber-900 dark:text-amber-200">
             My pantry
           </h2>
-          <p className="text-xs text-amber-700/80 dark:text-amber-300/70">
+          <p className="text-xs text-amber-800 dark:text-amber-200">
             {connected
               ? "What you have on hand."
               : "Log in to sync across devices."}
           </p>
         </div>
-        <Link
-          href="/"
-          className="rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-xs hover:bg-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
-        >
-          Home
-        </Link>
+
       </div>
 
       <div className="space-y-2">
@@ -263,25 +257,29 @@ export default function PantryPage() {
         />
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:items-center text-xs w-full">
           <div className="flex items-center gap-2 flex-1 relative group">
-            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-14 sm:min-w-0">Amount</label>
+            <label htmlFor="pantry-amount" className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-14 sm:min-w-0">Amount</label>
             <input
+              id="pantry-amount"
+              inputMode="decimal"
               type="number"
               step="any"
               min="0"
               placeholder="e.g. 2"
               value={addAmount}
               onChange={(e) => setAddAmount(e.target.value)}
-              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-hidden transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-xs"
+              className="w-full sm:w-20 min-h-11 rounded-xl border border-orange-200 bg-white px-3 sm:min-h-9 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-hidden transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-xs"
             />
           </div>
           <div className="flex items-center gap-2 flex-1 relative group">
-            <label className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-14 sm:min-w-0">Unit</label>
+            <label htmlFor="pantry-unit" className="text-amber-800 dark:text-amber-200 font-medium sm:font-normal min-w-14 sm:min-w-0">Unit</label>
             <input
+              id="pantry-unit"
+              autoCapitalize="none"
               type="text"
               placeholder="e.g. kg"
               value={addUnit}
               onChange={(e) => setAddUnit(e.target.value)}
-              className="w-full sm:w-20 rounded-xl border border-orange-200 bg-white px-3 py-2 sm:py-1.5 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-hidden transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-xs"
+              className="w-full sm:w-20 min-h-11 rounded-xl border border-orange-200 bg-white px-3 sm:min-h-9 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50 outline-hidden transition-all dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 shadow-xs"
             />
           </div>
         </div>
@@ -312,7 +310,7 @@ export default function PantryPage() {
               <div key={category}>
                 <div className="mb-1 flex items-center gap-1.5">
                   <span className="text-sm" aria-hidden>{getCategoryEmoji(category)}</span>
-                  <span className="text-[11px] font-medium text-amber-800 dark:text-amber-200">
+                  <span className="text-xs font-medium text-amber-800 dark:text-amber-200">
                     {category} ({items.length})
                   </span>
                 </div>
@@ -386,7 +384,7 @@ export default function PantryPage() {
                               <button
                                 type="button"
                                 onClick={() => addToShoppingList(item.ingredient_id)}
-                                className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-800 hover:bg-orange-200 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/40"
+                                className="tap rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-900 hover:bg-orange-200 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/40"
                                 title="Add to list"
                               >
                                 + List

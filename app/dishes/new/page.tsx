@@ -6,7 +6,7 @@ import {
   IngredientAutocompleteInput,
   IngredientOption
 } from "../../components/IngredientAutocompleteInput";
-import { Link as LinkIcon, Camera, Plus, Save, ChefHat, Clock, Users, Tags, Wand2, PenLine, ChevronDown, Search } from "lucide-react";
+import { Link as LinkIcon, Camera, Plus, Save, ChefHat, Clock, Users, Tags, Wand2, PenLine, ChevronDown, ClipboardPaste } from "lucide-react";
 
 type Ingredient = {
   id: string;
@@ -35,11 +35,10 @@ export default function NewDishPage() {
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
-  const [importUrl, setImportUrl] = useState("");
-  const [importScreenshotFile, setImportScreenshotFile] = useState<File | null>(null);
+  const [smartValue, setSmartValue] = useState("");
+  const [canPaste, setCanPaste] = useState(false);
   const [importingType, setImportingType] = useState<null | "name" | "url" | "screenshot">(null);
   const [importError, setImportError] = useState<string | null>(null);
-  const [importName, setImportName] = useState("");
   const [newIngredientName, setNewIngredientName] = useState("");
   const [addingIngredient, setAddingIngredient] = useState(false);
 
@@ -53,6 +52,13 @@ export default function NewDishPage() {
     if (params.get("mode") === "manual") {
       setExpandedSection("manual");
     }
+    // Web Share Target / deep link: /dishes/new?url=… (or text=… containing a link)
+    const shared = params.get("url") || params.get("text") || params.get("title");
+    if (shared) {
+      const link = shared.match(/https?:\/\/\S+/)?.[0];
+      setSmartValue(link ?? shared);
+    }
+    setCanPaste(typeof navigator !== "undefined" && !!navigator.clipboard?.readText);
     
     (async () => {
       const res = await fetch("/api/ingredients");
@@ -129,9 +135,26 @@ export default function NewDishPage() {
     );
   };
 
-  const handleImport = async (e: React.FormEvent) => {
+  const smartIsUrl = /^(https?:\/\/|www\.)\S+$/i.test(smartValue.trim()) || /^\S+\.[a-z]{2,}\/\S*$/i.test(smartValue.trim());
+
+  const handleSmartImport = async (e: React.FormEvent) => {
     e.preventDefault();
-    const url = importUrl.trim();
+    const v = smartValue.trim();
+    if (!v) return;
+    if (smartIsUrl) await importFromUrl(/^https?:\/\//i.test(v) ? v : `https://${v}`);
+    else await importByName(v);
+  };
+
+  const pasteFromClipboard = async () => {
+    try {
+      const text = (await navigator.clipboard.readText()).trim();
+      if (text) setSmartValue(text);
+    } catch {
+      setCanPaste(false);
+    }
+  };
+
+  const importFromUrl = async (url: string) => {
     if (!url) return;
     setImportError(null);
     setImportingType("url");
@@ -150,13 +173,11 @@ export default function NewDishPage() {
     }
   };
 
-  const handleImportScreenshot = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!importScreenshotFile) return;
+  const importScreenshotFile = async (file: File) => {
     setImportError(null);
     setImportingType("screenshot");
     const formData = new FormData();
-    formData.append("file", importScreenshotFile);
+    formData.append("file", file);
     const res = await fetch("/api/import-recipe", {
       method: "POST",
       body: formData
@@ -171,9 +192,7 @@ export default function NewDishPage() {
     }
   };
 
-  const handleImportByName = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const nameToImport = importName.trim();
+  const importByName = async (nameToImport: string) => {
     if (!nameToImport) return;
     setImportError(null);
     setImportingType("name");
@@ -249,148 +268,123 @@ export default function NewDishPage() {
         </div>
       </div>
 
-      {/* Import Accordion */}
-      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
-        <button
-          type="button"
-          onClick={() => setExpandedSection(expandedSection === "magic" ? "manual" : "magic")}
-          className="flex w-full items-center justify-between p-6 sm:p-8 text-left"
-        >
-          <div className="flex items-center gap-4">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${expandedSection === "magic" ? "bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400" : "bg-stone-100 text-stone-500 dark:bg-stone-800/60 dark:text-stone-400"}`}>
-              <Wand2 className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Auto-Import Magic</h2>
-              <p className="mt-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">Extract from URL or screenshot</p>
-            </div>
+      {/* Smart import: one field for links and dish names, one button for photos */}
+      <div className={`relative overflow-hidden rounded-4xl glass-panel p-5 sm:p-8 ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : ""}`}>
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">
+            <Wand2 className="h-5 w-5" aria-hidden />
           </div>
-          <ChevronDown className={`h-5 w-5 text-stone-400 transition-transform ${expandedSection === "magic" ? "rotate-180" : ""}`} />
-        </button>
-        
-        {expandedSection === "magic" && (
-          <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-0 animate-in fade-in slide-in-from-top-4">
-            <div className="h-px bg-stone-200/50 dark:bg-stone-700/50 mb-6 -mt-2" />
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-              
-              {/* Name Import */}
-              <div className="flex flex-col">
-                <div className="mb-4">
-                  <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
-                    <Search className="h-4 w-4 text-stone-400" />
-                    From Name
-                  </h3>
-                  <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Type a dish name to generate a recipe.
-                  </p>
-                </div>
-                <form onSubmit={handleImportByName} className="mt-auto space-y-3">
-                  <input
-                    type="text"
-                    placeholder="e.g. Pasta Carbonara"
-                    className={inputClasses}
-                    value={importName}
-                    onChange={(e) => setImportName(e.target.value)}
-                    disabled={!!importingType}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!!importingType || !importName.trim()}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
-                  >
-                     {importingType === "name" ? "Generating…" : "Generate Recipe"}
-                  </button>
-                </form>
-              </div>
-
-              {/* URL Import */}
-              <div className="flex flex-col">
-                <div className="mb-4">
-                  <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
-                    <LinkIcon className="h-4 w-4 text-stone-400" />
-                    From URL or YouTube
-                  </h3>
-                  <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Paste a link to extract the recipe.
-                  </p>
-                </div>
-                <form onSubmit={handleImport} className="mt-auto space-y-3">
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    className={inputClasses}
-                    value={importUrl}
-                    onChange={(e) => setImportUrl(e.target.value)}
-                    disabled={!!importingType}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!!importingType || !importUrl.trim()}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
-                  >
-                     {importingType === "url" ? "Importing…" : "Extract Recipe"}
-                  </button>
-                </form>
-              </div>
-
-              {/* Screenshot Import */}
-              <div className="flex flex-col">
-                <div className="mb-4">
-                  <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
-                    <Camera className="h-4 w-4 text-stone-400" />
-                    From Screenshot
-                  </h3>
-                  <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Upload a photo of a recipe page.
-                  </p>
-                </div>
-                <form onSubmit={handleImportScreenshot} className="mt-auto space-y-3">
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    className="w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-200 file:px-4 file:py-1.5 file:font-semibold file:text-stone-700 hover:file:bg-stone-300 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-400 dark:file:bg-stone-700 dark:file:text-stone-300 dark:hover:file:bg-stone-600"
-                    onChange={(e) => setImportScreenshotFile(e.target.files?.[0] ?? null)}
-                    disabled={!!importingType}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!!importingType || !importScreenshotFile}
-                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-black active:scale-95 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
-                  >
-                    {importingType === "screenshot" ? "Importing…" : "Scan Image"}
-                  </button>
-                </form>
-              </div>
-            </div>
-            
-            {importError && (
-              <div className="mt-4 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-800 dark:bg-red-950/30 dark:text-red-400 flex items-start gap-3 border border-red-100 dark:border-red-900/50">
-                 <div className="mt-0.5 rounded-full bg-red-100 p-1 dark:bg-red-900/50">
-                     <svg className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                 </div>
-                 <div>
-                    <p className="font-bold">Import failed</p>
-                    <p className="mt-1 opacity-90">{importError}</p>
-                 </div>
-              </div>
+          <div>
+            <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Import magic</h2>
+            <p className="text-sm text-stone-600 dark:text-stone-300">Paste a recipe or YouTube link, or just type a dish name.</p>
+          </div>
+        </div>
+        <form onSubmit={handleSmartImport} className="space-y-3">
+          <label htmlFor="smart-import" className="sr-only">
+            Recipe link or dish name
+          </label>
+          <div className="relative">
+            <input
+              id="smart-import"
+              type="text"
+              inputMode={smartIsUrl ? "url" : "text"}
+              autoCapitalize={smartIsUrl ? "none" : "sentences"}
+              autoCorrect="off"
+              autoComplete="off"
+              enterKeyHint="go"
+              placeholder="https://… or “Paneer butter masala”"
+              className={`${inputClasses} min-h-12 pr-24 text-base`}
+              value={smartValue}
+              onChange={(e) => setSmartValue(e.target.value)}
+              disabled={!!importingType}
+            />
+            {!smartValue && canPaste && (
+              <button
+                type="button"
+                onClick={pasteFromClipboard}
+                className="absolute right-1 top-1/2 flex min-h-10 -translate-y-1/2 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-stone-800"
+              >
+                <ClipboardPaste className="h-4 w-4" aria-hidden /> Paste
+              </button>
             )}
+          </div>
+          <button
+            type="submit"
+            disabled={!!importingType || !smartValue.trim()}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-4 text-base font-bold text-white shadow-md transition-all hover:bg-orange-700 active:scale-[0.98] disabled:opacity-50"
+          >
+            {importingType === "url" || importingType === "name" ? (
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden />
+            ) : smartIsUrl ? (
+              <LinkIcon className="h-5 w-5" aria-hidden />
+            ) : (
+              <Wand2 className="h-5 w-5" aria-hidden />
+            )}
+            {importingType === "url"
+              ? "Reading the recipe…"
+              : importingType === "name"
+              ? "Writing the recipe…"
+              : smartIsUrl
+              ? "Import from link"
+              : "Create recipe"}
+          </button>
+        </form>
+
+        <div className="my-4 flex items-center gap-3" aria-hidden>
+          <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+          <span className="text-xs font-bold uppercase tracking-widest text-stone-600 dark:text-stone-300">or</span>
+          <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+        </div>
+
+        <label
+          className={`flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-stone-300 bg-white/70 px-4 text-base font-bold text-stone-800 transition-all active:scale-[0.98] dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-100 ${
+            importingType ? "pointer-events-none opacity-60" : ""
+          }`}
+        >
+          {importingType === "screenshot" ? (
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden />
+          ) : (
+            <Camera className="h-5 w-5" aria-hidden />
+          )}
+          {importingType === "screenshot" ? "Scanning photo…" : "Scan a photo or screenshot"}
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/heic"
+            className="sr-only"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (f) void importScreenshotFile(f);
+            }}
+            disabled={!!importingType}
+          />
+        </label>
+
+        {importingType && (
+          <p className="mt-3 text-center text-sm text-stone-600 dark:text-stone-300" role="status">
+            This usually takes 10–30 seconds. You can keep this screen open.
+          </p>
+        )}
+
+        {importError && (
+          <div role="alert" className="mt-4 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+            <div>
+              <p className="font-bold">Import failed</p>
+              <p className="mt-1">{importError}</p>
+              <button type="button" onClick={() => setExpandedSection("manual")} className="mt-2 min-h-11 font-bold underline underline-offset-2">
+                Enter it manually instead
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-4 py-2 px-6">
-        <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
-        <span className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 dark:text-stone-500">
-          OR
-        </span>
-        <div className="h-px flex-1 bg-linear-to-r from-transparent via-stone-200 to-transparent dark:via-stone-700" />
-      </div>
-
       {/* Manual Accordion */}
-      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "opacity-80 hover:opacity-100 shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "shadow-none border-stone-200/40"}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "manual" ? "magic" : "manual")}
+          aria-expanded={expandedSection === "manual"}
           className="flex w-full items-center justify-between p-6 sm:p-8 text-left"
         >
           <div className="flex items-center gap-4">
@@ -398,11 +392,11 @@ export default function NewDishPage() {
               <PenLine className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Enter Manually</h2>
+              <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Enter manually</h2>
               <p className="mt-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">Fill out recipe details yourself</p>
             </div>
           </div>
-          <ChevronDown className={`h-5 w-5 text-stone-400 transition-transform ${expandedSection === "manual" ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-5 w-5 text-stone-500 dark:text-stone-400 transition-transform ${expandedSection === "manual" ? "rotate-180" : ""}`} />
         </button>
 
         {expandedSection === "manual" && (
@@ -413,8 +407,8 @@ export default function NewDishPage() {
                {/* Basic Info */}
                <div className="space-y-5">
                  <div>
-                   <label className={labelClasses}>Recipe Name</label>
-                   <input
+                   <label className={labelClasses} htmlFor="dish-field-1">Recipe Name</label>
+                   <input id="dish-field-1"
                      required
                      placeholder="e.g. Nonna's Spaghetti Bolognese"
                      className={inputClasses}
@@ -423,10 +417,10 @@ export default function NewDishPage() {
                    />
                  </div>
                  <div>
-                   <label className={labelClasses}>
-                     Description <span className="text-stone-400 font-normal">(Optional)</span>
+                   <label className={labelClasses} htmlFor="dish-field-2">
+                     Description <span className="text-stone-500 dark:text-stone-400 font-normal">(Optional)</span>
                    </label>
-                   <textarea
+                   <textarea id="dish-field-2"
                      placeholder="A brief summary of this delicious dish..."
                      className={`${inputClasses} resize-none`}
                      rows={3}
@@ -439,10 +433,10 @@ export default function NewDishPage() {
                {/* Metadata Grid */}
                <div className="grid gap-5 sm:grid-cols-3">
                  <div>
-                   <label className={`${labelClasses} flex items-center gap-2`}>
-                     <ChefHat className="h-4 w-4 text-stone-400" /> Meal Type
+                   <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-11">
+                     <ChefHat className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Meal Type
                    </label>
-                   <select
+                   <select id="dish-field-11"
                      className={inputClasses}
                      value={mealType}
                      onChange={(e) => setMealType(e.target.value)}
@@ -453,27 +447,29 @@ export default function NewDishPage() {
                    </select>
                  </div>
                  <div>
-                   <label className={`${labelClasses} flex items-center gap-2`}>
-                     <Clock className="h-4 w-4 text-stone-400" /> Prep Time
+                   <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-12">
+                     <Clock className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Prep Time
                    </label>
                    <div className="relative">
-                     <input
+                     <input id="dish-field-12"
                        type="number"
+                       inputMode="numeric"
                        min={0}
                        placeholder="45"
                        className={inputClasses}
                        value={prepTime}
                        onChange={(e) => setPrepTime(e.target.value)}
                      />
-                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-400">min</span>
+                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-stone-500 dark:text-stone-400">min</span>
                    </div>
                  </div>
                  <div>
-                   <label className={`${labelClasses} flex items-center gap-2`}>
-                     <Users className="h-4 w-4 text-stone-400" /> Servings
+                   <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-13">
+                     <Users className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Servings
                    </label>
-                   <input
+                   <input id="dish-field-13"
                      type="number"
+                     inputMode="numeric"
                      min={1}
                      placeholder="4"
                      className={inputClasses}
@@ -484,10 +480,10 @@ export default function NewDishPage() {
                </div>
 
                <div>
-                 <label className={`${labelClasses} flex items-center gap-2`}>
-                   <Tags className="h-4 w-4 text-stone-400" /> Tags
+                 <label className={`${labelClasses} flex items-center gap-2`} htmlFor="dish-field-14">
+                   <Tags className="h-4 w-4 text-stone-500 dark:text-stone-400" /> Tags
                  </label>
-                 <input
+                 <input id="dish-field-14"
                    placeholder="e.g. spicy, vegan, quick (comma separated)"
                    className={inputClasses}
                    value={tags}
@@ -505,7 +501,7 @@ export default function NewDishPage() {
                    </h3>
                    <div className="max-w-md">
                      <IngredientAutocompleteInput
-                       label=""
+                       label="Add an ingredient"
                        ingredients={ingredientOptions}
                        value={newIngredientName}
                        onChange={setNewIngredientName}
@@ -521,26 +517,27 @@ export default function NewDishPage() {
                      />
                    </div>
 
-                   <div className="flex flex-wrap gap-2 pt-2">
-                     {ingredients.map((ing) => {
-                       const selected = selectedIngredients.some(
-                         (s) => s.ingredient_id === ing.id
-                       );
-                       return (
-                         <button
-                           type="button"
-                           key={ing.id}
-                           onClick={() => toggleIngredient(ing.id)}
-                           className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 border ${
-                             selected
-                               ? "bg-emerald-500 text-white border-emerald-600 shadow-xs dark:bg-emerald-600 dark:border-emerald-500"
-                               : "bg-white text-stone-600 hover:bg-stone-100 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700 dark:hover:bg-stone-700"
-                           }`}
-                         >
-                           {ing.name}
-                         </button>
-                       );
-                     })}
+                   <div className="flex flex-wrap gap-2 pt-2" aria-label="Selected ingredients">
+                     {selectedIngredients.length === 0 ? (
+                       <p className="text-sm text-stone-600 dark:text-stone-300">Search above to add ingredients. Pick a suggestion or press Enter to create a new one.</p>
+                     ) : (
+                       selectedIngredients.map((sel) => {
+                         const ing = ingredients.find((i) => i.id === sel.ingredient_id);
+                         if (!ing) return null;
+                         return (
+                           <button
+                             type="button"
+                             key={ing.id}
+                             onClick={() => toggleIngredient(ing.id)}
+                             aria-label={`Remove ${ing.name}`}
+                             className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white transition-all active:scale-95"
+                           >
+                             {ing.name}
+                             <span aria-hidden className="text-base leading-none">×</span>
+                           </button>
+                         );
+                       })
+                     )}
                    </div>
                  </div>
 
@@ -562,14 +559,14 @@ export default function NewDishPage() {
                                <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
                                  {ing.name}
                                </span>
-                               <label className="flex items-center gap-2 text-xs font-medium text-stone-500 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
+                               <label className="-my-2 flex min-h-11 items-center gap-2 px-1 text-sm font-medium text-stone-600 cursor-pointer hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200">
                                  <input
                                    type="checkbox"
                                    checked={sel.is_optional}
                                    onChange={(e) =>
                                      updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
                                    }
-                                   className="rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                                   className="h-5 w-5 rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
                                  />
                                  Optional
                                </label>
@@ -577,7 +574,7 @@ export default function NewDishPage() {
                              <div className="flex flex-wrap items-center gap-2">
                                 <input
                                  placeholder="Display Text (e.g. '2 cups diced')"
-                                 className="w-full sm:flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                 className="w-full sm:flex-1 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                  value={sel.quantity}
                                  onChange={(e) =>
                                    updateIngredient(sel.ingredient_id, "quantity", e.target.value)
@@ -588,8 +585,9 @@ export default function NewDishPage() {
                                      type="number"
                                      min={0}
                                      step="any"
+                                    inputMode="decimal"
                                      placeholder="Amt"
-                                     className="w-20 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-20 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.amount ?? ""}
                                      onChange={(e) =>
                                        updateIngredient(
@@ -601,7 +599,7 @@ export default function NewDishPage() {
                                    />
                                    <input
                                      placeholder="Unit"
-                                     className="w-24 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-24 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.unit}
                                      onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
                                    />
@@ -619,7 +617,7 @@ export default function NewDishPage() {
                  <button
                    type="submit"
                    disabled={loading}
-                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-500 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-700 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-700"
                  >
                    {loading ? (
                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />
