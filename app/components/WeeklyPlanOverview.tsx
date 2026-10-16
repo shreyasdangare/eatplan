@@ -124,7 +124,7 @@ export async function WeeklyPlanOverview() {
             <li key={key}>
               <Link
                 href={`/plan?date=${today}&add=${key}`}
-                className={`group flex min-h-[4.25rem] items-center gap-3 px-3.5 py-2.5 hover:bg-orange-50/60 dark:hover:bg-stone-800/60 ${past ? "opacity-70" : ""}`}
+                className={`group flex min-h-[4.25rem] items-center gap-3 px-3.5 py-2.5 hover:bg-orange-50/60 dark:hover:bg-stone-800/60`}
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 text-stone-500 transition-colors group-hover:border-orange-400 group-hover:text-orange-600 dark:border-stone-700 dark:text-stone-400">
                   <Icon className="h-5 w-5" aria-hidden />
