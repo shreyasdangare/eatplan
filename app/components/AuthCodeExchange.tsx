@@ -49,20 +49,20 @@ export function AuthCodeExchange() {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/80 dark:bg-stone-950/90 p-4">
         <div className="max-w-sm rounded-xl bg-white p-6 shadow-lg dark:bg-stone-800 dark:text-stone-100">
           <p className="font-medium text-stone-900 dark:text-stone-100">
-            Couldn’t complete sign-in
+            Your email is confirmed
           </p>
           <p className="mt-2 text-sm text-stone-600 dark:text-stone-400">
-            Open this link in the same browser where you signed up, or the link may have expired. You can try logging in and use “Resend confirmation email” to get a new link.
+            We couldn’t sign you in automatically (this happens when the link is opened in a different browser or app). Log in with your email and password to continue. If login says your email isn’t confirmed, the link expired: use “Resend confirmation email” there.
           </p>
           <button
             type="button"
             onClick={() => {
               setStatus("idle");
-              router.replace("/", { scroll: false });
+              router.replace("/login", { scroll: false });
             }}
             className="mt-4 w-full rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-stone-700"
           >
-            OK
+            Log in
           </button>
         </div>
       </div>

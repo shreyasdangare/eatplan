@@ -7,19 +7,21 @@ export type AggregatedLine = {
   category?: string | null;
 };
 
+/** Dish ids planned for the household in [from, to]. (meal_plans is keyed by household; there is no user_id column.) */
 export async function getDishIdsFromDateRange(
-  userId: string,
+  householdId: string,
   from: string,
   to: string
 ): Promise<string[]> {
   const { data, error } = await supabaseServer
     .from("meal_plans")
     .select("dish_id")
-    .eq("user_id", userId)
+    .eq("household_id", householdId)
     .gte("date", from)
     .lte("date", to)
     .not("dish_id", "is", null);
 
+  if (error) console.error("getDishIdsFromDateRange failed", error);
   if (error || !data) return [];
   return [
     ...new Set(

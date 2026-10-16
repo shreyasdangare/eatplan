@@ -1,4 +1,5 @@
 "use client";
+import { toISODate, weekStartOf } from "@/lib/dates";
 
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -67,18 +68,9 @@ function SortableTile({
   );
 }
 
-function getWeekStart(d: Date): Date {
-  const x = new Date(d);
-  const day = x.getDay();
-  const diff = x.getDate() - day + (day === 0 ? -6 : 1);
-  x.setDate(diff);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-
-function formatDate(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
+// Local-date helpers: toISOString() shifts to UTC and turned Monday into Sunday east of UTC (e.g. India/Europe).
+const getWeekStart = weekStartOf;
+const formatDate = toISODate;
 
 export default function ShoppingListPage() {
   const [toBuy, setToBuy] = useState<ShoppingTileItem[]>([]);
@@ -284,7 +276,12 @@ export default function ShoppingListPage() {
       if (res.ok) {
         setShowMealPlanModal(false);
         loadList();
-        toast("Meal plan ingredients added");
+        const data = (await res.json().catch(() => ({}))) as { added?: number; message?: string };
+        toast(
+          data.added
+            ? `Added ${data.added} item${data.added === 1 ? "" : "s"} from your plan`
+            : data.message ?? "Nothing new to add"
+        );
       } else {
         toast({ message: "Couldn't add from the plan.", tone: "error" });
       }
