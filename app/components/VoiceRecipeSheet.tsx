@@ -8,7 +8,7 @@ import {
 import { BottomSheet } from "./ui/BottomSheet";
 import { toast } from "./ui/Toast";
 import {
-  MAX_AUDIO_BYTES, MAX_RECORDING_SECONDS, RECORDING_WARN_SECONDS, formatDuration, pickRecorderMime,
+  MAX_AUDIO_BYTES, MAX_RECORDING_SECONDS, RECORDING_WARN_SECONDS, SILENCE_PEAK, formatDuration, pickRecorderMime,
   type ParsedRecipe, type VoiceResult,
 } from "@/lib/voiceRecipe";
 
@@ -69,6 +69,8 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
   const xhr = useRef<XMLHttpRequest | null>(null);
   const discardOnStop = useRef(false);
   const phaseTimer = useRef<number | null>(null);
+  const peak = useRef(0);
+  const meterOk = useRef(false);
 
   const supported =
     typeof window !== "undefined" && !!navigator.mediaDevices?.getUserMedia && typeof window.MediaRecorder !== "undefined";
@@ -190,12 +192,15 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
         last = t;
         if (recorder.current?.state !== "recording") return;
         analyser.getByteFrequencyData(data);
+        meterOk.current = true;
         const step = Math.floor(data.length / BARS) || 1;
-        setLevels(Array.from({ length: BARS }, (_, i) => {
+        const next = Array.from({ length: BARS }, (_, i) => {
           let sum = 0;
           for (let j = 0; j < step; j++) sum += data[i * step + j] ?? 0;
           return Math.min(1, sum / step / 180);
-        }));
+        });
+        peak.current = Math.max(peak.current, ...next);
+        setLevels(next);
       };
       raf.current = requestAnimationFrame(draw);
     } catch {
@@ -261,6 +266,8 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
       rec = new MediaRecorder(s);
     }
     chunks.current = [];
+    peak.current = 0;
+    meterOk.current = false;
     rec.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
     rec.onstop = () => {
       releaseMic();
@@ -268,6 +275,11 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
       const audio = new Blob(chunks.current, { type: rec.mimeType || mimeType || "audio/webm" });
       blob.current = audio;
       setCanRetry(audio.size <= MAX_AUDIO_BYTES);
+      if (meterOk.current && peak.current < SILENCE_PEAK) {
+        setError("We didn't pick up any sound. Check that the right microphone is on and not muted, then record again.");
+        setPhase("error");
+        return;
+      }
       if (audio.size > MAX_AUDIO_BYTES) {
         setError("That recording is too large to upload. Please record a shorter version.");
         setPhase("error");

@@ -20,6 +20,8 @@ export const RECORDING_WARN_SECONDS = 540;
 /** Vercel functions accept ~4.5 MB request bodies; keep headroom for multipart overhead. */
 export const MAX_AUDIO_BYTES = 4_300_000;
 export const MIN_AUDIO_BYTES = 1_000;
+/** Peak input level (0–1) below which we assume the mic captured silence. */
+export const SILENCE_PEAK = 0.06;
 export const VOICE_RATE_LIMIT = { perHour: 10, perDay: 30 };
 
 /** Recorder preference order: Chrome/Firefox give webm/opus, iOS Safari mp4/aac. */
@@ -76,9 +78,10 @@ Rules:
 - "quantity" is a short display string like "1.5 cup" or "to taste"; set numeric "amount" and "unit" when there is a number.
 - Name: the core dish name without adjectives ("Aai's Special Pohe" -> "Kanda Poha"). If not said, infer it from the ingredients and method.
 - Instructions: numbered steps "1. ...\\n2. ..." in English.
-- If the audio contains no recipe (silence, noise, unrelated talk), return name "" and empty ingredients.
+- First decide whether you can actually hear human speech. If the audio is silence, hiss, music or noise with no clearly intelligible words, set "speech_detected": false, transcript "", name "" and empty ingredients. Never guess or make up a recipe that was not spoken.
+- If there is speech but no recipe (unrelated talk), set name "" and empty ingredients, but still return the transcript.
 Reply with ONLY a JSON object:
-{"transcript": string, "language": "en"|"hi"|"mr"|"mixed", "name": string, "description": string, "servings": number|null, "prep_time_minutes": number|null,
+{"speech_detected": boolean, "transcript": string, "language": "en"|"hi"|"mr"|"mixed", "name": string, "description": string, "servings": number|null, "prep_time_minutes": number|null,
  "ingredients": [{"name": string, "quantity": string, "amount": number|null, "unit": string|null}], "instructions": string}`;
 
 export const VOICE_USER_PROMPT = "Here is my recipe recording. Transcribe it and structure it as instructed.";
@@ -184,6 +187,7 @@ export function normalizeRecipe(raw: unknown): ParsedRecipe {
 /** Parses the model's voice reply into recipe + transcript; throws a user-facing message when there's no recipe. */
 export function parseVoiceResult(raw: unknown): VoiceResult {
   const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  if (r.speech_detected === false) throw new Error("We couldn't hear anything. Check your microphone and try again.");
   const transcript = str(r.transcript, 20000);
   let recipe: ParsedRecipe;
   try {

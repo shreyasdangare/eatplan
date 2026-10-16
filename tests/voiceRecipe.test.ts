@@ -83,6 +83,7 @@ describe("parseVoiceResult", () => {
   it("gives friendly errors", () => {
     expect(() => parseVoiceResult({ transcript: "hello there", name: "" })).toThrow(/couldn't find a recipe/);
     expect(() => parseVoiceResult({})).toThrow(/couldn't hear/);
+    expect(() => parseVoiceResult({ speech_detected: false, transcript: "x", name: "Chai", ingredients: ["Tea"] })).toThrow(/couldn't hear/);
   });
 });
 
