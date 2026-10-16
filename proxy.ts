@@ -43,8 +43,14 @@ export async function proxy(request: NextRequest) {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    await supabase.auth.signOut();
+  // Only clear a stale/invalid session. Calling signOut() whenever there is no user also deleted the
+  // PKCE code-verifier cookie (set by signup, forgot-password and Google sign-in), so the email/OAuth
+  // link could never be exchanged and users landed on "auth_callback_failed".
+  const hasSessionCookie = request.cookies
+    .getAll()
+    .some((c) => /^sb-.+-auth-token(\.\d+)?$/.test(c.name));
+  if (!user && userError && hasSessionCookie) {
+    await supabase.auth.signOut({ scope: "local" });
   }
 
   if (isProtected(request.nextUrl.pathname) && !user) {
