@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const { data: household, error: hError } = await supabaseServer
     .from("households")
-    .select("id, name")
+    .select("id, name, invite_code")
     .eq("id", householdId)
     .single();
 
@@ -27,28 +27,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch household" }, { status: 500 });
   }
 
-  // We need to fetch email addresses for the user IDs.
-  // Note: auth.users is only readable via service role, which supabaseServer uses.
-  let membersWithEmails = members ?? [];
-  
-  if (members && members.length > 0) {
-    const userIds = members.map(m => m.user_id);
-    const { data: authUsers } = await supabaseServer.auth.admin.listUsers();
-      
-    if (authUsers?.users) {
-      membersWithEmails = members.map(m => {
-        const matchingUser = authUsers.users.find((u: any) => u.id === m.user_id);
-        return {
-          ...m,
-          email: matchingUser?.email ?? "Unknown User"
-        };
-      });
-    }
-  }
+  // Look up only this household's members (listUsers() returned just the first page of all users).
+  const membersWithEmails = await Promise.all(
+    (members ?? []).map(async (m) => {
+      const { data } = await supabaseServer.auth.admin.getUserById(m.user_id);
+      return { ...m, email: data?.user?.email ?? "Unknown user" };
+    })
+  );
+  const myRole = members?.find((m) => m.user_id === auth.user.id)?.role ?? "member";
 
   return NextResponse.json({
     id: household.id,
     name: household.name,
+    invite_code: household.invite_code ?? null,
+    my_role: myRole,
     members: membersWithEmails
   });
 }
