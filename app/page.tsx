@@ -81,7 +81,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {isFirstVisit && <MarkHomeVisited />}
 
           {/* Greeting row: replaces the header card on phones (no empty bar with a lone gear). */}
-          <header className="flex items-center gap-3 motion-safe:animate-[rise_380ms_cubic-bezier(0.2,0.8,0.2,1)_both]">
+          <header className="flex items-center gap-3 pt-2 motion-safe:animate-[rise_380ms_cubic-bezier(0.2,0.8,0.2,1)_both]">
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
                 {welcomePrefix.replace(/,\s*$/, "")}

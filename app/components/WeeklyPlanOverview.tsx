@@ -127,7 +127,7 @@ export async function WeeklyPlanOverview() {
                     {past ? "Skipped" : "Pick a recipe"}
                   </span>
                 </span>
-                <span className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-orange-600 px-3 text-sm font-bold text-white shadow-sm" aria-hidden>
+                <span className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-orange-100 px-3 text-sm font-bold text-orange-800 transition-colors group-hover:bg-orange-600 group-hover:text-white dark:bg-orange-500/15 dark:text-orange-200" aria-hidden>
                   <Plus className="h-4 w-4" strokeWidth={3} /> Add
                 </span>
                 <span className="sr-only">Add {label.toLowerCase()} for today</span>
