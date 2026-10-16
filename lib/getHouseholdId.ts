@@ -44,6 +44,12 @@ export async function getHouseholdId(userId: string): Promise<string | null> {
     .from("household_members")
     .insert({ household_id: newHouseholdId, user_id: userId, role: "admin" });
 
+  if (memberErr?.code === "23505") {
+    // Another concurrent request already linked this user (unique user_id, migration 023).
+    await supabaseServer.from("households").delete().eq("id", newHouseholdId);
+    const { data: existing } = await primaryMembership(userId);
+    return existing?.household_id ?? null;
+  }
   if (memberErr) {
     console.error("Failed to link new user to household", memberErr);
     return null;
