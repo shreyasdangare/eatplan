@@ -8,6 +8,13 @@ export function ServiceWorker() {
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
+    // Lets server-rendered "Today" use the user's own date (see lib/userTimeZone).
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz && !document.cookie.includes(`tz=${encodeURIComponent(tz)}`)) {
+        document.cookie = `tz=${encodeURIComponent(tz)}; path=/; max-age=31536000; samesite=lax`;
+      }
+    } catch {}
     if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
     }

@@ -32,3 +32,25 @@ export function getTranslatedWelcome(language?: string, isFirstVisit: boolean = 
   
   return prefix;
 }
+
+/** BCP 47 locale for dates/numbers in the user's language (falls back to English). */
+export function languageToLocale(language?: string): string {
+  const lang = (language ?? "").toLowerCase().trim();
+  const map: [string, string][] = [
+    ["marathi", "mr-IN"], ["hindi", "hi-IN"], ["gujarati", "gu-IN"], ["telugu", "te-IN"], ["tamil", "ta-IN"],
+    ["kannada", "kn-IN"], ["bengali", "bn-IN"], ["spanish", "es-ES"], ["french", "fr-FR"], ["german", "de-DE"],
+  ];
+  for (const [name, locale] of map) if (lang.includes(name) || lang === locale.slice(0, 2)) return locale;
+  return "en-GB";
+}
+
+/** First visible character of a name for an avatar (handles Devanagari and emoji). */
+export function initialOf(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return "?";
+  const Seg = (Intl as unknown as { Segmenter?: new (l?: string, o?: { granularity: string }) => { segment: (s: string) => Iterable<{ segment: string }> } }).Segmenter;
+  if (Seg) {
+    for (const { segment } of new Seg(undefined, { granularity: "grapheme" }).segment(trimmed)) return segment.toUpperCase();
+  }
+  return Array.from(trimmed)[0].toUpperCase();
+}
