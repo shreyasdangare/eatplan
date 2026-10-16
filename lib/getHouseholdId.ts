@@ -1,21 +1,27 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 
-export async function getHouseholdId(userId: string): Promise<string | null> {
-  if (!userId) return null;
-
-  // Attempt to fetch the primary household attached to this user
-  const { data, error } = await supabaseServer
+/** The user's primary household: the earliest membership, so the answer is stable if duplicates exist. */
+async function primaryMembership(userId: string) {
+  return supabaseServer
     .from("household_members")
     .select("household_id")
     .eq("user_id", userId)
+    .order("joined_at", { ascending: true })
+    .order("household_id", { ascending: true })
     .limit(1)
-    .single();
+    .maybeSingle();
+}
+
+export async function getHouseholdId(userId: string): Promise<string | null> {
+  if (!userId) return null;
+
+  const { data, error } = await primaryMembership(userId);
 
   if (data?.household_id) {
     return data.household_id;
   }
   
-  if (error && error.code !== "PGRST116") {
+  if (error) {
     // Log unexpected errors other than 'Row not found'
     console.error("Error fetching household membership:", error);
   }
@@ -41,6 +47,15 @@ export async function getHouseholdId(userId: string): Promise<string | null> {
   if (memberErr) {
     console.error("Failed to link new user to household", memberErr);
     return null;
+  }
+
+  // A brand-new user's first page fires several API calls at once, and each can get here and
+  // provision its own household (seen on prod). Converge on the earliest one and drop ours if we lost.
+  const { data: winner } = await primaryMembership(userId);
+  if (winner?.household_id && winner.household_id !== newHouseholdId) {
+    await supabaseServer.from("household_members").delete().eq("user_id", userId).eq("household_id", newHouseholdId);
+    await supabaseServer.from("households").delete().eq("id", newHouseholdId);
+    return winner.household_id;
   }
 
   return newHouseholdId;
