@@ -18,7 +18,7 @@ export async function GET() {
     .eq("household_id", householdId);
 
   // Pantry is hidden and its table isn't in this database yet: treat as an empty pantry, not a 500.
-  if (error && (error.code === "42P01" || error.code === "PGRST205")) {
+  if (isMissingTable(error)) {
     return NextResponse.json({ items: [], ingredient_ids: [] });
   }
   if (error) {
@@ -70,6 +70,9 @@ export async function POST(req: NextRequest) {
     { onConflict: "household_id,ingredient_id" }
   );
 
+  if (isMissingTable(error)) {
+    return NextResponse.json({ ok: true, skipped: "pantry unavailable" });
+  }
   if (error) {
     console.error("Error adding to pantry", error);
     return NextResponse.json(
@@ -105,6 +108,9 @@ export async function DELETE(req: NextRequest) {
     .eq("household_id", householdId)
     .eq("ingredient_id", ingredientId);
 
+  if (isMissingTable(error)) {
+    return NextResponse.json({ ok: true, skipped: "pantry unavailable" });
+  }
   if (error) {
     console.error("Error removing from pantry", error);
     return NextResponse.json(
@@ -114,4 +120,8 @@ export async function DELETE(req: NextRequest) {
   }
 
   return new NextResponse(null, { status: 204 });
+}
+
+function isMissingTable(error: { code?: string } | null): boolean {
+  return !!error && (error.code === "42P01" || error.code === "PGRST205");
 }

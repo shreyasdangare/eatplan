@@ -7,12 +7,35 @@ import { useRouter } from "next/navigation";
 
 export default function HouseholdSettings() {
   const router = useRouter();
-  const [household, setHousehold] = useState<{ id: string; name: string; members: any[] } | null>(null);
+  const [household, setHousehold] = useState<{ id: string; name: string; invite_code: string | null; my_role: string; members: any[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState("");
+  const [codeBusy, setCodeBusy] = useState(false);
+  const [codeError, setCodeError] = useState("");
+
+  const updateCode = async (action: "regenerate" | "revoke") => {
+    const msg = action === "revoke" ? "Turn off invites? The current code will stop working." : "Make a new code? The current code will stop working.";
+    if ((action === "revoke" || household?.invite_code) && !window.confirm(msg)) return;
+    setCodeBusy(true);
+    setCodeError("");
+    try {
+      const res = await fetch("/api/household/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update code");
+      setHousehold((h) => (h ? { ...h, invite_code: data.invite_code } : h));
+    } catch (err: any) {
+      setCodeError(err.message);
+    } finally {
+      setCodeBusy(false);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/household")
@@ -31,9 +54,9 @@ export default function HouseholdSettings() {
   }, []);
 
   const handleCopy = async () => {
-    if (!household?.id) return;
+    if (!household?.invite_code) return;
     try {
-      await navigator.clipboard.writeText(household.id);
+      await navigator.clipboard.writeText(household.invite_code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -52,7 +75,7 @@ export default function HouseholdSettings() {
       const res = await fetch("/api/household/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ householdId: joinCode.trim() })
+        body: JSON.stringify({ code: joinCode })
       });
       const data = await res.json();
       
@@ -97,23 +120,43 @@ export default function HouseholdSettings() {
           
           <div className="mb-6">
              <label className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-2 block">
-                Your Join Code
+                Invite Code
              </label>
-             <div className="flex items-center gap-2">
-               <code className="flex-1 rounded-xl bg-stone-100 dark:bg-stone-800 p-3.5 text-sm font-mono text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 break-all">
-                 {household?.id}
-               </code>
-               <button
-                 onClick={handleCopy}
-                 className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 hover:bg-orange-200 hover:text-orange-700 dark:bg-orange-500/20 dark:text-orange-400 dark:hover:bg-orange-500/30 transition-colors"
-                 title="Copy Code"
-               >
-                 {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-               </button>
-             </div>
+             {household?.invite_code ? (
+               <div className="flex items-center gap-2">
+                 <code className="flex-1 rounded-xl bg-stone-100 dark:bg-stone-800 p-3.5 text-lg tracking-[0.2em] font-mono text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700">
+                   {household.invite_code}
+                 </code>
+                 <button
+                   onClick={handleCopy}
+                   className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 hover:bg-orange-200 hover:text-orange-700 dark:bg-orange-500/20 dark:text-orange-400 dark:hover:bg-orange-500/30 transition-colors"
+                   title="Copy code"
+                   aria-label="Copy invite code"
+                 >
+                   {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                 </button>
+               </div>
+             ) : (
+               <p className="rounded-xl bg-stone-100 p-3.5 text-sm text-stone-600 dark:bg-stone-800 dark:text-stone-400">
+                 Invites are off. Nobody can join with an old code.
+               </p>
+             )}
              <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
-               Share this secure code with your family members so they can join your household.
+               Share this code with family so they can join. Anyone with the code can join, so make a new one if it gets out.
              </p>
+             {household?.my_role === "admin" && (
+               <div className="mt-3 flex flex-wrap gap-2">
+                 <button type="button" disabled={codeBusy} onClick={() => updateCode("regenerate")} className="rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-stone-200 text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:ring-stone-700 dark:text-stone-300 dark:hover:bg-stone-800">
+                   {household.invite_code ? "New code" : "Turn on invites"}
+                 </button>
+                 {household.invite_code && (
+                   <button type="button" disabled={codeBusy} onClick={() => updateCode("revoke")} className="rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-stone-200 text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:ring-stone-700 dark:text-stone-300 dark:hover:bg-stone-800">
+                     Turn off invites
+                   </button>
+                 )}
+               </div>
+             )}
+             {codeError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{codeError}</p>}
           </div>
 
           <div>
@@ -141,8 +184,8 @@ export default function HouseholdSettings() {
             <LinkIcon className="h-5 w-5 text-stone-500 dark:text-stone-400" /> Join Existing Household
           </h2>
           <p className="text-sm font-medium text-stone-500 dark:text-stone-400 mb-6 max-w-md">
-            Got an invite code from your partner? Paste it below to merge your account into their household. 
-            <br/><span className="text-orange-600 dark:text-orange-400 font-bold">Warning:</span> You will lose access to your current isolated recipes and meal plans.
+            Got an invite code from your partner? Enter it below to move into their household.
+            <br/><span className="text-orange-600 dark:text-orange-400 font-bold">Warning:</span> You will lose access to your current recipes, plan and list. If nobody else is in your current household, it is deleted.
           </p>
 
           <form onSubmit={handleJoin} className="flex flex-col gap-3 sm:flex-row">
@@ -150,7 +193,9 @@ export default function HouseholdSettings() {
                type="text"
                value={joinCode}
                onChange={(e) => setJoinCode(e.target.value)}
-               placeholder="Paste household code here..."
+               placeholder="Invite code, e.g. K7QM4RTX"
+               autoCapitalize="characters"
+               autoComplete="off"
                className="flex-1 rounded-2xl border-0 bg-white px-4 py-3.5 text-sm ring-1 ring-inset ring-stone-200 placeholder:text-stone-400 focus:ring-2 focus:ring-inset focus:ring-orange-500 dark:bg-stone-900 dark:text-white dark:ring-stone-700 dark:focus:ring-orange-500 shadow-xs"
                required
              />

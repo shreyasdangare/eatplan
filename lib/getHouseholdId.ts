@@ -1,3 +1,4 @@
+import { generateInviteCode } from "@/lib/inviteCode";
 import { supabaseServer } from "@/lib/supabaseServer";
 
 /** The user's primary household: the earliest membership, so the answer is stable if duplicates exist. */
@@ -32,7 +33,7 @@ export async function getHouseholdId(userId: string): Promise<string | null> {
   
   const { error: insertHouseErr } = await supabaseServer
     .from("households")
-    .insert({ id: newHouseholdId, name: "My Household" });
+    .insert({ id: newHouseholdId, name: "My Household", invite_code: generateInviteCode() });
 
   if (insertHouseErr) {
     console.error("Failed to provision household for new user", insertHouseErr);
