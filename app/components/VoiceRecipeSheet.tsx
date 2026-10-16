@@ -26,8 +26,9 @@ type SpeechRec = {
 const BARS = 32;
 const btnBase = "flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-base font-bold transition-all active:scale-[0.98] disabled:opacity-50";
 const btnPrimary = `${btnBase} bg-orange-600 text-white shadow-md hover:bg-orange-700`;
+const iconBtn = "flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-stone-300 bg-white text-stone-800 transition-all active:scale-95 disabled:opacity-50 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100";
 const btnSecondary = `${btnBase} border-2 border-stone-300 bg-white text-stone-800 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100`;
-const input = "w-full min-h-11 rounded-xl border border-stone-300 bg-white px-3 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-4 focus:ring-orange-500/15 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100";
+const input = "min-h-11 rounded-xl border border-stone-300 bg-white px-3 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-4 focus:ring-orange-500/15 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -358,18 +359,18 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
   if (recordingActive) {
     footer = (
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-        <button type="button" onClick={() => { reset(); }} className={`${btnSecondary} w-12 px-0`} aria-label="Restart recording">
+        <button type="button" onClick={() => { reset(); }} className={iconBtn} aria-label="Restart recording">
           <RotateCcw className="h-5 w-5" aria-hidden />
         </button>
         <button type="button" onClick={finishRecording} className={btnPrimary}>
           <Check className="h-5 w-5" aria-hidden /> Done
         </button>
         {phase === "recording" ? (
-          <button type="button" onClick={pause} className={`${btnSecondary} w-12 px-0`} aria-label="Pause recording">
+          <button type="button" onClick={pause} className={iconBtn} aria-label="Pause recording">
             <Pause className="h-5 w-5" aria-hidden />
           </button>
         ) : (
-          <button type="button" onClick={resume} className={`${btnSecondary} w-12 px-0`} aria-label="Resume recording">
+          <button type="button" onClick={resume} className={iconBtn} aria-label="Resume recording">
             <Play className="h-5 w-5" aria-hidden />
           </button>
         )}
@@ -389,7 +390,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
   } else if (phase === "review" || phase === "saving") {
     footer = (
       <div className="grid grid-cols-[auto_1fr] gap-3">
-        <button type="button" onClick={reset} disabled={phase === "saving"} className={`${btnSecondary} w-12 px-0`} aria-label="Discard and record again">
+        <button type="button" onClick={reset} disabled={phase === "saving"} className={iconBtn} aria-label="Discard and record again">
           <RotateCcw className="h-5 w-5" aria-hidden />
         </button>
         <button type="button" onClick={save} disabled={phase === "saving"} className={btnPrimary}>
@@ -403,7 +404,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
   return (
     <BottomSheet open={open} onClose={onClose} title={title} subtitle={subtitle} footer={footer} dismissible={!busy && !recordingActive} size="tall">
       {(phase === "idle" || phase === "requesting") && (
-        <div className="flex flex-col items-center gap-5 py-6 text-center">
+        <div className="flex flex-col items-center gap-5 pb-6 pt-10 text-center">
           <button
             type="button"
             data-autofocus
@@ -412,7 +413,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
             aria-label="Start recording"
             className="group relative flex h-28 w-28 items-center justify-center rounded-full bg-orange-600 text-white shadow-[0_10px_40px_rgb(234_88_12/0.45)] transition-transform hover:bg-orange-700 active:scale-95 disabled:opacity-70"
           >
-            <span aria-hidden className="absolute inset-0 rounded-full bg-orange-500/40 motion-safe:animate-ping motion-safe:[animation-duration:2.4s]" />
+            <span aria-hidden className="absolute -inset-3 rounded-full bg-orange-500/20 motion-safe:animate-pulse" />
             {phase === "requesting" ? <Loader2 className="relative h-10 w-10 motion-safe:animate-spin" aria-hidden /> : <Mic className="relative h-11 w-11" aria-hidden />}
           </button>
           <p className="text-base font-bold text-stone-900 dark:text-stone-50">{phase === "requesting" ? "Allow microphone access…" : "Tap to start"}</p>
@@ -514,16 +515,16 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
           {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-800 dark:bg-red-950/40 dark:text-red-200">{error}</p>}
           <div>
             <label htmlFor="vr-name" className="mb-1 block text-sm font-bold text-stone-800 dark:text-stone-200">Name</label>
-            <input id="vr-name" className={`${input} text-lg font-bold`} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} enterKeyHint="done" />
+            <input id="vr-name" className={`${input} w-full text-lg font-bold`} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} enterKeyHint="done" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="vr-serves" className="mb-1 block text-sm font-bold text-stone-800 dark:text-stone-200">Serves</label>
-              <input id="vr-serves" type="number" inputMode="numeric" min={1} className={input} value={draft.servings ?? ""} onChange={(e) => setDraft({ ...draft, servings: e.target.value ? Number(e.target.value) : undefined })} />
+              <input id="vr-serves" type="number" inputMode="numeric" min={1} className={`${input} w-full`} value={draft.servings ?? ""} onChange={(e) => setDraft({ ...draft, servings: e.target.value ? Number(e.target.value) : undefined })} />
             </div>
             <div>
               <label htmlFor="vr-prep" className="mb-1 block text-sm font-bold text-stone-800 dark:text-stone-200">Time (min)</label>
-              <input id="vr-prep" type="number" inputMode="numeric" min={1} className={input} value={draft.prep_time_minutes ?? ""} onChange={(e) => setDraft({ ...draft, prep_time_minutes: e.target.value ? Number(e.target.value) : undefined })} />
+              <input id="vr-prep" type="number" inputMode="numeric" min={1} className={`${input} w-full`} value={draft.prep_time_minutes ?? ""} onChange={(e) => setDraft({ ...draft, prep_time_minutes: e.target.value ? Number(e.target.value) : undefined })} />
             </div>
           </div>
           <fieldset>
@@ -545,7 +546,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
           </fieldset>
           <div>
             <label htmlFor="vr-steps" className="mb-1 block text-sm font-bold text-stone-800 dark:text-stone-200">Steps</label>
-            <textarea id="vr-steps" rows={8} className={`${input} py-2 leading-relaxed`} value={draft.instructions} onChange={(e) => setDraft({ ...draft, instructions: e.target.value })} />
+            <textarea id="vr-steps" rows={8} className={`${input} w-full py-2 leading-relaxed`} value={draft.instructions} onChange={(e) => setDraft({ ...draft, instructions: e.target.value })} />
           </div>
           {result?.transcript && (
             <div className="rounded-2xl bg-stone-100 dark:bg-stone-800">
