@@ -86,7 +86,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
                 {welcomePrefix.replace(/,\s*$/, "")}
               </p>
-              <h1 className="text-[1.65rem] font-extrabold leading-tight tracking-tight text-stone-900 text-balance wrap-break-word dark:text-stone-50 sm:text-3xl">
+              <h1 className={`${chefName.length > 22 ? "text-[1.35rem]" : "text-[1.65rem]"} font-extrabold leading-tight tracking-tight text-stone-900 text-balance wrap-break-word dark:text-stone-50 sm:text-3xl`}>
                 {preferred ? chefName : `Chef ${chefName}`}
               </h1>
             </div>
