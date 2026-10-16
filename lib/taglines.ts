@@ -19,31 +19,6 @@ export function getTranslatedTagline(language?: string): string {
   return "What to eat?";
 }
 
-export function getTranslatedWelcome(language?: string, isFirstVisit: boolean = false): string {
-  const prefix = isFirstVisit ? "Welcome," : "Welcome back,";
-  if (!language) return prefix;
-  
-  const lang = language.toLowerCase().trim();
-  if (lang.includes("english") || lang === "en") return prefix;
-  if (lang.includes("hindi") || lang === "hi") return isFirstVisit ? "स्वागत है," : "वापसी पर स्वागत है,";
-  if (lang.includes("marathi") || lang === "mr") return isFirstVisit ? "स्वागत आहे," : "परत आल्याबद्दल स्वागत,";
-  if (lang.includes("spanish") || lang === "es") return isFirstVisit ? "Bienvenido," : "Bienvenido de nuevo,";
-  if (lang.includes("french") || lang === "fr") return isFirstVisit ? "Bienvenue," : "Bon retour,";
-  
-  return prefix;
-}
-
-/** BCP 47 locale for dates/numbers in the user's language (falls back to English). */
-export function languageToLocale(language?: string): string {
-  const lang = (language ?? "").toLowerCase().trim();
-  const map: [string, string][] = [
-    ["marathi", "mr-IN"], ["hindi", "hi-IN"], ["gujarati", "gu-IN"], ["telugu", "te-IN"], ["tamil", "ta-IN"],
-    ["kannada", "kn-IN"], ["bengali", "bn-IN"], ["spanish", "es-ES"], ["french", "fr-FR"], ["german", "de-DE"],
-  ];
-  for (const [name, locale] of map) if (lang.includes(name) || lang === locale.slice(0, 2)) return locale;
-  return "en-GB";
-}
-
 /** First visible character of a name for an avatar (handles Devanagari and emoji). */
 export function initialOf(name: string): string {
   const trimmed = name.trim();
