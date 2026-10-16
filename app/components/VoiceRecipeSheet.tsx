@@ -527,7 +527,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
               <input id="vr-prep" type="number" inputMode="numeric" min={1} className={`${input} w-full`} value={draft.prep_time_minutes ?? ""} onChange={(e) => setDraft({ ...draft, prep_time_minutes: e.target.value ? Number(e.target.value) : undefined })} />
             </div>
           </div>
-          <fieldset>
+          <fieldset className="min-w-0">
             <legend className="mb-2 text-sm font-bold text-stone-800 dark:text-stone-200">Ingredients ({draft.ingredients.length})</legend>
             <ul className="space-y-2">
               {draft.ingredients.map((ing, i) => (
