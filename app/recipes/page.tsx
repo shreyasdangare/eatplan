@@ -57,10 +57,10 @@ export default function RecipesPage() {
       
       <Suspense fallback={
         <div role="status" aria-label="Loading recipes" className="space-y-4">
-          <div className="h-16 animate-pulse rounded-3xl bg-stone-200/50 dark:bg-stone-800/50" />
+          <div className="h-16 animate-pulse rounded-3xl bg-stone-200/50 dark:bg-stone-800" />
           <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="aspect-4/5 animate-pulse rounded-3xl bg-stone-200/50 dark:bg-stone-800/50 sm:aspect-4/3" />
+              <div key={i} className="aspect-4/5 animate-pulse rounded-3xl bg-stone-200/50 dark:bg-stone-800 sm:aspect-4/3" />
             ))}
           </div>
         </div>

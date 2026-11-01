@@ -15,7 +15,7 @@ export function FavoriteButton({ dishId }: { dishId: string }) {
       className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 transition-all active:scale-90 ${
         fav
           ? "border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-400"
-          : "border-stone-200 bg-white/60 text-stone-600 hover:text-rose-600 dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-300"
+          : "border-stone-200 bg-white text-stone-600 hover:text-rose-600 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300"
       }`}
     >
       <Heart className={`h-5 w-5 ${fav ? "fill-current" : ""}`} aria-hidden />

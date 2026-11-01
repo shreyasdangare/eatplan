@@ -36,6 +36,15 @@ const SLOT_LABELS: Record<string, string> = {
   dinner: "Dinner"
 };
 
+/** Rotating colour bands for the day cards on phones (white text is AA on all but saffron). */
+const DAY_BANDS = ["bg-indigo text-white", "bg-leaf text-white", "bg-chili text-white", "bg-saffron text-ink"];
+/** Meal sticker colours, matching the home screen pills. */
+const SLOT_TILE: Record<string, string> = {
+  breakfast: "bg-saffron text-ink",
+  lunch: "bg-leaf text-white",
+  dinner: "bg-chili text-white",
+};
+
 const SLOT_ICONS: Record<string, any> = {
   breakfast: Sun,
   lunch: Utensils,
@@ -53,10 +62,10 @@ function DraggableDish({ dish }: { dish: Dish }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`group/tray relative shrink-0 cursor-grab overflow-hidden rounded-full border w-[150px] h-[46px] text-[16px] font-bold transition-all active:scale-[0.98] active:cursor-grabbing ${
+      className={`group/tray relative shrink-0 cursor-grab overflow-hidden press rounded-full border-2 w-[150px] h-[46px] text-[15px] font-bold active:cursor-grabbing ${
         isDragging
-          ? "border-orange-400 ring-2 ring-orange-400 shadow-xl opacity-0"
-          : "border-stone-200/60 shadow-xs hover:border-orange-300 hover:shadow-md dark:border-stone-700/60"
+          ? "border-ink opacity-0"
+          : "border-ink shadow-xs hover:-translate-y-0.5 dark:border-stone-500"
       }`}
     >
       {/* Blurred background image */}
@@ -66,8 +75,8 @@ function DraggableDish({ dish }: { dish: Dish }) {
           style={{ backgroundImage: `url(${dish.image_url})` }}
         />
       )}
-      <div className="absolute inset-0 bg-white/70 backdrop-blur-md dark:bg-stone-900/70" />
-      <span className="relative z-10 block truncate px-4 text-stone-700 dark:text-stone-200 group-hover/tray:text-orange-900 dark:group-hover/tray:text-orange-300">
+      <div className="absolute inset-0 bg-white dark:bg-stone-900" />
+      <span className="relative z-10 block truncate px-4 text-ink dark:text-stone-100">
         {dish.name}
       </span>
     </button>
@@ -108,10 +117,10 @@ function SortableDishPill({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group/pill relative flex items-center gap-1.5 overflow-hidden rounded-xl border px-3 py-2 transition-all ${
+      className={`group/pill relative flex items-center gap-1.5 overflow-hidden rounded-xl border-2 px-3 py-2 transition-all ${
         prepared
-          ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
-          : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-xs"
+          ? "bg-leaf/10 border-leaf/50 dark:border-emerald-700"
+          : "bg-white dark:bg-stone-900 border-ink dark:border-stone-600 shadow-xs"
       }`}
     >
       {/* Blurred background image if not prepared */}
@@ -121,7 +130,7 @@ function SortableDishPill({
             className="absolute inset-0 bg-cover bg-center opacity-[0.15] blur-[3px] transition-all group-hover/pill:opacity-[0.25]"
             style={{ backgroundImage: `url(${imageUrl})` }}
           />
-          <div className="absolute inset-0 bg-white/60 dark:bg-stone-900/60" />
+          <div className="absolute inset-0 bg-white dark:bg-stone-900" />
         </>
       )}
 
@@ -139,10 +148,10 @@ function SortableDishPill({
       )}
 
       <span
-        className={`relative z-10 min-w-0 flex-1 truncate text-[15px] font-bold tracking-tight ${
+        className={`relative z-10 min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-tight ${
           prepared
             ? "text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600"
-            : "text-stone-800 dark:text-stone-200"
+            : "text-ink dark:text-cream"
         }`}
         title={dishName}
       >
@@ -262,15 +271,15 @@ function DroppableSlot({
   const allPrepared = entries.length > 0 && entries.every((e) => isMealPast(date, slot));
 
   return (
-    <td className="min-w-40 border-b border-stone-200/50 p-2 align-top dark:border-stone-700/50 group/slot">
+    <td className="min-w-40 p-2 align-top group/slot">
       <div
         ref={setNodeRef}
         className={`relative flex min-h-22 flex-col rounded-[1.25rem] border-2 p-2.5 transition-all duration-300 ${
           isOver
-            ? "scale-[1.02] border-orange-400 bg-orange-50 shadow-md dark:border-orange-500/80 dark:bg-orange-900/30"
+            ? "scale-[1.02] border-ink bg-saffron/30 shadow-hard dark:border-saffron"
             : allPrepared && entries.length > 0
-            ? "border-emerald-300/80 bg-emerald-50/80 dark:border-emerald-700/80 dark:bg-emerald-950/40"
-            : "border-dashed border-stone-200/60 bg-stone-50/40 hover:border-stone-300 dark:border-stone-700/60 dark:bg-stone-800/30 dark:hover:border-stone-600"
+            ? "border-leaf bg-leaf/10 dark:border-emerald-600"
+            : "border-dashed border-stone-300 bg-cream hover:border-ink dark:border-stone-700 dark:bg-stone-950 dark:hover:border-stone-500"
         }`}
       >
         {entries.length > 0 ? (
@@ -310,7 +319,7 @@ function DroppableSlot({
               <button
                 type="button"
                 onClick={() => setShowInlineAdd(true)}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-500 opacity-0 transition-all hover:bg-orange-50 hover:text-orange-600 group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-400"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-500 opacity-0 transition-all hover:bg-saffron hover:text-ink group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-400"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add
@@ -726,14 +735,14 @@ export default function PlanPage() {
     return (
       <LoadingRegion label="Loading your meal plan">
         <section className="space-y-4 pt-2">
-          <div className="rounded-3xl glass-panel px-4 py-3">
+          <div className="rounded-3xl sticker-card px-4 py-3">
             <p className="text-lg font-extrabold tracking-tight text-stone-900 dark:text-stone-50">This week</p>
             <p className="mt-1 text-base text-stone-600 dark:text-stone-300">
               Getting your breakfasts, lunches and dinners ready for the whole household…
             </p>
           </div>
           {[0, 1].map((i) => (
-            <div key={i} className="space-y-3 rounded-4xl glass-panel p-5">
+            <div key={i} className="space-y-3 rounded-4xl sticker-card p-5">
               <Skeleton className="h-7 w-40" />
               <Skeleton className="h-12 w-full" />
               <Skeleton className="h-12 w-full" />
@@ -764,13 +773,13 @@ export default function PlanPage() {
         onDragEnd={handleDragEnd}
       >
         {/* Desktop Only: Sticky Main Bar */}
-        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl glass-panel p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl sticker-card p-5 shadow-sm">
           {/* Top Row: Date nav & Recipe search/action */}
           <div className="mb-4 flex items-center justify-between gap-4">
             
             {/* Left side: Date control */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center rounded-2xl p-1 shadow-inner bg-stone-100/80 dark:bg-stone-800/80">
+              <div className="flex items-center rounded-2xl p-1 shadow-inner bg-stone-100 dark:bg-stone-800">
                 <button
                   type="button"
                   onClick={prevWeek}
@@ -802,7 +811,7 @@ export default function PlanPage() {
                 <button
                   type="button"
                   onClick={() => setWeekStart(getWeekStart(new Date()))}
-                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-xs transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
+                  className="rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-xs transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
                 >
                   This Week
                 </button>
@@ -813,7 +822,7 @@ export default function PlanPage() {
                     next.setDate(next.getDate() + 7);
                     setWeekStart(getWeekStart(next));
                   }}
-                  className="rounded-xl border border-stone-200 bg-white/70 px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-xs transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
+                  className="rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-bold tracking-tight text-stone-700 hover:bg-stone-50 shadow-xs transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
                 >
                   Next Week
                 </button>
@@ -831,7 +840,7 @@ export default function PlanPage() {
                   placeholder="Search recipes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-full border border-stone-200/60 bg-stone-100/50 py-2 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
+                  className="w-full rounded-full border border-stone-200/60 bg-stone-100 py-2 pl-9 pr-8 text-sm text-stone-800 placeholder:text-stone-400 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800 dark:text-stone-200 dark:focus:border-orange-500/50 dark:focus:bg-stone-900 transition-all shadow-inner"
                 />
                 {searchQuery && (
                   <button
@@ -859,7 +868,7 @@ export default function PlanPage() {
                   className={`shrink-0 rounded-full px-4 py-1.5 text-[14px] font-bold tracking-tight transition-all active:scale-95 border ${
                     activeFilter === f
                       ? "bg-stone-800 text-white border-stone-800 dark:bg-stone-200 dark:text-stone-900 border-none shadow-xs"
-                      : "bg-transparent border-stone-200/60 text-stone-600 hover:bg-stone-100/50 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800/50"
+                      : "bg-transparent border-stone-200/60 text-stone-600 hover:bg-stone-100 hover:border-stone-300 dark:border-stone-700/60 dark:text-stone-400 dark:hover:bg-stone-800"
                   }`}
                 >
                   {f}
@@ -867,7 +876,7 @@ export default function PlanPage() {
               ))}
             </div>
 
-            <div className="flex items-center rounded-full bg-stone-100/80 p-1 dark:bg-stone-800/80 shadow-inner shrink-0 hidden lg:flex">
+            <div className="flex items-center rounded-full bg-stone-100 p-1 dark:bg-stone-800 shadow-inner shrink-0 hidden lg:flex">
               {(["Both", "Veg", "Non-Veg"] as const).map((diet) => (
                 <button
                   key={diet}
@@ -909,12 +918,12 @@ export default function PlanPage() {
         </div>
 
         {/* Desktop Only: Calendar Grid */}
-        <div className="hidden sm:block overflow-hidden rounded-[2.5rem] glass-panel shadow-xs mt-4">
+        <div className="hidden sm:block overflow-hidden rounded-3xl sticker-card mt-4">
           <div className="overflow-x-auto pb-2 scrollbar-thin">
             <table className="w-full min-w-160 border-collapse text-left">
               <thead>
-                <tr className="border-b border-stone-200/50 dark:border-stone-700/50">
-                  <th className="sticky left-0 z-20 min-w-24 border-b border-r border-stone-200/50 bg-stone-50/50 p-4 text-xs font-bold uppercase tracking-widest text-stone-500 backdrop-blur-xl dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-400">
+                <tr className="bg-ink text-white dark:bg-stone-950">
+                  <th className="sticky left-0 z-20 min-w-24 bg-ink p-4 text-xs font-extrabold uppercase tracking-widest text-saffron dark:bg-stone-950">
                     Day
                   </th>
                   {SLOTS.map((s) => {
@@ -922,7 +931,7 @@ export default function PlanPage() {
                     return (
                       <th
                         key={s}
-                        className="min-w-0 border-b border-stone-200/50 bg-stone-50/30 p-4 text-xs font-bold uppercase tracking-widest text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/30 dark:text-stone-400 sm:min-w-40"
+                        className="min-w-0 p-4 text-xs font-extrabold uppercase tracking-widest text-white sm:min-w-40"
                       >
                         <span className="flex items-center gap-2">
                           <Icon className="h-4 w-4" aria-hidden />
@@ -933,7 +942,7 @@ export default function PlanPage() {
                   })}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-200/50 dark:divide-stone-700/50">
+              <tbody className="divide-y-2 divide-stone-200 dark:divide-stone-800">
                   {weekDates.map((date) => (
                   <tr
                     key={date}
@@ -941,15 +950,15 @@ export default function PlanPage() {
                   >
                     <th
                       scope="row"
-                      className="sticky left-0 z-10 min-w-24 border-r border-stone-200/50 bg-white/50 p-4 text-left backdrop-blur-xl transition-colors group-hover:bg-stone-50/80 dark:border-stone-700/50 dark:bg-stone-900/50 dark:group-hover:bg-stone-800/80"
+                      className={`sticky left-0 z-10 min-w-24 border-r-2 border-stone-200 p-4 text-left dark:border-stone-800 ${date === todayIso ? "bg-saffron text-ink" : "bg-white dark:bg-stone-900"}`}
                     >
                       <div className="flex flex-col">
-                        <span className="text-sm font-extrabold text-stone-900 dark:text-stone-50">
+                        <span className="text-sm font-extrabold">
                           {new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
                             weekday: "short",
                           })}
                         </span>
-                        <span className="mt-0.5 text-xs font-semibold text-stone-500 dark:text-stone-400">
+                        <span className="mt-0.5 text-xs font-semibold opacity-80">
                            {new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "short"
@@ -981,7 +990,7 @@ export default function PlanPage() {
             easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
           }}>
           {activeDish ? (
-            <div className="rotate-3 scale-105 overflow-hidden flex items-center justify-center rounded-2xl border-2 border-orange-400 bg-white/80 backdrop-blur-md shadow-2xl dark:border-orange-500 dark:bg-stone-800/80 w-40 h-24 relative group">
+            <div className="rotate-3 scale-105 overflow-hidden flex items-center justify-center rounded-2xl border-2 border-ink bg-saffron shadow-[6px_6px_0_var(--shadow-ink,#1b1530)] dark:border-stone-950 w-40 h-24 relative group">
               {activeDish.image_url && (
                 <div 
                    className="absolute inset-0 bg-cover bg-center opacity-40 blur-[2px] transition-all"
@@ -1000,7 +1009,7 @@ export default function PlanPage() {
       </DndContext>
 
       {/* Mobile Only: sticky week navigator + day strip */}
-      <div className="sm:hidden sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 -mx-1 rounded-3xl glass-panel bg-white/90 p-2 dark:bg-stone-900/90">
+      <div className="sm:hidden sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 -mx-1 rounded-3xl sticker-card bg-white p-2 dark:bg-stone-900">
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -1036,7 +1045,7 @@ export default function PlanPage() {
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
         </div>
-        <nav aria-label="Days" className="mt-1 grid grid-cols-7 gap-1">
+        <nav aria-label="Days" className="mt-2 grid grid-cols-7 gap-1.5">
           {weekDates.map((date) => {
             const d = new Date(date + "T12:00:00");
             const count = plans.filter((p) => p.date === date && p.dish_id).length;
@@ -1050,14 +1059,16 @@ export default function PlanPage() {
                   document.getElementById(`day-${date}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
                   setTimeout(() => window.scrollBy({ top: -136, behavior: "smooth" }), 350);
                 }}
-                className={`flex min-h-12 flex-col items-center justify-center rounded-2xl text-xs font-semibold ${
-                  isToday ? "bg-orange-600 text-white" : "text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                className={`flex min-h-14 flex-col items-center justify-center rounded-xl border-2 text-[11px] font-bold ${
+                  isToday
+                    ? "border-ink bg-saffron text-ink shadow-xs"
+                    : "border-ink bg-white text-ink hover:bg-cream dark:border-stone-600 dark:bg-stone-900 dark:text-cream"
                 }`}
               >
                 <span className="sr-only">{`${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${count} meal${count === 1 ? "" : "s"} planned`}</span>
                 <span aria-hidden>{d.toLocaleDateString("en-GB", { weekday: "narrow" })}</span>
-                <span aria-hidden className="text-sm font-bold">{d.getDate()}</span>
-                <span aria-hidden className={`mt-0.5 h-1 w-1 rounded-full ${count ? (isToday ? "bg-white" : "bg-orange-600") : "bg-transparent"}`} />
+                <span aria-hidden className="text-base font-extrabold leading-tight">{d.getDate()}</span>
+                <span aria-hidden className={`mt-0.5 h-1 w-1 rounded-full ${count ? (isToday ? "bg-ink" : "bg-chili") : "bg-transparent"}`} />
               </a>
             );
           })}
@@ -1067,31 +1078,31 @@ export default function PlanPage() {
       {/* Mobile Only: Vertical Stacked Designer List */}
       <div className="sm:hidden flex flex-col gap-5 mt-2">
         {plannedCount === 0 && (
-          <div className="rounded-3xl border border-dashed border-stone-300 bg-white/60 p-5 text-center dark:border-stone-700 dark:bg-stone-900/40">
-            <p className="text-base font-bold text-stone-900 dark:text-stone-50">Nothing planned this week</p>
+          <div className="rounded-2xl border-2 border-dashed border-ink/40 p-5 text-center dark:border-stone-600">
+            <p className="text-lg font-extrabold text-stone-900 dark:text-stone-50">Nothing planned this week</p>
             <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
               Tap <span className="font-semibold">+ Add</span> under any meal to pick a recipe.
             </p>
             {dishes.length === 0 && (
-              <Link href="/dishes/new" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-orange-600 px-5 font-bold text-white">
+              <Link href="/dishes/new" className="mt-3 inline-flex min-h-11 items-center rounded-xl border-2 border-ink bg-saffron px-5 font-extrabold text-ink shadow-md">
                 Add your first recipe
               </Link>
             )}
           </div>
         )}
-        {weekDates.map((date) => (
-          <div key={date} id={`day-${date}`} className="scroll-mt-40 flex flex-col overflow-hidden rounded-4xl glass-panel bg-white/60 dark:bg-stone-900/40 outline-solid outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all">
-            <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-stone-200/40 dark:border-stone-700/40">
-              <div className="flex items-end gap-2 text-stone-900 dark:text-stone-50">
-                <h4 className="text-2xl font-extrabold tracking-tight">
+        {weekDates.map((date, dayIndex) => (
+          <div key={date} id={`day-${date}`} className="scroll-mt-40 flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-white shadow-md dark:border-stone-600 dark:bg-stone-900">
+            <div className={`flex items-center justify-between px-4 py-2 ${DAY_BANDS[dayIndex % DAY_BANDS.length]}`}>
+              <div className="flex items-baseline gap-2">
+                <h4 className="text-lg font-extrabold tracking-tight">
                   {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long" })}
                 </h4>
-                <p className="text-[13px] font-semibold text-stone-500 dark:text-stone-400 mb-1">
+                <p className="text-[13px] font-bold opacity-85">
                   {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
                 </p>
               </div>
             </div>
-            <div className="px-4 py-4 pb-5 space-y-3">
+            <div className="space-y-3 p-3">
               {SLOTS.map((slot) => {
                  const Icon = SLOT_ICONS[slot];
                  const entries = getSlotEntries(date, slot);
@@ -1099,7 +1110,7 @@ export default function PlanPage() {
 
                  return (
                    <div key={slot} className="flex gap-3">
-                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-500 dark:text-stone-400 ring-stone-200/80 dark:ring-stone-700/80'} shadow-xs mt-0.5`}>
+                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] border-2 border-ink dark:border-stone-600 ${allPrepared ? 'bg-leaf text-white' : SLOT_TILE[slot]} mt-0.5`}>
                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
                      </div>
                      
@@ -1114,17 +1125,21 @@ export default function PlanPage() {
                              return (
                                <div
                                  key={entry.id}
-                                 className={`flex items-center justify-between gap-2 rounded-xl border px-3.5 h-[46px] transition-colors ${
+                                 className={`flex items-center justify-between gap-2 rounded-xl border-2 px-3.5 min-h-12 transition-colors ${
                                    isPrepared
-                                     ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
-                                     : "bg-white/90 dark:bg-stone-800/90 border-stone-200/80 dark:border-stone-700/80 shadow-xs"
+                                     ? "border-leaf/40 bg-emerald-50 dark:border-stone-700 dark:bg-stone-950"
+                                     : "border-ink bg-cream dark:border-stone-600 dark:bg-stone-800"
                                  }`}
                                >
+                                 {entry.dishes?.image_url ? (
+                                   // eslint-disable-next-line @next/next/no-img-element -- small thumbnail
+                                   <img src={imageVariant(entry.dishes.image_url, 250) ?? entry.dishes.image_url} alt="" loading="lazy" className={`-ml-1.5 h-9 w-9 shrink-0 rounded-full border-2 border-ink object-cover dark:border-stone-600 ${isPrepared ? "opacity-60 grayscale" : ""}`} />
+                                 ) : null}
                                  <span
-                                   className={`truncate text-[15px] font-bold tracking-tight ${
+                                   className={`min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-tight ${
                                      isPrepared
                                        ? "text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600"
-                                       : "text-stone-800 dark:text-stone-200"
+                                       : "text-ink dark:text-cream"
                                    }`}
                                  >
                                    {dishId ? (
@@ -1158,7 +1173,7 @@ export default function PlanPage() {
                          <button 
                            type="button" 
                            onClick={() => setMobileSlotOpen({ date, slot })}
-                           className="w-full h-[46px] flex items-center justify-center gap-2 rounded-xl bg-stone-100/50 hover:bg-orange-50 dark:bg-stone-800/50 dark:hover:bg-orange-900/30 text-stone-500 dark:text-stone-400 transition-colors border border-dashed border-stone-300 dark:border-stone-700/60 font-semibold text-[13px] active:scale-[0.98]"
+                           className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink/35 text-[13px] font-bold text-stone-600 transition-colors hover:border-ink hover:bg-cream active:scale-[0.98] dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
                          >
                            <Plus className="h-4 w-4" strokeWidth={3} /> Add {SLOT_LABELS[slot]}
                          </button>
@@ -1272,7 +1287,7 @@ export default function PlanPage() {
                 <li className="flex flex-col items-center justify-center gap-3 py-10 text-center">
                   <Utensils className="h-10 w-10 text-stone-400" aria-hidden />
                   <p className="text-base font-bold text-stone-700 dark:text-stone-200">No recipes yet</p>
-                  <Link href="/dishes/new" className="min-h-11 rounded-full bg-orange-600 px-5 py-2.5 font-bold text-white">
+                  <Link href="/dishes/new" className="min-h-11 rounded-full bg-orange-500 px-5 py-2.5 font-bold text-ink">
                     Add a recipe
                   </Link>
                 </li>
@@ -1299,7 +1314,7 @@ export default function PlanPage() {
                             : undefined,
                         });
                       }}
-                      className="flex min-h-14 w-full items-center gap-3 rounded-2xl bg-stone-50 px-3 py-2 text-left active:scale-[0.98] active:bg-orange-50 dark:bg-stone-800/60 dark:active:bg-orange-950/40"
+                      className="flex min-h-14 w-full items-center gap-3 rounded-2xl bg-stone-50 px-3 py-2 text-left active:scale-[0.98] active:bg-orange-50 dark:bg-stone-800 dark:active:bg-orange-950/40"
                     >
                       {dish.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element -- tiny thumbnail
@@ -1319,7 +1334,7 @@ export default function PlanPage() {
                           </span>
                         )}
                       </span>
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white" aria-hidden>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500 text-ink" aria-hidden>
                         <Plus className="h-5 w-5" strokeWidth={3} />
                       </span>
                     </button>

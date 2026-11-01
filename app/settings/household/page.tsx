@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Copy, Check, Link as LinkIcon, AlertCircle } from "lucide-react";
+import { Copy, Check, Link as LinkIcon, AlertCircle, ChevronLeft, RefreshCw, Ban } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -92,128 +92,113 @@ export default function HouseholdSettings() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-orange-500 dark:border-stone-700 dark:border-t-orange-500" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-saffron dark:border-stone-700 dark:border-t-saffron" />
       </div>
     );
   }
 
+  const isAdmin = household?.my_role === "admin";
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 pb-24 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <Link href="/settings" className="mb-6 inline-flex min-h-11 items-center text-sm font-semibold text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
-          ← Back to Settings
-        </Link>
-        <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
-          <Users className="h-8 w-8 text-orange-500" /> Household Sharing
-        </h1>
-        <p className="mt-2 text-stone-500 dark:text-stone-400 font-medium leading-relaxed">
-          Invite your partner or family members to sync your meal plans, recipes, and pantry automatically in real-time.
-        </p>
-      </div>
+    <div className="mx-auto max-w-2xl space-y-6 px-4 py-6 pb-28 sm:px-6">
+      <Link href="/settings" className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-ink dark:text-stone-200">
+        <ChevronLeft className="h-5 w-5" /> Settings
+      </Link>
 
-      <div className="space-y-8">
-        {/* Current Household Info */}
-        <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
-          <h2 className="text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-6">
-            Your Household
-          </h2>
-          
-          <div className="mb-6">
-             <label className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-2 block">
-                Invite Code
-             </label>
-             {household?.invite_code ? (
-               <div className="flex items-center gap-2">
-                 <code className="flex-1 rounded-xl bg-stone-100 dark:bg-stone-800 p-3.5 text-lg tracking-[0.2em] font-mono text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700">
-                   {household.invite_code}
-                 </code>
-                 <button
-                   onClick={handleCopy}
-                   className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 hover:bg-orange-200 hover:text-orange-700 dark:bg-orange-500/20 dark:text-orange-400 dark:hover:bg-orange-500/30 transition-colors"
-                   title="Copy code"
-                   aria-label="Copy invite code"
-                 >
-                   {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                 </button>
-               </div>
-             ) : (
-               <p className="rounded-xl bg-stone-100 p-3.5 text-sm text-stone-600 dark:bg-stone-800 dark:text-stone-400">
-                 Invites are off. Nobody can join with an old code.
-               </p>
-             )}
-             <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
-               Share this code with family so they can join. Anyone with the code can join, so make a new one if it gets out.
-             </p>
-             {household?.my_role === "admin" && (
-               <div className="mt-3 flex flex-wrap gap-2">
-                 <button type="button" disabled={codeBusy} onClick={() => updateCode("regenerate")} className="rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-stone-200 text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:ring-stone-700 dark:text-stone-300 dark:hover:bg-stone-800">
-                   {household.invite_code ? "New code" : "Turn on invites"}
-                 </button>
-                 {household.invite_code && (
-                   <button type="button" disabled={codeBusy} onClick={() => updateCode("revoke")} className="rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-stone-200 text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:ring-stone-700 dark:text-stone-300 dark:hover:bg-stone-800">
-                     Turn off invites
-                   </button>
-                 )}
-               </div>
-             )}
-             {codeError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{codeError}</p>}
-          </div>
-
-          <div>
-             <label className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-2 block">
-                Members ({household?.members?.length || 0})
-             </label>
-             <ul className="divide-y divide-stone-100 dark:divide-stone-800">
-                {household?.members?.map((member, idx) => (
-                  <li key={idx} className="flex items-center justify-between py-3">
-                    <span className="font-semibold text-stone-700 dark:text-stone-300">
-                      {member.email}
-                    </span>
-                    <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-stone-500 dark:bg-stone-800 dark:text-stone-400">
-                      {member.role}
-                    </span>
-                  </li>
-                ))}
-             </ul>
-          </div>
-        </section>
-
-        {/* Join Household */}
-        <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
-          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-2">
-            <LinkIcon className="h-5 w-5 text-stone-500 dark:text-stone-400" /> Join Existing Household
-          </h2>
-          <p className="text-sm font-medium text-stone-500 dark:text-stone-400 mb-6 max-w-md">
-            Got an invite code from your partner? Enter it below to move into their household.
-            <br/><span className="text-orange-600 dark:text-orange-400 font-bold">Warning:</span> You will lose access to your current recipes, plan and list. If nobody else is in your current household, it is deleted.
+      {/* Invite hero */}
+      <section className="sticker-card overflow-hidden rounded-3xl">
+        <div className="relative overflow-hidden bg-saffron p-5 text-ink">
+          <span aria-hidden className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-chili" />
+          <span aria-hidden className="absolute -bottom-10 right-16 h-16 w-16 rounded-full bg-pink" />
+          <h1 className="relative text-3xl font-extrabold tracking-tight">Household</h1>
+          <p className="relative mt-1 max-w-[28ch] font-semibold">Share one plan, one recipe box and one grocery list.</p>
+        </div>
+        <div className="p-5">
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-widest text-stone-600 dark:text-stone-400">Invite code</p>
+          {household?.invite_code ? (
+            <div className="flex items-stretch gap-2">
+              <code className="flex min-h-14 flex-1 items-center justify-center rounded-2xl border-2 border-dashed border-ink bg-cream font-mono text-2xl font-bold tracking-[0.25em] text-ink dark:border-stone-500 dark:bg-stone-950 dark:text-saffron">
+                {household.invite_code}
+              </code>
+              <button
+                onClick={handleCopy}
+                className="press flex w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-saffron text-ink shadow-hard dark:border-stone-950"
+                aria-label="Copy invite code"
+              >
+                {copied ? <Check className="h-6 w-6" strokeWidth={3} /> : <Copy className="h-5 w-5" />}
+              </button>
+            </div>
+          ) : (
+            <p className="rounded-2xl border-2 border-dashed border-stone-400 p-4 text-sm font-semibold text-stone-600 dark:text-stone-400">
+              Invites are off. Nobody can join with an old code.
+            </p>
+          )}
+          <p className="mt-3 text-sm text-stone-600 dark:text-stone-400">
+            Anyone with the code can join, so make a new one if it gets out.
           </p>
-
-          <form onSubmit={handleJoin} className="flex flex-col gap-3 sm:flex-row">
-             <input
-               type="text"
-               value={joinCode}
-               onChange={(e) => setJoinCode(e.target.value)}
-               placeholder="Invite code, e.g. K7QM4RTX"
-               autoCapitalize="characters"
-               autoComplete="off"
-               className="flex-1 rounded-2xl border-0 bg-white px-4 py-3.5 text-sm ring-1 ring-inset ring-stone-200 placeholder:text-stone-400 focus:ring-2 focus:ring-inset focus:ring-orange-500 dark:bg-stone-900 dark:text-white dark:ring-stone-700 dark:focus:ring-orange-500 shadow-xs"
-               required
-             />
-             <button
-               type="submit"
-               disabled={joining}
-               className="rounded-2xl bg-stone-900 px-6 py-3.5 text-sm font-semibold text-white shadow-xs hover:bg-stone-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 disabled:opacity-50 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white"
-             >
-               {joining ? "Joining..." : "Join"}
-             </button>
-          </form>
-          {joinError && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-medium text-red-600 dark:bg-red-900/30 dark:text-red-400 border border-red-100 dark:border-red-900/50">
-              <AlertCircle className="h-4 w-4" /> {joinError}
+          {isAdmin && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" disabled={codeBusy} onClick={() => updateCode("regenerate")} className="btn-outline press text-sm disabled:opacity-50">
+                <RefreshCw className="h-4 w-4" /> {household?.invite_code ? "New code" : "Turn on invites"}
+              </button>
+              {household?.invite_code && (
+                <button type="button" disabled={codeBusy} onClick={() => updateCode("revoke")} className="btn-outline press text-sm disabled:opacity-50">
+                  <Ban className="h-4 w-4" /> Turn off invites
+                </button>
+              )}
             </div>
           )}
-        </section>
-      </div>
+          {codeError && <p className="mt-2 text-sm font-semibold text-chili dark:text-red-400">{codeError}</p>}
+        </div>
+      </section>
+
+      {/* Members */}
+      <section aria-labelledby="members" className="space-y-2">
+        <h2 id="members" className="px-1 text-xs font-extrabold uppercase tracking-widest text-stone-600 dark:text-stone-400">
+          Members · {household?.members?.length || 0}
+        </h2>
+        <ul className="sticker-card divide-y-2 divide-stone-200 overflow-hidden rounded-3xl dark:divide-stone-800">
+          {household?.members?.map((member, idx) => (
+            <li key={idx} className="flex min-h-16 items-center gap-3 px-4 py-3">
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-ink font-extrabold uppercase text-ink dark:border-stone-950 ${["bg-pink", "bg-saffron", "bg-leaf text-white", "bg-indigo text-white"][idx % 4]}`}>
+                {member.email?.charAt(0)}
+              </span>
+              <span className="min-w-0 flex-1 truncate font-bold text-ink dark:text-stone-100">{member.email}</span>
+              <span className={`rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-extrabold uppercase tracking-wider dark:border-stone-500 ${member.role === "admin" ? "bg-ink text-saffron dark:bg-saffron dark:text-ink" : "bg-white text-ink dark:bg-stone-900 dark:text-stone-200"}`}>
+                {member.role}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Join */}
+      <section aria-labelledby="join" className="sticker-card rounded-3xl p-5">
+        <h2 id="join" className="flex items-center gap-2 text-xl font-extrabold text-ink dark:text-stone-50">
+          <LinkIcon className="h-5 w-5" /> Join another household
+        </h2>
+        <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">Got a code from family? Enter it to move in with them.</p>
+        <p className="mt-3 flex gap-2 rounded-2xl border-2 border-chili bg-chili/10 p-3 text-sm font-semibold text-chili dark:border-red-400/60 dark:text-red-300">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          You will lose access to your current recipes, plan and list. If nobody else is in your current household, it is deleted.
+        </p>
+        <form onSubmit={handleJoin} className="mt-4 flex gap-2">
+          <input
+            type="text"
+            value={joinCode}
+            onChange={(e) => setJoinCode(e.target.value)}
+            placeholder="e.g. K7QM4RTX"
+            aria-label="Invite code"
+            autoCapitalize="characters"
+            autoComplete="off"
+            className="min-h-12 min-w-0 flex-1 rounded-2xl border-2 border-ink bg-cream px-4 font-mono text-base font-bold uppercase tracking-widest text-ink placeholder:font-sans placeholder:normal-case placeholder:tracking-normal placeholder:text-stone-500 focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
+            required
+          />
+          <button type="submit" disabled={joining} className="press min-h-12 rounded-2xl border-2 border-ink bg-ink px-6 font-extrabold text-white shadow-hard disabled:opacity-50 dark:border-stone-950 dark:bg-saffron dark:text-ink">
+            {joining ? "Joining…" : "Join"}
+          </button>
+        </form>
+        {joinError && <p className="mt-3 text-sm font-semibold text-chili dark:text-red-400">{joinError}</p>}
+      </section>
     </div>
   );
 }

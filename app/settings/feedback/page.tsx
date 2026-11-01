@@ -62,7 +62,7 @@ export default function FeedbackPage() {
         </p>
       </div>
 
-      <section className="glass-panel overflow-hidden rounded-[2.5rem] p-6 sm:p-8 shadow-xs">
+      <section className="sticker-card overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs">
         <form onSubmit={submitFeedback} className="space-y-4">
            <div>
              <label htmlFor="feedback_message" className="mb-2 block text-sm font-semibold text-stone-700 dark:text-stone-300">
@@ -82,7 +82,7 @@ export default function FeedbackPage() {
            <button
              type="submit"
              disabled={feedbackStatus === "sending" || !feedback.trim()}
-             className="inline-flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-orange-600 px-4 py-3 text-base font-bold text-white shadow-md transition-all active:scale-[0.98] hover:bg-orange-700 disabled:opacity-50 disabled:active:scale-100 dark:bg-orange-600 dark:text-white"
+             className="inline-flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-base font-bold text-ink shadow-md transition-all active:scale-[0.98] hover:bg-orange-400 disabled:opacity-50 disabled:active:scale-100 dark:bg-orange-500 dark:text-white"
            >
              {feedbackStatus === "sending" ? "Sending..." : feedbackStatus === "success" ? "Message Sent!" : feedbackStatus === "error" ? "Failed to send" : <><Send className="h-4 w-4" /> Send Message</>}
            </button>

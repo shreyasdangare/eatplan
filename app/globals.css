@@ -16,6 +16,88 @@
   --text-4xl--line-height: 2.5rem;
 }
 
+
+/* ── EatPlan design tokens: "Bold Indian kitchen" ─────────────────────────────────────
+   Flat colour blocks, 2px ink outlines, hard offset shadows. No glass, no gradients.
+   The stone/orange/amber/rose/emerald scales are remapped onto the brand palette so the
+   whole app shifts together; new code should prefer the semantic names below. */
+@theme {
+  --font-sans: var(--font-bricolage), var(--font-mukta), ui-sans-serif, system-ui, sans-serif;
+  --font-mr: var(--font-mukta), var(--font-bricolage), sans-serif;
+
+  --color-cream: #fff4df;
+  --color-ink: #1b1530;
+  --color-saffron: #f2a007;
+  --color-leaf: #1f7a4d;
+  --color-indigo: #2b2d7c;
+  --color-chili: #c2371f;
+  --color-pink: #f7b9c4;
+
+  /* Warm neutral ramp: cream → ink. */
+  --color-stone-50: #fff4df;
+  --color-stone-100: #faeacb;
+  --color-stone-200: #ecdab8;
+  --color-stone-300: #d4c09d;
+  --color-stone-400: #a39379;
+  --color-stone-500: #6f6253;
+  --color-stone-600: #564a45;
+  --color-stone-700: #3d3448;
+  --color-stone-800: #2a2240;
+  --color-stone-900: #1b1530;
+  --color-stone-950: #120e22;
+
+  /* Saffron ramp. 500 is a fill (ink text on it); 600+ are AA text/button tones. */
+  --color-orange-50: #fff7e6;
+  --color-orange-100: #feebbf;
+  --color-orange-200: #fbd884;
+  --color-orange-300: #f8c24b;
+  --color-orange-400: #f5b021;
+  --color-orange-500: #f2a007;
+  --color-orange-600: #9a5a00;
+  --color-orange-700: #7c4700;
+  --color-orange-800: #5e3600;
+  --color-orange-900: #402500;
+  --color-orange-950: #2a1800;
+
+  --color-amber-50: #fff7e6;
+  --color-amber-100: #feebbf;
+  --color-amber-200: #fbd884;
+  --color-amber-300: #f8c24b;
+  --color-amber-400: #f5b021;
+  --color-amber-500: #f2a007;
+
+  /* Chili ramp. */
+  --color-rose-50: #fdeeea;
+  --color-rose-100: #fbd8cf;
+  --color-rose-200: #f6b2a2;
+  --color-rose-300: #ee8a73;
+  --color-rose-400: #e5664c;
+  --color-rose-500: #c2371f;
+  --color-red-500: #c2371f;
+
+  /* Leaf ramp. */
+  --color-emerald-50: #e8f4ed;
+  --color-emerald-100: #cde7d8;
+  --color-emerald-500: #1f7a4d;
+  --color-lime-500: #1f7a4d;
+  --color-lime-400: #2f9963;
+
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.25rem;
+  --radius-4xl: 1.5rem;
+
+  /* Hard offset shadows instead of soft blurs. */
+  --shadow-2xs: 1px 1px 0 var(--shadow-ink, #1b1530);
+  --shadow-xs: 2px 2px 0 var(--shadow-ink, #1b1530);
+  --shadow-sm: 2px 2px 0 var(--shadow-ink, #1b1530);
+  --shadow-md: 3px 3px 0 var(--shadow-ink, #1b1530);
+  --shadow-lg: 3px 3px 0 var(--shadow-ink, #1b1530);
+  --shadow-xl: 4px 4px 0 var(--shadow-ink, #1b1530);
+  --shadow-2xl: 4px 4px 0 var(--shadow-ink, #1b1530);
+  --shadow-hard: 3px 3px 0 var(--shadow-ink, #1b1530);
+}
+
 /* Tailwind v3 compatibility (see https://tailwindcss.com/docs/upgrade-guide):
    v4 sets buttons to cursor:default and placeholders to currentColor at 50% opacity. */
 @layer base {
@@ -43,7 +125,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-stone-300, currentcolor);
   }
 }
 
@@ -61,7 +143,7 @@
 
 @layer base {
   body {
-    @apply bg-stone-50 text-stone-900 antialiased selection:bg-orange-200 selection:text-orange-900 transition-colors duration-300;
+    @apply bg-stone-50 text-stone-900 antialiased selection:bg-saffron selection:text-ink transition-colors duration-300;
   }
 
   .dark body {
@@ -182,13 +264,14 @@ textarea {
   }
 }
 
-/* glass-panel as a plain class in the utilities layer (not @utility), so it is emitted after
+/* sticker-card as a plain class in the utilities layer (not @utility), so it is emitted after
    Tailwind's generated utilities and wins conflicts (bg/shadow/border/blur) the way it did
    in v3. As an @utility, v4 sorted it before core utilities, so e.g. shadow-2xl and bg-white/80
    on the dish detail card started overriding it. */
 @layer utilities {
-  .glass-panel {
-    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_30px_rgb(0_0_0/0.04)] dark:bg-stone-900/60 dark:border-stone-700/50 dark:shadow-[0_8px_30px_rgb(0_0_0/0.2)];
+  /* Flat sticker card: white fill, 2px ink outline, hard offset shadow. */
+  .sticker-card {
+    @apply bg-white border-2 border-ink shadow-hard dark:bg-stone-900 dark:border-stone-600;
   }
 }
 
@@ -198,8 +281,6 @@ textarea {
    background behind white text they fall below WCAG AA (4.5:1). Pin the tones we use for
    text/buttons to AA-safe values. Lighter tints (50–400) are unchanged. */
 @theme {
-  --color-orange-600: #c2410c;
-  --color-orange-700: #9a3412;
   --color-amber-600: #b45309;
   --color-amber-700: #92400e;
   --color-emerald-600: #047857;
@@ -207,7 +288,6 @@ textarea {
   --color-lime-700: #3f6212;
   --color-rose-600: #be123c;
   --color-red-600: #b91c1c;
-  --color-stone-500: #6b6560;
 }
 
 @keyframes sheet-up {
@@ -301,4 +381,35 @@ input[type="range"].range-touch::-moz-range-thumb {
   border-radius: 9999px;
   background: var(--color-orange-600);
   border: 3px solid white;
+}
+
+/* Dark mode: ink shadows vanish on an ink background, so offset in pure black. */
+.dark { --shadow-ink: #5b3d0a; }
+
+/* Motion (adapted from React Bits BlurText + spring press). Kept CSS-only. */
+@keyframes blur-word-in {
+  0% { opacity: 0; filter: blur(10px); transform: translateY(-0.35em); }
+  60% { opacity: 0.7; filter: blur(3px); transform: translateY(0.06em); }
+  100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+.blur-word {
+  display: inline-block;
+  animation: blur-word-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Springy sticker press: the card sinks into its hard shadow, then overshoots back. */
+.press {
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.press:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--shadow-ink, #1b1530);
+  transition-duration: 70ms;
+}
+/* Secondary buttons: full 2px ink outline. */
+.btn-outline {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-white px-4 font-bold text-ink shadow-hard dark:border-stone-500 dark:bg-stone-900 dark:text-stone-100;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blur-word { animation: none; }
+  .press, .press:active { transition: none; transform: none; }
 }

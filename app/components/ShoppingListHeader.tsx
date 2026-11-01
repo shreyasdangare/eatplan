@@ -101,7 +101,7 @@ export function ShoppingListHeader({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
+        <h1 className="text-3xl font-extrabold tracking-tight text-ink dark:text-stone-50">
           Shopping list
         </h1>
         <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export function ShoppingListHeader({
             type="button"
             onClick={onAddFromMealPlan}
             disabled={populateLoading}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-amber-100 px-4 text-sm font-semibold text-amber-900 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-100 dark:hover:bg-amber-800/60 disabled:opacity-50"
+            className="btn-outline press min-h-11 rounded-full whitespace-nowrap px-4 text-sm"
           >
             <CalendarPlus className="h-4 w-4" aria-hidden />
             {populateLoading ? "Adding…" : "From plan"}
@@ -119,7 +119,7 @@ export function ShoppingListHeader({
               type="button"
               onClick={onCopyList}
               aria-label="Copy list to clipboard"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-stone-100 text-stone-800 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700"
+              className="press inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-white text-ink shadow-hard dark:border-stone-500 dark:bg-stone-900 dark:text-stone-100"
             >
               <Copy className="h-4 w-4" aria-hidden />
             </button>
@@ -148,13 +148,13 @@ export function ShoppingListHeader({
           autoCapitalize="none"
           spellCheck={false}
           enterKeyHint="done"
-          className="min-h-12 w-full rounded-xl border border-orange-200 bg-white px-3.5 text-base placeholder:text-stone-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-400"
+          className="min-h-12 w-full rounded-2xl border-2 border-ink bg-white px-4 text-base font-semibold shadow-hard placeholder:font-normal placeholder:text-stone-500 focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
         />
         {open && (searchResults.length > 0 || showCreateNew) && (
           <ul
             id="shopping-add-results"
             role="listbox"
-            className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-orange-200 bg-white shadow-lg dark:border-stone-600 dark:bg-stone-800"
+            className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-2xl border-2 border-ink bg-white shadow-hard dark:border-stone-500 dark:bg-stone-900"
           >
             {searching && searchResults.length === 0 && (
               <li className="px-3.5 py-2 text-sm text-amber-800 dark:text-amber-200">
@@ -166,7 +166,7 @@ export function ShoppingListHeader({
                 key={ing.id}
                 role="option"
                 aria-selected={false}
-                className="flex min-h-11 cursor-pointer items-center px-3.5 text-base text-stone-800 hover:bg-orange-50 dark:text-stone-200 dark:hover:bg-stone-700"
+                className="flex min-h-11 cursor-pointer items-center px-3.5 text-base text-stone-800 hover:bg-cream dark:text-stone-200 dark:hover:bg-stone-700"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSelect(ing);
@@ -179,7 +179,7 @@ export function ShoppingListHeader({
               <li
                 role="option"
                 aria-selected={false}
-                className="flex min-h-11 cursor-pointer items-center px-3.5 text-base font-semibold text-amber-800 hover:bg-orange-50 dark:text-amber-300 dark:hover:bg-stone-700"
+                className="flex min-h-11 cursor-pointer items-center px-3.5 text-base font-semibold text-amber-800 hover:bg-cream dark:text-amber-300 dark:hover:bg-stone-700"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSelect(null, searchValue.trim());

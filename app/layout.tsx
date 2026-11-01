@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
-import { Outfit } from "next/font/google";
+import { Bricolage_Grotesque, Mukta } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { HeaderTitle } from "./components/HeaderTitle";
@@ -16,7 +16,9 @@ import { ServiceWorker } from "./components/ServiceWorker";
 import { getSession } from "@/lib/supabaseServerClient";
 import { getTranslatedTagline } from "@/lib/taglines";
 
-const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage", display: "swap" });
+// Devanagari for the Marathi/Hindi tagline and translated ingredient names.
+const mukta = Mukta({ subsets: ["devanagari", "latin"], weight: ["500", "700", "800"], variable: "--font-mukta", display: "swap" });
 export const metadata: Metadata = {
   title: "EatPlan – काय खायचं?",
   description: "Simple ingredient-based meal planning app"
@@ -29,8 +31,8 @@ export const viewport: Viewport = {
   userScalable: true,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0a09" },
+    { media: "(prefers-color-scheme: light)", color: "#fff4df" },
+    { media: "(prefers-color-scheme: dark)", color: "#120e22" },
   ],
 };
 
@@ -43,7 +45,7 @@ export default async function RootLayout({
   const tagline = getTranslatedTagline(user?.native_language);
 
   return (
-    <html lang="en" suppressHydrationWarning className={outfit.className}>
+    <html lang="en" suppressHydrationWarning className={`${bricolage.variable} ${mukta.variable} font-sans`}>
       <head>
         <link rel="preconnect" href="https://upload.wikimedia.org" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

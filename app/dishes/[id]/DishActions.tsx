@@ -65,7 +65,7 @@ export function DishActions({
         <button
           type="button"
           onClick={() => setPlanOpen(true)}
-          className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-full bg-orange-600 px-6 text-base font-bold text-white shadow-lg transition-all hover:bg-orange-700 active:scale-95"
+          className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-full bg-orange-500 px-6 text-base font-bold text-ink shadow-lg transition-all hover:bg-orange-400 active:scale-95"
         >
           <CalendarPlus className="h-5 w-5" aria-hidden />
           Add to plan

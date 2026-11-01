@@ -285,7 +285,7 @@ export default function PantryPage() {
         </div>
       </div>
 
-      <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800/80">
+      <div className="space-y-2 rounded-lg border border-orange-200 bg-orange-50/80 p-3 dark:border-stone-600 dark:bg-stone-800">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-semibold text-amber-800 dark:text-amber-200">
             In pantry ({pantryItems.length})

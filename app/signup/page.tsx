@@ -94,7 +94,7 @@ function SignupForm() {
         </p>
         <Link
           href="/login"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:opacity-90 dark:bg-stone-700 dark:hover:bg-stone-600"
+          className="press inline-flex items-center justify-center min-h-12 rounded-2xl border-2 border-ink bg-ink px-4 py-3 text-base font-extrabold text-white shadow-hard disabled:opacity-50 dark:border-stone-950 dark:bg-saffron dark:text-ink"
         >
           Go to Log in
         </Link>
@@ -103,10 +103,13 @@ function SignupForm() {
   }
 
   return (
-    <section className="mx-auto max-w-sm space-y-6 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-        Sign up
-      </h1>
+    <section className="mx-auto max-w-sm space-y-6 pt-4">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-ink bg-indigo p-6 text-white shadow-hard dark:border-stone-950">
+        <span aria-hidden className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-saffron" />
+        <span aria-hidden className="absolute -bottom-6 right-14 h-12 w-12 rounded-full bg-chili" />
+        <h1 className="relative text-4xl font-extrabold tracking-tight">Sign up</h1>
+        <p className="relative mt-1 max-w-[22ch] font-semibold text-white/90">Plan the week’s meals with your family.</p>
+      </div>
       {hintNoAccount && (
         <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
           We couldn&apos;t find an account with that email. Create one below to get started.
@@ -116,7 +119,7 @@ function SignupForm() {
         type="button"
         onClick={handleGoogleSignIn}
         disabled={googleLoading}
-        className="flex w-full min-h-[44px] items-center justify-center gap-3 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-xs transition hover:bg-stone-50 active:scale-[0.98] disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700"
+        className="btn-outline press w-full min-h-12 gap-3 disabled:opacity-50"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -128,14 +131,14 @@ function SignupForm() {
       </button>
 
       <div className="flex items-center gap-4">
-        <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+        <div className="h-0.5 flex-1 rounded bg-stone-300 dark:bg-stone-700" />
         <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">or</span>
-        <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+        <div className="h-0.5 flex-1 rounded bg-stone-300 dark:bg-stone-700" />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+          <label htmlFor="email" className="mb-1.5 block text-sm font-bold text-ink dark:text-stone-200">
             Email
           </label>
           <input
@@ -145,11 +148,11 @@ function SignupForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
           />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+          <label htmlFor="password" className="mb-1.5 block text-sm font-bold text-ink dark:text-stone-200">
             Password
           </label>
           <input
@@ -160,12 +163,12 @@ function SignupForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
           />
           <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">At least 6 characters</p>
         </div>
         <div>
-          <label htmlFor="confirm_password" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+          <label htmlFor="confirm_password" className="mb-1.5 block text-sm font-bold text-ink dark:text-stone-200">
             Confirm password
           </label>
           <input
@@ -176,12 +179,12 @@ function SignupForm() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
           />
         </div>
         <div>
-          <label htmlFor="preferred_name" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-            What should we call you? <span className="text-amber-600 dark:text-amber-400">Required</span>
+          <label htmlFor="preferred_name" className="mb-1.5 block text-sm font-bold text-ink dark:text-stone-200">
+            What should we call you? <span className="text-chili dark:text-red-300">Required</span>
           </label>
           <input
             id="preferred_name"
@@ -192,11 +195,11 @@ function SignupForm() {
             onChange={(e) => setPreferredName(e.target.value)}
             required
             minLength={1}
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
           />
         </div>
         <div>
-          <label htmlFor="native_language" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+          <label htmlFor="native_language" className="mb-1.5 block text-sm font-bold text-ink dark:text-stone-200">
             Mother Tongue <span className="text-stone-500 dark:text-stone-400 font-normal">Optional</span>
           </label>
           <div className="relative">
@@ -204,7 +207,7 @@ function SignupForm() {
               id="native_language"
               value={nativeLanguage}
               onChange={(e) => setNativeLanguage(e.target.value)}
-              className="w-full min-h-[44px] appearance-none rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+              className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100 appearance-none"
             >
               <option value="">Select a language...</option>
               <option value="English">English</option>
@@ -230,14 +233,14 @@ function SignupForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full min-h-[44px] rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white shadow-xs transition hover:bg-stone-800 active:opacity-90 disabled:opacity-50 dark:bg-stone-700 dark:hover:bg-stone-600"
+          className="press w-full min-h-12 rounded-2xl border-2 border-ink bg-saffron px-4 py-3 text-base font-extrabold text-ink shadow-hard disabled:opacity-50 dark:border-stone-950"
         >
           {loading ? "Creating account…" : "Sign up"}
         </button>
       </form>
       <p className="text-center text-sm text-stone-600 dark:text-stone-400">
         Already have an account?{" "}
-        <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-orange-700 underline underline-offset-2 dark:text-orange-400">
+        <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-ink underline decoration-saffron decoration-2 underline-offset-4 dark:text-saffron">
           Log in
         </Link>
       </p>

@@ -77,7 +77,7 @@ export default async function DishDetailPage({ params }: PageProps) {
           />
           <Link
             href="/recipes"
-            className="group absolute left-4 top-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/60 active:scale-95 sm:left-6 sm:top-6 sm:h-12 sm:w-12"
+            className="group absolute left-4 top-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white shadow-lg transition-all hover:bg-black/60 active:scale-95 sm:left-6 sm:top-6 sm:h-12 sm:w-12"
             aria-label="Back to recipes"
           >
             <ChevronLeft className="h-6 w-6 transition-transform group-hover:-translate-x-0.5" aria-hidden />
@@ -88,7 +88,7 @@ export default async function DishDetailPage({ params }: PageProps) {
 
         {/* Overlapping Header Card */}
         <div className="px-4 sm:px-8 lg:px-12 relative z-10 -mt-20 sm:-mt-28">
-          <div className="flex flex-col gap-6 rounded-4xl glass-panel p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-2xl">
+          <div className="flex flex-col gap-6 rounded-4xl sticker-card p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white dark:bg-stone-900 ">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {dish.meal_type && (
@@ -99,7 +99,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                 {dish.tags && dish.tags.length > 0 && dish.tags.map((tag: string) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-stone-200/50 bg-white/50 px-3 py-1 text-xs font-semibold text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/50 dark:text-stone-300 backdrop-blur-xs"
+                    className="rounded-full border border-stone-200/50 bg-white px-3 py-1 text-xs font-semibold text-stone-600 dark:border-stone-700/50 dark:bg-stone-800 dark:text-stone-300 "
                   >
                     {tag}
                   </span>
@@ -190,11 +190,11 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <h2 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
                     Instructions
                   </h2>
-                  <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-700" />
+                  <div className="h-px flex-1 bg-stone-300 dark:bg-stone-700" />
                 </div>
                 <div className="prose prose-stone dark:prose-invert prose-lg max-w-none text-stone-700 dark:text-stone-300 leading-relaxed font-medium">
                   {/* Here we might assume instructions could be markdown later, but for now we just render pre-line text nicely */}
-                  <div className="rounded-4xl glass-panel p-6 sm:p-8 shadow-xs space-y-4">
+                  <div className="rounded-4xl sticker-card p-6 sm:p-8 shadow-xs space-y-4">
                     {instructions.split('\n').filter(line => line.trim() !== '').map((line, idx) => (
                       <p key={idx} className="text-stone-700 dark:text-stone-300">
                         {line}
@@ -209,9 +209,9 @@ export default async function DishDetailPage({ params }: PageProps) {
                   <h2 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
                     Instructions
                   </h2>
-                  <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-700" />
+                  <div className="h-px flex-1 bg-stone-300 dark:bg-stone-700" />
                 </div>
-                <div className="rounded-4xl border border-dashed border-stone-300 bg-stone-50/50 p-8 text-center dark:border-stone-700 dark:bg-stone-800/30">
+                <div className="rounded-4xl border border-dashed border-stone-300 bg-stone-50 p-8 text-center dark:border-stone-700 dark:bg-stone-800/30">
                   <p className="text-stone-500 dark:text-stone-400 font-medium">No instructions provided.</p>
                   <Link href={`/dishes/${dish.id}/edit`} className="mt-2 inline-flex min-h-11 items-center font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
                     Add instructions →

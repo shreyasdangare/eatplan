@@ -43,7 +43,7 @@ export function AuthCodeExchange() {
 
   if (status === "exchanging") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/80 dark:bg-stone-950/90">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900 dark:bg-stone-950">
         <p className="rounded-xl bg-white px-6 py-4 text-stone-800 shadow-lg dark:bg-stone-800 dark:text-stone-100">
           Signing you in…
         </p>
@@ -53,7 +53,7 @@ export function AuthCodeExchange() {
 
   if (status === "error") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/80 dark:bg-stone-950/90 p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900 dark:bg-stone-950 p-4">
         <div className="max-w-sm rounded-xl bg-white p-6 shadow-lg dark:bg-stone-800 dark:text-stone-100">
           <p className="font-medium text-stone-900 dark:text-stone-100">
             Your email is confirmed

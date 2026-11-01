@@ -44,7 +44,7 @@ export function PortionScaling({
   return (
     <section className="space-y-6">
       {/* Slider */}
-      <div className="rounded-4xl glass-panel p-6 shadow-xs">
+      <div className="rounded-4xl sticker-card p-6 shadow-xs">
         <div className="flex items-center gap-3 mb-4">
            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-stone-800 dark:text-orange-500">
              <Scale className="h-5 w-5" />
@@ -98,18 +98,18 @@ function IngredientList({
             <h2 className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
               Ingredients
             </h2>
-            <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-700" />
+            <div className="h-px flex-1 bg-stone-300 dark:bg-stone-700" />
           </div>
           <ul className="flex flex-col gap-2">
             {required.map((di) => (
               <li
                 key={di.id}
-                className="group flex flex-wrap items-center justify-between gap-4 rounded-2xl glass-panel px-5 py-3.5 transition-all hover:bg-stone-50/80 dark:hover:bg-stone-800/80"
+                className="group flex flex-wrap items-center justify-between gap-4 rounded-2xl sticker-card px-5 py-3.5 transition-all hover:bg-stone-50 dark:hover:bg-stone-800"
               >
                 <span className="text-base font-medium text-stone-800 dark:text-stone-200 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors flex items-center">
                   <TranslatedIngredient name={di.ingredients?.name ?? "Unknown ingredient"} />
                 </span>
-                <span className="shrink-0 rounded-lg bg-stone-100/50 px-3 py-1 font-mono text-sm font-semibold text-stone-600 dark:bg-stone-800/50 dark:text-stone-400">
+                <span className="shrink-0 rounded-lg bg-stone-100 px-3 py-1 font-mono text-sm font-semibold text-stone-600 dark:bg-stone-800 dark:text-stone-400">
                   {renderQty(di)}
                 </span>
               </li>
@@ -124,7 +124,7 @@ function IngredientList({
             <h2 className="text-lg font-bold tracking-tight text-stone-500 dark:text-stone-400">
               Optional
             </h2>
-            <div className="h-px flex-1 bg-linear-to-r from-stone-200 to-transparent dark:from-stone-800" />
+            <div className="h-px flex-1 bg-stone-300 dark:bg-stone-700" />
           </div>
           <ul className="flex flex-col gap-2">
             {optional.map((di) => (

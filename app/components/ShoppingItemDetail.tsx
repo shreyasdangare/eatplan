@@ -93,7 +93,7 @@ export function ShoppingItemDetail({
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="min-h-12 flex-1 rounded-full bg-orange-600 text-base font-bold text-white hover:bg-orange-700 disabled:opacity-50"
+            className="min-h-12 flex-1 rounded-full bg-orange-500 text-base font-bold text-ink hover:bg-orange-400 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save"}
           </button>
@@ -143,7 +143,7 @@ export function ShoppingItemDetail({
                   urgency === opt.value
                     ? opt.value === "urgent"
                       ? "bg-red-600 text-white"
-                      : "bg-orange-600 text-white"
+                      : "bg-orange-500 text-ink"
                     : "bg-stone-100 text-stone-800 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
                 }`}
               >

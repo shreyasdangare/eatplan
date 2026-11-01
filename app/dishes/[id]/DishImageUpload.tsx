@@ -61,7 +61,7 @@ export function DishImageUpload({
             className={imageClass}
           />
           <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
-          <label className={`absolute cursor-pointer flex min-h-11 items-center gap-2 rounded-full bg-black/60 px-4 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-black hover:scale-105 active:scale-95 shadow-lg border border-white/20 z-20 ${
+          <label className={`absolute cursor-pointer flex min-h-11 items-center gap-2 rounded-full bg-black/60 px-4 text-sm font-semibold text-white transition hover:bg-black hover:scale-105 active:scale-95 shadow-lg border border-white/20 z-20 ${
             isHero ? "top-4 right-4 sm:top-6 sm:right-6" : "bottom-4 right-4"
           }`}>
             <Camera className="h-4 w-4" />
@@ -79,8 +79,8 @@ export function DishImageUpload({
         <label
           className={
             isHero
-              ? "group flex h-full min-h-[300px] w-full cursor-pointer flex-col items-center justify-center bg-stone-100/50 p-6 text-center text-stone-500 transition-all hover:bg-stone-200/50 dark:bg-stone-800/50 dark:text-stone-400 dark:hover:bg-stone-700/50"
-              : "group flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-4xl border-2 border-dashed border-stone-300 bg-stone-50/50 p-6 text-center transition-all hover:border-orange-400 hover:bg-orange-50 dark:border-stone-700 dark:bg-stone-900/30 dark:hover:border-orange-500 dark:hover:bg-stone-800/50"
+              ? "group flex h-full min-h-[300px] w-full cursor-pointer flex-col items-center justify-center bg-stone-100 p-6 text-center text-stone-500 transition-all hover:bg-stone-200/50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700/50"
+              : "group flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-4xl border-2 border-dashed border-stone-300 bg-stone-50 p-6 text-center transition-all hover:border-orange-400 hover:bg-orange-50 dark:border-stone-700 dark:bg-stone-900/30 dark:hover:border-orange-500 dark:hover:bg-stone-800"
           }
         >
           {uploading ? (
