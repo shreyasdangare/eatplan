@@ -21,9 +21,9 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Main"
-      className="mobile-tabbar sm:hidden fixed inset-x-0 bottom-0 z-100 border-t border-stone-200/70 bg-white/90 backdrop-blur-xl shadow-[0_-8px_30px_rgb(0_0_0/0.06)] dark:border-stone-800/70 dark:bg-stone-950/90 pb-safe"
+      className="mobile-tabbar sm:hidden fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-100 rounded-[1.25rem] border-2 border-ink bg-ink p-1.5 shadow-md dark:border-stone-700"
     >
-      <ul className="mx-auto flex h-16 max-w-lg items-stretch justify-around px-1">
+      <ul className="mx-auto flex h-14 max-w-lg items-stretch gap-1">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -37,19 +37,11 @@ export function MobileNav() {
               <Link
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-xl text-xs transition-colors active:scale-95 ${
-                  isActive
-                    ? "font-bold text-orange-700 dark:text-orange-300"
-                    : "font-medium text-stone-600 dark:text-stone-300"
+                className={`flex flex-1 flex-col items-center justify-center gap-0.5 rounded-[0.9rem] text-xs font-extrabold transition-colors active:scale-95 ${
+                  isActive ? "bg-saffron text-ink" : "text-cream/80 hover:text-cream"
                 }`}
               >
-                <span
-                  className={`flex h-8 w-14 items-center justify-center rounded-full transition-colors ${
-                    isActive ? "bg-orange-100 dark:bg-orange-500/20" : ""
-                  }`}
-                >
-                  <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} aria-hidden />
-                </span>
+                <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} aria-hidden />
                 <span className="leading-none">{item.label}</span>
               </Link>
             </li>

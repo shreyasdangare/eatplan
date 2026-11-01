@@ -17,6 +17,7 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { ShoppingCart } from "lucide-react";
 import { ShoppingTile, type ShoppingTileItem } from "@/app/components/ShoppingTile";
 import { ShoppingItemDetail } from "@/app/components/ShoppingItemDetail";
 import { ShoppingListHeader } from "@/app/components/ShoppingListHeader";
@@ -384,8 +385,8 @@ export default function ShoppingListPage() {
           </div>
         </LoadingRegion>
       ) : toBuy.length === 0 && bought.length === 0 ? (
-        <div className="flex flex-col items-center rounded-3xl border border-dashed border-orange-300 bg-orange-50/60 px-6 py-10 text-center dark:border-stone-700 dark:bg-stone-900/40">
-          <span className="text-4xl" aria-hidden>🛒</span>
+        <div className="flex flex-col items-center rounded-3xl border border-dashed border-orange-300 bg-orange-50/60 px-6 py-10 text-center dark:border-stone-700 dark:bg-stone-900">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ink bg-saffron text-ink shadow-md" aria-hidden><ShoppingCart className="h-7 w-7" strokeWidth={2.5} /></span>
           <h2 className="mt-3 text-lg font-bold text-stone-900 dark:text-stone-50">Your list is empty</h2>
           <p className="mt-1 max-w-xs text-sm text-stone-700 dark:text-stone-300">
             Type an item above, or pull in everything you need for this week&apos;s meals.
@@ -393,14 +394,14 @@ export default function ShoppingListPage() {
           <button
             type="button"
             onClick={handleAddFromMealPlan}
-            className="mt-4 min-h-12 rounded-full bg-orange-600 px-6 text-base font-bold text-white active:scale-95"
+            className="mt-4 min-h-12 rounded-full bg-orange-500 px-6 text-base font-bold text-ink active:scale-95"
           >
             Add from this week&apos;s plan
           </button>
         </div>
       ) : (
         <>
-          <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800/80">
+          <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800">
             <h3 className="mb-2 px-0.5 text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
               To buy{groupByCategory ? " · by aisle" : ""} <span className="font-medium normal-case tracking-normal">· hold &amp; drag to reorder</span>
             </h3>
@@ -520,7 +521,7 @@ export default function ShoppingListPage() {
             type="button"
             onClick={runPopulate}
             disabled={populateLoading}
-            className="min-h-12 w-full rounded-full bg-orange-600 text-base font-bold text-white hover:bg-orange-700 disabled:opacity-50"
+            className="min-h-12 w-full rounded-full bg-orange-500 text-base font-bold text-ink hover:bg-orange-400 disabled:opacity-50"
           >
             {populateLoading ? "Adding…" : "Add ingredients"}
           </button>

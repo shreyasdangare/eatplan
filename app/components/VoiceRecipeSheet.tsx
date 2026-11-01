@@ -411,7 +411,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
             onClick={start}
             disabled={phase === "requesting"}
             aria-label="Start recording"
-            className="group relative flex h-28 w-28 items-center justify-center rounded-full bg-orange-600 text-white shadow-[0_10px_40px_rgb(234_88_12/0.45)] transition-transform hover:bg-orange-700 active:scale-95 disabled:opacity-70"
+            className="group relative flex h-28 w-28 items-center justify-center rounded-full bg-orange-500 text-ink shadow-sm transition-transform hover:bg-orange-400 active:scale-95 disabled:opacity-70"
           >
             <span aria-hidden className="absolute -inset-3 rounded-full bg-orange-500/20 motion-safe:animate-pulse" />
             {phase === "requesting" ? <Loader2 className="relative h-10 w-10 motion-safe:animate-spin" aria-hidden /> : <Mic className="relative h-11 w-11" aria-hidden />}
@@ -470,7 +470,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
               const state = i < idx ? "done" : i === idx ? "active" : "todo";
               return (
                 <li key={key} className="flex items-center gap-3">
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${state === "done" ? "bg-emerald-600 text-white" : state === "active" ? "bg-orange-600 text-white" : "bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${state === "done" ? "bg-emerald-600 text-white" : state === "active" ? "bg-orange-500 text-ink" : "bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
                     {state === "done" ? <Check className="h-5 w-5" aria-hidden /> : state === "active" ? <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden /> : <span className="text-sm font-bold">{i + 1}</span>}
                   </span>
                   <span className={`text-base ${state === "todo" ? "text-stone-500 dark:text-stone-400" : "font-bold text-stone-900 dark:text-stone-50"}`}>{label}</span>

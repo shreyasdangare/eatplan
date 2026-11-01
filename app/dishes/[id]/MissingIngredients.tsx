@@ -87,7 +87,7 @@ export function MissingIngredients({ dishIngredients }: Props) {
       {/* Progress bar */}
       <div className="h-2 w-full rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden">
         <div
-          className="h-full rounded-full bg-linear-to-r from-lime-500 to-lime-400 transition-all duration-500"
+          className="h-full rounded-full bg-leaf transition-all duration-500"
           style={{
             width: `${dishIngredients.length > 0 ? (inPantry.length / dishIngredients.length) * 100 : 0}%`,
           }}
@@ -114,7 +114,7 @@ export function MissingIngredients({ dishIngredients }: Props) {
             className={`flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold transition-all ${
               added
                 ? "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300"
-                : "bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-700"
+                : "bg-orange-500 text-ink hover:bg-orange-400 active:scale-[0.98] dark:bg-orange-500 dark:hover:bg-orange-400"
             } disabled:opacity-60`}
           >
             {added ? (

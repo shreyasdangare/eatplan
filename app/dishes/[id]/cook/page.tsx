@@ -92,7 +92,7 @@ export default function CookModePage() {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
         <p className="text-lg font-semibold text-stone-800 dark:text-stone-100">Couldn&apos;t load this recipe.</p>
-        <Link href={`/dishes/${id}`} className="min-h-12 rounded-full bg-orange-600 px-6 py-3 font-bold text-white">
+        <Link href={`/dishes/${id}`} className="min-h-12 rounded-full bg-orange-500 px-6 py-3 font-bold text-ink">
           Back to recipe
         </Link>
       </div>
@@ -148,7 +148,7 @@ export default function CookModePage() {
       {total === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-stone-300 p-8 text-center dark:border-stone-700">
           <p className="text-lg font-semibold text-stone-800 dark:text-stone-100">This recipe has no steps yet.</p>
-          <Link href={`/dishes/${id}/edit`} className="min-h-12 rounded-full bg-orange-600 px-6 py-3 font-bold text-white">
+          <Link href={`/dishes/${id}/edit`} className="min-h-12 rounded-full bg-orange-500 px-6 py-3 font-bold text-ink">
             Add instructions
           </Link>
         </div>
@@ -193,7 +193,7 @@ export default function CookModePage() {
               <button
                 type="button"
                 onClick={() => go(1)}
-                className="flex min-h-14 items-center justify-center gap-2 rounded-full bg-orange-600 text-base font-bold text-white"
+                className="flex min-h-14 items-center justify-center gap-2 rounded-full bg-orange-500 text-base font-bold text-ink"
               >
                 Next <ChevronRight className="h-5 w-5" aria-hidden />
               </button>
@@ -202,7 +202,7 @@ export default function CookModePage() {
                 href={`/dishes/${id}`}
                 className="flex min-h-14 items-center justify-center rounded-full bg-emerald-700 text-base font-bold text-white"
               >
-                Done 🎉
+                Done
               </Link>
             )}
           </div>

@@ -19,10 +19,10 @@ export function HeaderTitle({ tagline = "काय खायचं?" }: { taglin
     >
       <Logo aria-hidden className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 drop-shadow-xs transition-transform group-hover:scale-105" />
       <div className="flex flex-col">
-        <span className="text-xl font-semibold tracking-tight text-orange-900 dark:text-orange-200 sm:text-2xl leading-tight">
+        <span className="text-xl font-extrabold tracking-tight text-ink dark:text-cream sm:text-2xl leading-tight">
           EatPlan
         </span>
-        <span className="text-xs text-amber-700 dark:text-amber-300">
+        <span className="font-mr text-xs font-bold text-indigo dark:text-saffron">
           {tagline}
         </span>
       </div>

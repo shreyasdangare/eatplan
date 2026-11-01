@@ -132,7 +132,7 @@ export function InstallPrompt() {
             <button
               type="button"
               onClick={handleAndroidInstall}
-              className="flex-1 rounded-xl bg-orange-600 px-3 py-1.5 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all hover:bg-orange-600 active:scale-[0.98] dark:bg-orange-600 dark:hover:bg-orange-700"
+              className="flex-1 rounded-xl bg-orange-500 px-3 py-1.5 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-ink shadow-xs transition-all hover:bg-orange-400 active:scale-[0.98] dark:bg-orange-500 dark:hover:bg-orange-400"
             >
               Install
             </button>

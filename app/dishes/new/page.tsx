@@ -314,7 +314,7 @@ export default function NewDishPage() {
           <button
             type="submit"
             disabled={!!importingType || !smartValue.trim()}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-4 text-base font-bold text-white shadow-md transition-all hover:bg-orange-700 active:scale-[0.98] disabled:opacity-50"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-4 text-base font-bold text-ink shadow-md transition-all hover:bg-orange-400 active:scale-[0.98] disabled:opacity-50"
           >
             {importingType === "url" || importingType === "name" ? (
               <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden />
@@ -349,7 +349,7 @@ export default function NewDishPage() {
           <Mic className="h-5 w-5" aria-hidden /> Speak a recipe
         </button>
         <label
-          className={`flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-stone-300 bg-white/70 px-4 text-base font-bold text-stone-800 transition-all active:scale-[0.98] dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-100 ${
+          className={`flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-stone-300 bg-white px-4 text-base font-bold text-stone-800 transition-all active:scale-[0.98] dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100 ${
             importingType ? "pointer-events-none opacity-60" : ""
           }`}
         >
@@ -401,7 +401,7 @@ export default function NewDishPage() {
           className="flex w-full items-center justify-between p-6 sm:p-8 text-left"
         >
           <div className="flex items-center gap-4">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${expandedSection === "manual" ? "bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400" : "bg-stone-100 text-stone-500 dark:bg-stone-800/60 dark:text-stone-400"}`}>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${expandedSection === "manual" ? "bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400" : "bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
               <PenLine className="h-5 w-5" />
             </div>
             <div>
@@ -508,7 +508,7 @@ export default function NewDishPage() {
 
                {/* Ingredients Builder */}
                <div className="space-y-6">
-                 <div className="space-y-4 rounded-2xl bg-stone-50/50 p-5 dark:bg-stone-900/50 border border-stone-200/50 dark:border-stone-700/50">
+                 <div className="space-y-4 rounded-2xl bg-stone-50 p-5 dark:bg-stone-900 border border-stone-200/50 dark:border-stone-700/50">
                    <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">
                       Build Ingredient List
                    </h3>
@@ -630,7 +630,7 @@ export default function NewDishPage() {
                  <button
                    type="submit"
                    disabled={loading}
-                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-700 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-700"
+                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-lg font-bold text-ink shadow-xl transition-all hover:bg-orange-400 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-500 dark:hover:bg-orange-400"
                  >
                    {loading ? (
                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />

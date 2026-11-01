@@ -80,7 +80,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
         <p className="mt-2 max-w-sm text-sm text-stone-600 dark:text-stone-300">
           Paste a link, type a dish name or snap a photo of a recipe and we&apos;ll do the rest.
         </p>
-        <Link href="/dishes/new" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-full bg-orange-600 px-6 font-bold text-white">
+        <Link href="/dishes/new" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-full bg-orange-500 px-6 font-bold text-ink">
           <Plus className="h-5 w-5" aria-hidden /> Add your first recipe
         </Link>
       </div>
@@ -91,11 +91,11 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
     `shrink-0 min-h-11 rounded-full border px-4 text-sm font-semibold transition-all active:scale-95 ${
       on
         ? "border-stone-800 bg-stone-800 text-white dark:border-stone-200 dark:bg-stone-200 dark:text-stone-900"
-        : "border-stone-300 bg-white/60 text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-800/50 dark:text-stone-200 dark:hover:bg-stone-700"
+        : "border-stone-300 bg-white text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
     }`;
 
   const dietButtons = (
-    <div className="flex items-center rounded-full bg-stone-100/80 p-1 shadow-inner dark:bg-stone-800/80" role="radiogroup" aria-label="Diet">
+    <div className="flex items-center rounded-full bg-stone-100 p-1 shadow-inner dark:bg-stone-800" role="radiogroup" aria-label="Diet">
       {(["Both", "Veg", "Non-Veg"] as const).map((diet) => (
         <button
           key={diet}
@@ -121,7 +121,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 rounded-3xl glass-panel bg-white/90 p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-stone-900/90 sm:top-24 sm:p-5">
+      <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 rounded-3xl glass-panel bg-white p-2 shadow-sm dark:bg-stone-900 sm:top-24 sm:p-5">
         <div className="flex items-center gap-2 sm:mb-4 sm:gap-4">
           <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500 dark:text-stone-400" aria-hidden />
@@ -133,7 +133,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="min-h-12 w-full rounded-full border border-stone-200/60 bg-stone-100/60 pl-10 pr-11 text-base text-stone-900 placeholder:text-stone-500 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800/60 dark:text-stone-100 dark:focus:bg-stone-900 sm:text-sm"
+              className="min-h-12 w-full rounded-full border border-stone-200/60 bg-stone-100 pl-10 pr-11 text-base text-stone-900 placeholder:text-stone-500 focus:border-orange-400/50 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/50 dark:bg-stone-800 dark:text-stone-100 dark:focus:bg-stone-900 sm:text-sm"
             />
             {searchQuery && (
               <button
@@ -149,12 +149,12 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
           <button
             type="button"
             onClick={() => setFiltersOpen(true)}
-            className="relative flex h-12 shrink-0 items-center gap-2 rounded-full border border-stone-300 bg-white/70 px-4 text-sm font-semibold text-stone-800 dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-100 sm:hidden"
+            className="relative flex h-12 shrink-0 items-center gap-2 rounded-full border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100 sm:hidden"
             aria-label={`Filters${activeFilterCount ? `, ${activeFilterCount} active` : ""}`}
           >
             <SlidersHorizontal className="h-4 w-4" aria-hidden />
             {activeFilterCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-600 px-1 text-xs font-bold text-white" aria-hidden>
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-xs font-bold text-ink" aria-hidden>
                 {activeFilterCount}
               </span>
             )}
@@ -162,7 +162,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
           <Link
             href="/dishes/new"
             aria-label="Add recipe"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white shadow-md active:scale-95 sm:hidden"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500 text-ink shadow-md active:scale-95 sm:hidden"
           >
             <Plus className="h-6 w-6" aria-hidden />
           </Link>
@@ -204,7 +204,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
 
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {filteredDishes.length === 0 ? (
-          <li className="col-span-full flex min-h-[200px] flex-col items-center justify-center rounded-4xl border border-dashed border-stone-300 bg-stone-50/50 p-6 text-center dark:border-stone-700 dark:bg-stone-800/30">
+          <li className="col-span-full flex min-h-[200px] flex-col items-center justify-center rounded-4xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center dark:border-stone-700 dark:bg-stone-800/30">
             <p className="text-base font-medium text-stone-700 dark:text-stone-200">No recipes match your filters.</p>
             <button type="button" onClick={clearAll} className="mt-3 min-h-11 px-4 font-semibold text-orange-700 hover:underline dark:text-orange-300">
               Clear filters
@@ -248,7 +248,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                   toggleFavorite(dish.id);
                 }}
                 aria-pressed={isFavorite(dish.id)}
-                className={`absolute right-2 top-2 z-20 flex h-11 w-11 items-center justify-center rounded-full shadow-lg backdrop-blur-md transition-all active:scale-90 sm:right-4 sm:top-4 ${
+                className={`absolute right-2 top-2 z-20 flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-all active:scale-90 sm:right-4 sm:top-4 ${
                   isFavorite(dish.id)
                     ? "bg-white text-rose-600 dark:bg-stone-800 dark:text-rose-400"
                     : "border border-white/30 bg-black/30 text-white hover:bg-black/50"
@@ -261,7 +261,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
                 type="button"
                 onClick={() => setPlanDish(dish)}
                 aria-label={`Add ${dish.name} to plan`}
-                className="absolute bottom-2 right-2 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-orange-600 text-white shadow-lg transition-all active:scale-90 sm:bottom-4 sm:right-4"
+                className="absolute bottom-2 right-2 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 text-ink shadow-lg transition-all active:scale-90 sm:bottom-4 sm:right-4"
               >
                 <CalendarPlus className="h-5 w-5" aria-hidden />
               </button>
@@ -279,7 +279,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
             <button type="button" onClick={clearAll} className="min-h-12 rounded-full border border-stone-300 px-5 font-semibold text-stone-800 dark:border-stone-700 dark:text-stone-100">
               Reset
             </button>
-            <button type="button" onClick={() => setFiltersOpen(false)} className="min-h-12 flex-1 rounded-full bg-orange-600 font-bold text-white">
+            <button type="button" onClick={() => setFiltersOpen(false)} className="min-h-12 flex-1 rounded-full bg-orange-500 font-bold text-ink">
               Show {filteredDishes.length} recipe{filteredDishes.length === 1 ? "" : "s"}
             </button>
           </div>

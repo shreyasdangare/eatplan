@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
           </div>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button type="submit" disabled={loading || hasSession === null}
-            className="w-full min-h-[44px] rounded-lg bg-orange-600 px-4 py-2.5 font-medium text-white disabled:opacity-60">
+            className="w-full min-h-[44px] rounded-lg bg-orange-500 px-4 py-2.5 font-medium text-ink disabled:opacity-60">
             {loading ? "Saving…" : "Save password"}
           </button>
         </form>

@@ -321,7 +321,7 @@ export default function EditDishPage() {
         </div>
         <Link
           href={`/dishes/${id}`}
-          className="flex min-h-11 items-center gap-2 rounded-full border border-stone-200/80 bg-white/50 px-4 text-sm font-bold text-stone-600 shadow-xs transition-all hover:bg-stone-50 dark:border-stone-700/80 dark:bg-stone-800/50 dark:text-stone-300 dark:hover:bg-stone-800"
+          className="flex min-h-11 items-center gap-2 rounded-full border border-stone-200/80 bg-white px-4 text-sm font-bold text-stone-600 shadow-xs transition-all hover:bg-stone-50 dark:border-stone-700/80 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-800"
         >
            Cancel
         </Link>
@@ -404,7 +404,7 @@ export default function EditDishPage() {
         </div>
 
         {/* Dietary Classification Toggle */}
-        <div className="space-y-3 rounded-2xl bg-stone-50/50 p-5 dark:bg-stone-900/50 border border-stone-200/50 dark:border-stone-700/50">
+        <div className="space-y-3 rounded-2xl bg-stone-50 p-5 dark:bg-stone-900 border border-stone-200/50 dark:border-stone-700/50">
           <label className={`${labelClasses} mb-0`}>Dietary Category</label>
           <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-3">
              Classify this explicitly to ensure your filters work flawlessly!
@@ -473,7 +473,7 @@ export default function EditDishPage() {
 
         {/* Ingredients Builder */}
         <div className="space-y-6">
-          <div className="space-y-4 rounded-2xl bg-stone-50/50 p-5 dark:bg-stone-900/50 border border-stone-200/50 dark:border-stone-700/50">
+          <div className="space-y-4 rounded-2xl bg-stone-50 p-5 dark:bg-stone-900 border border-stone-200/50 dark:border-stone-700/50">
             <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">
                Build Ingredient List
             </h3>
@@ -601,7 +601,7 @@ export default function EditDishPage() {
           <button
             type="submit"
             disabled={saving}
-            className="group flex w-full items-center justify-center gap-2 rounded-full mb-8 bg-orange-600 px-8 py-4 text-lg font-bold text-white shadow-xl transition-all hover:bg-orange-700 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-700"
+            className="group flex w-full items-center justify-center gap-2 rounded-full mb-8 bg-orange-500 px-8 py-4 text-lg font-bold text-ink shadow-xl transition-all hover:bg-orange-400 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-500 dark:hover:bg-orange-400"
           >
             {saving ? (
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />

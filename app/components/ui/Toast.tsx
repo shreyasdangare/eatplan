@@ -49,7 +49,7 @@ function ToastRow({ t }: { t: ToastItem }) {
 
   return (
     <div
-      className={`pointer-events-auto flex min-h-12 w-full items-center gap-3 rounded-2xl px-4 py-2 text-[15px] font-medium shadow-[0_10px_30px_rgb(0_0_0/0.25)] transition-opacity duration-150 motion-safe:animate-[toast-in_180ms_ease-out] ${
+      className={`pointer-events-auto flex min-h-12 w-full items-center gap-3 rounded-2xl px-4 py-2 text-[15px] font-medium shadow-sm transition-opacity duration-150 motion-safe:animate-[toast-in_180ms_ease-out] ${
         leaving ? "opacity-0" : "opacity-100"
       } ${t.tone === "error" ? "bg-red-700 text-white" : "bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900"}`}
     >

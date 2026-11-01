@@ -41,7 +41,7 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
   );
 
   return (
-    <div className="rounded-xl border border-orange-200 bg-orange-50/50 px-3 py-0.5 dark:border-stone-600 dark:bg-stone-800/50">
+    <div className="rounded-xl border border-orange-200 bg-orange-50/50 px-3 py-0.5 dark:border-stone-600 dark:bg-stone-800">
       <button
         type="button"
         onClick={() => setExpanded((p) => (p ? null : SHOPPING_CATEGORIES[0]))}

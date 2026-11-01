@@ -63,7 +63,7 @@ export function ShoppingTile({
           ? "border-lime-200 bg-lime-50/80 dark:border-lime-800 dark:bg-lime-950/40"
           : item.urgency === "urgent"
             ? "border-red-300 bg-red-50/80 dark:border-red-900/50 dark:bg-red-950/30"
-            : "border-orange-200 bg-white dark:border-stone-700 dark:bg-stone-800/90"
+            : "border-orange-200 bg-white dark:border-stone-700 dark:bg-stone-800"
         }
       `}
     >

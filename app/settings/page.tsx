@@ -133,7 +133,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Option 3: Household */}
-      <Link href="/settings/household" className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800/80 hover:scale-[1.01] active:scale-[0.99]">
+      <Link href="/settings/household" className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
         <div className="flex items-center gap-3">
              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 group-hover:scale-110 transition-transform">
                 <Users className="h-5 w-5" />
@@ -188,7 +188,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Option 4: Send Feedback */}
-      <Link href="/settings/feedback" className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800/80 hover:scale-[1.01] active:scale-[0.99]">
+      <Link href="/settings/feedback" className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
         <div className="flex items-center gap-3">
              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 group-hover:scale-110 transition-transform">
                 <MessageSquare className="h-5 w-5" />
@@ -202,7 +202,7 @@ export default function SettingsPage() {
       </Link>
 
       {/* Option 5: Account Section (Email & Logout) */}
-      <section className="glass-panel overflow-hidden rounded-4xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-red-100 dark:border-red-900/30">
+      <section className="glass-panel overflow-hidden rounded-4xl p-5 shadow-sm sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-red-100 dark:border-red-900/30">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
             <User className="h-6 w-6" />

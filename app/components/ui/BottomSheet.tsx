@@ -108,7 +108,7 @@ export function BottomSheet({
   return createPortal(
     <div className="fixed inset-0 z-200 flex flex-col justify-end sm:items-center sm:justify-center sm:p-6">
       <div
-        className="absolute inset-0 bg-stone-950/50 backdrop-blur-[2px] motion-safe:animate-[fade-in_150ms_ease-out]"
+        className="absolute inset-0 bg-stone-950 motion-safe:animate-[fade-in_150ms_ease-out]"
         aria-hidden
         onClick={() => dismissible && onClose()}
       />
@@ -119,7 +119,7 @@ export function BottomSheet({
         aria-labelledby={titleId}
         tabIndex={-1}
         style={dragY ? { transform: `translateY(${dragY}px)` } : undefined}
-        className={`relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[1.75rem] border-t border-stone-200 bg-white shadow-[0_-12px_40px_rgb(0_0_0/0.18)] outline-hidden motion-safe:animate-[sheet-up_220ms_cubic-bezier(0.2,0.8,0.2,1)] dark:border-stone-800 dark:bg-stone-900 sm:max-w-lg sm:rounded-3xl sm:border ${
+        className={`relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[1.75rem] border-t border-stone-200 bg-white shadow-sm outline-hidden motion-safe:animate-[sheet-up_220ms_cubic-bezier(0.2,0.8,0.2,1)] dark:border-stone-800 dark:bg-stone-900 sm:max-w-lg sm:rounded-3xl sm:border ${
           size === "tall" ? "min-h-[65dvh] sm:min-h-0 sm:max-h-[80dvh]" : ""
         }`}
       >
