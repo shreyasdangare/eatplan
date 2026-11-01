@@ -16,7 +16,7 @@ export function ServiceWorker() {
       }
     } catch {}
     if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
+      navigator.serviceWorker.register(`/sw.js?v=${process.env.NEXT_PUBLIC_BUILD_ID ?? "dev"}`, { scope: "/" }).catch(() => {});
     }
     const update = () => setOffline(!navigator.onLine);
     update();

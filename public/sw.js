@@ -1,5 +1,6 @@
 /* EatPlan service worker: offline app shell + last-known shopping list / plan. */
-const VERSION = "v1";
+// Version comes from the build (registered as /sw.js?v=<build id>), so each deploy gets fresh caches.
+const VERSION = new URL(self.location.href).searchParams.get("v") || "v1";
 const STATIC = `static-${VERSION}`;
 const PAGES = `pages-${VERSION}`;
 const API = `api-${VERSION}`;

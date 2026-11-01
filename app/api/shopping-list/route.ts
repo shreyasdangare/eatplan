@@ -63,11 +63,8 @@ export async function GET(_req: NextRequest) {
   const to_buy = items.filter((i) => i.status === "to_buy");
   const bought = items.filter((i) => i.status === "bought");
 
-  return NextResponse.json({
-    to_buy,
-    bought,
-    items,
-  });
+  // Each item is sent once, already split by status (the old extra `items` copy doubled the payload).
+  return NextResponse.json({ to_buy, bought });
 }
 
 /** POST: add one or more items to the shopping list */
