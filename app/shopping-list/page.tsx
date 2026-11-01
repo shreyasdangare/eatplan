@@ -1,7 +1,8 @@
 "use client";
 import { toISODate, weekStartOf } from "@/lib/dates";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type SetStateAction } from "react";
+import { useCachedState } from "@/lib/swr";
 import {
   DndContext,
   DragEndEvent,
@@ -73,11 +74,31 @@ function SortableTile({
 const getWeekStart = weekStartOf;
 const formatDate = toISODate;
 
+type ShoppingListData = { to_buy?: ShoppingTileItem[]; bought?: ShoppingTileItem[] };
+type IngredientOption = { id: string; name: string; category?: string | null };
+const NO_ITEMS: ShoppingTileItem[] = [];
+const EMPTY_LIST: ShoppingListData = { to_buy: NO_ITEMS, bought: NO_ITEMS };
+const NO_INGREDIENTS: IngredientOption[] = [];
+
 export default function ShoppingListPage() {
-  const [toBuy, setToBuy] = useState<ShoppingTileItem[]>([]);
-  const [bought, setBought] = useState<ShoppingTileItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [ingredients, setIngredients] = useState<{ id: string; name: string; category?: string | null }[]>([]);
+  // Cached (stale-while-revalidate): a return visit renders instantly and refreshes in the background.
+  const { data: list, setData: setList, loading, revalidate: loadList } = useCachedState<ShoppingListData>(
+    "/api/shopping-list",
+    EMPTY_LIST
+  );
+  const toBuy = list.to_buy ?? NO_ITEMS;
+  const bought = list.bought ?? NO_ITEMS;
+  const setToBuy = useCallback(
+    (u: SetStateAction<ShoppingTileItem[]>) =>
+      setList((prev) => ({ ...prev, to_buy: typeof u === "function" ? u(prev.to_buy ?? NO_ITEMS) : u })),
+    [setList]
+  );
+  const setBought = useCallback(
+    (u: SetStateAction<ShoppingTileItem[]>) =>
+      setList((prev) => ({ ...prev, bought: typeof u === "function" ? u(prev.bought ?? NO_ITEMS) : u })),
+    [setList]
+  );
+  const { data: ingredients } = useCachedState<IngredientOption[]>("/api/ingredients", NO_INGREDIENTS);
   const [detailItem, setDetailItem] = useState<ShoppingTileItem | null>(null);
   const [populateLoading, setPopulateLoading] = useState(false);
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
@@ -87,30 +108,6 @@ export default function ShoppingListPage() {
   const [mealPlanFrom, setMealPlanFrom] = useState("");
   const [mealPlanTo, setMealPlanTo] = useState("");
 
-  const loadList = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/shopping-list");
-      if (res.ok) {
-        const data = (await res.json()) as {
-          to_buy?: ShoppingTileItem[];
-          bought?: ShoppingTileItem[];
-        };
-        setToBuy(data.to_buy ?? []);
-        setBought(data.bought ?? []);
-      } else {
-        setToBuy([]);
-        setBought([]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadList();
-  }, [loadList]);
-
   useEffect(() => {
     const weekStart = getWeekStart(new Date());
     const weekEnd = new Date(weekStart);
@@ -119,12 +116,6 @@ export default function ShoppingListPage() {
     setMealPlanTo(formatDate(weekEnd));
   }, []);
 
-  useEffect(() => {
-    fetch("/api/ingredients")
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => setIngredients(Array.isArray(data) ? data : []))
-      .catch(() => setIngredients([]));
-  }, []);
 
 
   const handleTap = useCallback(

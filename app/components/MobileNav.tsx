@@ -36,6 +36,7 @@ export function MobileNav() {
             <li key={item.href} className="flex flex-1">
               <Link
                 href={item.href}
+                prefetch
                 aria-current={isActive ? "page" : undefined}
                 className={`flex flex-1 flex-col items-center justify-center gap-0.5 rounded-[0.9rem] text-xs font-extrabold transition-colors active:scale-95 ${
                   isActive ? "bg-saffron text-ink" : "text-cream/80 hover:text-cream"

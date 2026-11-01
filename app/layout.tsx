@@ -11,6 +11,8 @@ import { AuthCodeExchange } from "./components/AuthCodeExchange";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { MobileNav } from "./components/MobileNav";
+import Link from "next/link";
+import { SWRProvider } from "./components/SWRProvider";
 import { Toaster } from "./components/ui/Toast";
 import { ServiceWorker } from "./components/ServiceWorker";
 import { getSession } from "@/lib/supabaseServerClient";
@@ -54,6 +56,7 @@ export default async function RootLayout({
       </head>
       <body>
         <ThemeProvider>
+        <SWRProvider>
           <Suspense fallback={null}>
             <AuthCodeExchange />
           </Suspense>
@@ -66,27 +69,27 @@ export default async function RootLayout({
                     className="hidden sm:flex flex-wrap gap-1 sm:gap-1.5 text-sm"
                     aria-label="Main navigation"
                   >
-                    <a
+                    <Link
                       href="/recipes"
                       title="Browse and manage your recipe collection"
                       className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-orange-500/10 hover:text-orange-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-orange-500/20 dark:hover:text-orange-300"
                     >
                       Recipes
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                       href="/plan"
                       title="Assign recipes to days and meals (breakfast, lunch, dinner)"
                       className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-amber-500/10 hover:text-amber-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-amber-500/20 dark:hover:text-amber-300"
                     >
                       Planner
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                       href="/shopping-list"
                       title="Pick recipes and get one combined grocery list"
                       className="flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-600 hover:bg-rose-500/10 hover:text-rose-600 active:scale-95 transition-all dark:text-stone-300 dark:hover:bg-rose-500/20 dark:hover:text-rose-300"
                     >
                       List
-                    </a>
+                    </Link>
                     <div
                       title="Coming Soon"
                       className="hidden sm:flex items-center justify-center rounded-xl px-4 py-2 font-medium text-stone-500 dark:text-stone-400 cursor-not-allowed gap-2"
@@ -111,6 +114,7 @@ export default async function RootLayout({
             <Toaster />
             <ServiceWorker />
           </div>
+        </SWRProvider>
         </ThemeProvider>
         <SpeedInsights />
         <Analytics />

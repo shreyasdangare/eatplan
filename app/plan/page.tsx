@@ -21,6 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useCachedState } from "@/lib/swr";
 import Link from "next/link";
 import { Sun, Utensils, Moon, CheckCircle2, X, ChevronLeft, ChevronRight, Plus, Search, GripVertical, ShoppingCart } from "lucide-react";
 import { BottomSheet } from "@/app/components/ui/BottomSheet";
@@ -378,14 +379,14 @@ function getWeekStart(d: Date): Date {
   return x;
 }
 
+const NO_DISHES: Dish[] = [];
+const NO_PLANS: PlanEntry[] = [];
+
 export default function PlanPage() {
   const [weekStart, setWeekStart] = useState(() => {
     const n = new Date();
     return getWeekStart(n);
   });
-  const [dishes, setDishes] = useState<Dish[]>([]);
-  const [plans, setPlans] = useState<PlanEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeDish, setActiveDish] = useState<Dish | null>(null);
   
   // State for mobile tappable slots
@@ -414,6 +415,34 @@ export default function PlanPage() {
   const [dietFilter, setDietFilter] = useState<"Both" | "Veg" | "Non-Veg">("Both");
   const [hasSetInitialDiet, setHasSetInitialDiet] = useState(false);
 
+  const weekDates = getWeekDates(weekStart);
+  const from = weekDates[0];
+  const to = weekDates[6];
+
+  // Cached (stale-while-revalidate): a return visit renders instantly and refreshes in the background.
+  const { data: dishes, loading: dishesLoading } = useCachedState<Dish[]>("/api/dishes", NO_DISHES);
+  const { data: plans, setData: setPlans, loading: plansLoading } = useCachedState<PlanEntry[]>(
+    `/api/meal-plans?from=${from}&to=${to}`,
+    NO_PLANS
+  );
+  const loading = dishesLoading || plansLoading;
+
+  useEffect(() => {
+    if (hasSetInitialDiet) return;
+    let cancelled = false;
+    getSupabaseClient()
+      .then((supabase) => supabase.auth.getUser())
+      .then(({ data: { user } }) => {
+        if (cancelled) return;
+        if (user?.user_metadata?.isVegetarianOnly) setDietFilter("Veg");
+        setHasSetInitialDiet(true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [hasSetInitialDiet]);
+
   const filteredDishes = dishes.filter((d) => {
     const matchesSearch = d.name.toLowerCase().includes(searchQuery.toLowerCase());
     let matchesFilter = true;
@@ -435,28 +464,6 @@ export default function PlanPage() {
 
     return matchesSearch && matchesFilter && matchesDiet;
   });
-
-  const weekDates = getWeekDates(weekStart);
-  const from = weekDates[0];
-  const to = weekDates[6];
-
-  useEffect(() => {
-    (async () => {
-      const [dishesRes, plansRes, supabase] = await Promise.all([
-        fetch("/api/dishes"),
-        fetch(`/api/meal-plans?from=${from}&to=${to}`),
-        getSupabaseClient()
-      ]);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!hasSetInitialDiet && user?.user_metadata?.isVegetarianOnly) {
-         setDietFilter("Veg");
-         setHasSetInitialDiet(true);
-      }
-      if (dishesRes.ok) setDishes((await dishesRes.json()) ?? []);
-      if (plansRes.ok) setPlans((await plansRes.json()) ?? []);
-      setLoading(false);
-    })();
-  }, [from, to, hasSetInitialDiet]);
 
   /* ─── Slot helpers ─── */
   const getSlotEntries = useCallback(
