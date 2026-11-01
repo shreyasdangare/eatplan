@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { Languages, Loader2 } from "lucide-react";
 
+// Same ingredient appears on many screens; keep translations for the session.
+const memo = new Map<string, string>();
+const keyFor = (name: string) => `${name.toLowerCase()}|${typeof navigator !== "undefined" ? navigator.language : ""}`;
+
 interface TranslatedIngredientProps {
   name: string;
 }
 
 export function TranslatedIngredient({ name }: TranslatedIngredientProps) {
-  const [translation, setTranslation] = useState<string | null>(null);
+  const [translation, setTranslation] = useState<string | null>(() => memo.get(keyFor(name)) ?? null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -34,6 +38,7 @@ export function TranslatedIngredient({ name }: TranslatedIngredientProps) {
       if (!res.ok) throw new Error("Failed to translate");
 
       const data = await res.json();
+      memo.set(keyFor(name), data.translation);
       setTranslation(data.translation);
     } catch (err) {
       console.error("Translation error:", err);

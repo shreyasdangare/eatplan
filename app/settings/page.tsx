@@ -44,7 +44,8 @@ export default function SettingsPage() {
   useEffect(() => {
     setMounted(true);
     getSupabaseClient().then((supabase) => {
-      supabase.auth.getUser().then(({ data: { user: u } }) => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        const u = session?.user;
         if (!u) {
           router.push("/login");
           return;
@@ -66,6 +67,8 @@ export default function SettingsPage() {
         isVegetarianOnly: newVeg
       }
     });
+    // Server reads metadata from the JWT; refresh so the next request sees the change.
+    await supabase.auth.refreshSession();
     setUpdating(false);
   };
 

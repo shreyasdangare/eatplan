@@ -38,10 +38,9 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  // getClaims verifies the JWT locally (asymmetric keys) and only calls Auth when it must refresh.
+  const { data: claimsData, error: userError } = await supabase.auth.getClaims();
+  const user = claimsData?.claims?.sub ? { id: claimsData.claims.sub } : null;
 
   // Only clear a stale/invalid session. Calling signOut() whenever there is no user also deleted the
   // PKCE code-verifier cookie (set by signup, forgot-password and Google sign-in), so the email/OAuth

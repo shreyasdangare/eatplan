@@ -431,8 +431,9 @@ export default function PlanPage() {
     if (hasSetInitialDiet) return;
     let cancelled = false;
     getSupabaseClient()
-      .then((supabase) => supabase.auth.getUser())
-      .then(({ data: { user } }) => {
+      .then((supabase) => supabase.auth.getSession())
+      .then(({ data: { session } }) => {
+        const user = session?.user;
         if (cancelled) return;
         if (user?.user_metadata?.isVegetarianOnly) setDietFilter("Veg");
         setHasSetInitialDiet(true);

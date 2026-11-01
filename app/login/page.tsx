@@ -48,17 +48,7 @@ function LoginForm() {
     setResendSuccess(false);
     setLoading(true);
 
-    const isBypass = email.trim() === "test@eatplan.com" && password === "tester";
-
     try {
-      if (isBypass) {
-        // Auto-provision test user in dev
-        await fetch("/api/dev-setup-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email.trim(), password })
-        });
-      }
 
       const supabase = await getSupabaseClient();
       const { error: err } = await supabase.auth.signInWithPassword({

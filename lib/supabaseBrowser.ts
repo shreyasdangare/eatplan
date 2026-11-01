@@ -1,24 +1,6 @@
-import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 let cachedClient: SupabaseClient | null = null;
-
-/**
- * Synchronous client creation when env vars are already inlined (e.g. after restart).
- * Throws if NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY are missing.
- */
-export function createClient(): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. " +
-        "Add them to .env.local (anon key: Supabase Dashboard → Project Settings → API). " +
-        "Restart the dev server (npm run dev) after changing .env.local."
-    );
-  }
-  return createBrowserClient(url, anonKey);
-}
 
 /**
  * Returns a Supabase client, loading config from the server if env vars
@@ -27,6 +9,8 @@ export function createClient(): SupabaseClient {
  */
 export async function getSupabaseClient(): Promise<SupabaseClient> {
   if (cachedClient) return cachedClient;
+  // Loaded on demand so the ~67 KB gz auth client is not in every page's first-load JS.
+  const { createBrowserClient } = await import("@supabase/ssr");
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

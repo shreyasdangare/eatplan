@@ -103,7 +103,7 @@ export default async function RootLayout({
                     </div>
                   </nav>
                   <div className="flex shrink-0 items-center justify-center sm:border-l sm:pl-2 border-stone-200 dark:border-stone-700">
-                    <AuthLinks />
+                    <AuthLinks signedIn={!!user} />
                   </div>
                 </div>
               </div>

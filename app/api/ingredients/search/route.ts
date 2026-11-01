@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/supabaseServerClient";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 
@@ -40,6 +41,8 @@ function similarity(a: string, b: string): number {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
   const { searchParams } = new URL(req.url);
   const query = (searchParams.get("query") || "").trim();
 
@@ -47,9 +50,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ingredients: [] });
   }
 
-  const { data, error } = await supabaseServer
+  // Substring matches come straight from Postgres (trigram index, migration 026). Only when that
+  // finds too few do we fall back to scanning the table for typo-tolerant (Levenshtein) matches.
+  const escaped = query.replace(/[\\%_]/g, (c) => `\\${c}`);
+  let { data, error } = await supabaseServer
     .from("ingredients")
-    .select("id, name");
+    .select("id, name")
+    .ilike("name", `%${escaped}%`)
+    .limit(25);
+  if (!error && (data?.length ?? 0) < 8) {
+    ({ data, error } = await supabaseServer.from("ingredients").select("id, name"));
+  }
 
   if (error || !data) {
     console.error("Error fetching ingredients for search", error);
@@ -83,8 +94,9 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.score - a.score)
     .slice(0, 8);
 
-  return NextResponse.json({
-    ingredients: filtered
-  });
+  return NextResponse.json(
+    { ingredients: filtered },
+    { headers: { "Cache-Control": "private, max-age=60" } }
+  );
 }
 

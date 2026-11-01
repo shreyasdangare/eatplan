@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabaseServer } from "@/lib/supabaseServer";
 import { requireAuth } from "@/lib/supabaseServerClient";
 import { getHouseholdId } from "@/lib/getHouseholdId";
 import { logLlmUsage } from "@/lib/logLlmUsage";
@@ -29,6 +30,19 @@ export async function POST(req: NextRequest) {
         { error: "Missing targetLanguage or native_language" },
         { status: 400 }
       );
+    }
+
+    // Translations are global (not per household): serve repeats from the cache table (migration 026).
+    // Any cache error (e.g. table not migrated yet) just falls through to the model.
+    const cacheKey = { ingredient: String(ingredient).trim().toLowerCase(), language: String(finalLanguage).trim().toLowerCase() };
+    const { data: cached } = await supabaseServer
+      .from("ingredient_translations")
+      .select("translation")
+      .eq("ingredient", cacheKey.ingredient)
+      .eq("language", cacheKey.language)
+      .maybeSingle();
+    if (cached?.translation) {
+      return NextResponse.json({ translation: cached.translation, cached: true });
     }
 
     const prompt = `Translate the culinary ingredient "${ingredient}" into the language represented by the locale code or name "${finalLanguage}".
@@ -62,6 +76,11 @@ Provide ONLY the translated ingredient name as your response. Do not include any
       input_tokens: tokens.input_tokens,
       output_tokens: tokens.output_tokens,
     });
+
+    await supabaseServer
+      .from("ingredient_translations")
+      .upsert({ ...cacheKey, translation }, { onConflict: "ingredient,language" })
+      .then(({ error }) => error && console.warn("translation cache write skipped", error.message));
 
     return NextResponse.json({ translation });
   } catch (error: any) {
