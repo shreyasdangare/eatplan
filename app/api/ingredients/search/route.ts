@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/supabaseServerClient";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 
@@ -40,6 +41,8 @@ function similarity(a: string, b: string): number {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
   const { searchParams } = new URL(req.url);
   const query = (searchParams.get("query") || "").trim();
 

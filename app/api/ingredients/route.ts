@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { requireAuth } from "@/lib/supabaseServerClient";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
   const { data, error } = await supabaseServer
     .from("ingredients")
     .select("id, name, category")
@@ -19,6 +22,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
   const body = await req.json();
   const { name, category } = body as {
     name?: string;
