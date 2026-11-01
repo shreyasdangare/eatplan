@@ -264,13 +264,13 @@ textarea {
   }
 }
 
-/* glass-panel as a plain class in the utilities layer (not @utility), so it is emitted after
+/* sticker-card as a plain class in the utilities layer (not @utility), so it is emitted after
    Tailwind's generated utilities and wins conflicts (bg/shadow/border/blur) the way it did
    in v3. As an @utility, v4 sorted it before core utilities, so e.g. shadow-2xl and bg-white/80
    on the dish detail card started overriding it. */
 @layer utilities {
-  /* Legacy name kept so existing markup picks up the new look: a flat sticker card. */
-  .glass-panel {
+  /* Flat sticker card: white fill, 2px ink outline, hard offset shadow. */
+  .sticker-card {
     @apply bg-white border-2 border-ink shadow-hard dark:bg-stone-900 dark:border-stone-600;
   }
 }

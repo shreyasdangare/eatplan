@@ -166,7 +166,7 @@ export default function CookModePage() {
           </div>
           <section
             aria-live="polite"
-            className="flex flex-1 flex-col rounded-3xl glass-panel p-6"
+            className="flex flex-1 flex-col rounded-3xl sticker-card p-6"
             onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
             onTouchEnd={(e) => {
               if (touchX.current == null) return;

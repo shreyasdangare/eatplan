@@ -88,7 +88,7 @@ export default async function DishDetailPage({ params }: PageProps) {
 
         {/* Overlapping Header Card */}
         <div className="px-4 sm:px-8 lg:px-12 relative z-10 -mt-20 sm:-mt-28">
-          <div className="flex flex-col gap-6 rounded-4xl glass-panel p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white dark:bg-stone-900 ">
+          <div className="flex flex-col gap-6 rounded-4xl sticker-card p-6 sm:p-8 shadow-2xl xl:flex-row xl:items-start xl:justify-between border border-white/40 dark:border-stone-700/50 bg-white dark:bg-stone-900 ">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {dish.meal_type && (
@@ -194,7 +194,7 @@ export default async function DishDetailPage({ params }: PageProps) {
                 </div>
                 <div className="prose prose-stone dark:prose-invert prose-lg max-w-none text-stone-700 dark:text-stone-300 leading-relaxed font-medium">
                   {/* Here we might assume instructions could be markdown later, but for now we just render pre-line text nicely */}
-                  <div className="rounded-4xl glass-panel p-6 sm:p-8 shadow-xs space-y-4">
+                  <div className="rounded-4xl sticker-card p-6 sm:p-8 shadow-xs space-y-4">
                     {instructions.split('\n').filter(line => line.trim() !== '').map((line, idx) => (
                       <p key={idx} className="text-stone-700 dark:text-stone-300">
                         {line}

@@ -36,6 +36,15 @@ const SLOT_LABELS: Record<string, string> = {
   dinner: "Dinner"
 };
 
+/** Rotating colour bands for the day cards on phones (white text is AA on all but saffron). */
+const DAY_BANDS = ["bg-indigo text-white", "bg-leaf text-white", "bg-chili text-white", "bg-saffron text-ink"];
+/** Meal sticker colours, matching the home screen pills. */
+const SLOT_TILE: Record<string, string> = {
+  breakfast: "bg-saffron text-ink",
+  lunch: "bg-leaf text-white",
+  dinner: "bg-chili text-white",
+};
+
 const SLOT_ICONS: Record<string, any> = {
   breakfast: Sun,
   lunch: Utensils,
@@ -139,10 +148,10 @@ function SortableDishPill({
       )}
 
       <span
-        className={`relative z-10 min-w-0 flex-1 truncate text-[15px] font-bold tracking-tight ${
+        className={`relative z-10 min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-tight ${
           prepared
             ? "text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600"
-            : "text-stone-800 dark:text-stone-200"
+            : "text-ink dark:text-cream"
         }`}
         title={dishName}
       >
@@ -726,14 +735,14 @@ export default function PlanPage() {
     return (
       <LoadingRegion label="Loading your meal plan">
         <section className="space-y-4 pt-2">
-          <div className="rounded-3xl glass-panel px-4 py-3">
+          <div className="rounded-3xl sticker-card px-4 py-3">
             <p className="text-lg font-extrabold tracking-tight text-stone-900 dark:text-stone-50">This week</p>
             <p className="mt-1 text-base text-stone-600 dark:text-stone-300">
               Getting your breakfasts, lunches and dinners ready for the whole household…
             </p>
           </div>
           {[0, 1].map((i) => (
-            <div key={i} className="space-y-3 rounded-4xl glass-panel p-5">
+            <div key={i} className="space-y-3 rounded-4xl sticker-card p-5">
               <Skeleton className="h-7 w-40" />
               <Skeleton className="h-12 w-full" />
               <Skeleton className="h-12 w-full" />
@@ -764,7 +773,7 @@ export default function PlanPage() {
         onDragEnd={handleDragEnd}
       >
         {/* Desktop Only: Sticky Main Bar */}
-        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl glass-panel p-5 shadow-sm">
+        <div className="hidden sm:block sticky top-24 z-40 rounded-3xl sticker-card p-5 shadow-sm">
           {/* Top Row: Date nav & Recipe search/action */}
           <div className="mb-4 flex items-center justify-between gap-4">
             
@@ -909,7 +918,7 @@ export default function PlanPage() {
         </div>
 
         {/* Desktop Only: Calendar Grid */}
-        <div className="hidden sm:block overflow-hidden rounded-4xl glass-panel shadow-xs mt-4">
+        <div className="hidden sm:block overflow-hidden rounded-4xl sticker-card shadow-xs mt-4">
           <div className="overflow-x-auto pb-2 scrollbar-thin">
             <table className="w-full min-w-160 border-collapse text-left">
               <thead>
@@ -1000,7 +1009,7 @@ export default function PlanPage() {
       </DndContext>
 
       {/* Mobile Only: sticky week navigator + day strip */}
-      <div className="sm:hidden sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 -mx-1 rounded-3xl glass-panel bg-white p-2 dark:bg-stone-900">
+      <div className="sm:hidden sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 -mx-1 rounded-3xl sticker-card bg-white p-2 dark:bg-stone-900">
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -1036,7 +1045,7 @@ export default function PlanPage() {
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
         </div>
-        <nav aria-label="Days" className="mt-1 grid grid-cols-7 gap-1">
+        <nav aria-label="Days" className="mt-2 grid grid-cols-7 gap-1.5">
           {weekDates.map((date) => {
             const d = new Date(date + "T12:00:00");
             const count = plans.filter((p) => p.date === date && p.dish_id).length;
@@ -1050,14 +1059,16 @@ export default function PlanPage() {
                   document.getElementById(`day-${date}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
                   setTimeout(() => window.scrollBy({ top: -136, behavior: "smooth" }), 350);
                 }}
-                className={`flex min-h-12 flex-col items-center justify-center rounded-2xl text-xs font-semibold ${
-                  isToday ? "bg-orange-500 text-ink" : "text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                className={`flex min-h-14 flex-col items-center justify-center rounded-xl border-2 text-[11px] font-bold ${
+                  isToday
+                    ? "border-ink bg-saffron text-ink shadow-xs"
+                    : "border-ink bg-white text-ink hover:bg-cream dark:border-stone-600 dark:bg-stone-900 dark:text-cream"
                 }`}
               >
                 <span className="sr-only">{`${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${count} meal${count === 1 ? "" : "s"} planned`}</span>
                 <span aria-hidden>{d.toLocaleDateString("en-GB", { weekday: "narrow" })}</span>
-                <span aria-hidden className="text-sm font-bold">{d.getDate()}</span>
-                <span aria-hidden className={`mt-0.5 h-1 w-1 rounded-full ${count ? (isToday ? "bg-white" : "bg-orange-600") : "bg-transparent"}`} />
+                <span aria-hidden className="text-base font-extrabold leading-tight">{d.getDate()}</span>
+                <span aria-hidden className={`mt-0.5 h-1 w-1 rounded-full ${count ? (isToday ? "bg-ink" : "bg-chili") : "bg-transparent"}`} />
               </a>
             );
           })}
@@ -1067,31 +1078,31 @@ export default function PlanPage() {
       {/* Mobile Only: Vertical Stacked Designer List */}
       <div className="sm:hidden flex flex-col gap-5 mt-2">
         {plannedCount === 0 && (
-          <div className="rounded-3xl border border-dashed border-stone-300 bg-white p-5 text-center dark:border-stone-700 dark:bg-stone-900">
-            <p className="text-base font-bold text-stone-900 dark:text-stone-50">Nothing planned this week</p>
+          <div className="rounded-2xl border-2 border-dashed border-ink/40 p-5 text-center dark:border-stone-600">
+            <p className="text-lg font-extrabold text-stone-900 dark:text-stone-50">Nothing planned this week</p>
             <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
               Tap <span className="font-semibold">+ Add</span> under any meal to pick a recipe.
             </p>
             {dishes.length === 0 && (
-              <Link href="/dishes/new" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-orange-500 px-5 font-bold text-ink">
+              <Link href="/dishes/new" className="mt-3 inline-flex min-h-11 items-center rounded-xl border-2 border-ink bg-saffron px-5 font-extrabold text-ink shadow-md">
                 Add your first recipe
               </Link>
             )}
           </div>
         )}
-        {weekDates.map((date) => (
-          <div key={date} id={`day-${date}`} className="scroll-mt-40 flex flex-col overflow-hidden rounded-4xl glass-panel bg-white dark:bg-stone-900 outline-solid outline-1 outline-stone-200/60 dark:outline-stone-700/60 shadow-sm transition-all">
-            <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-stone-200/40 dark:border-stone-700/40">
-              <div className="flex items-end gap-2 text-stone-900 dark:text-stone-50">
-                <h4 className="text-2xl font-extrabold tracking-tight">
+        {weekDates.map((date, dayIndex) => (
+          <div key={date} id={`day-${date}`} className="scroll-mt-40 flex flex-col overflow-hidden rounded-2xl border-2 border-ink bg-white shadow-md dark:border-stone-600 dark:bg-stone-900">
+            <div className={`flex items-center justify-between px-4 py-2 ${DAY_BANDS[dayIndex % DAY_BANDS.length]}`}>
+              <div className="flex items-baseline gap-2">
+                <h4 className="text-lg font-extrabold tracking-tight">
                   {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { weekday: "long" })}
                 </h4>
-                <p className="text-[13px] font-semibold text-stone-500 dark:text-stone-400 mb-1">
+                <p className="text-[13px] font-bold opacity-85">
                   {new Date(date + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
                 </p>
               </div>
             </div>
-            <div className="px-4 py-4 pb-5 space-y-3">
+            <div className="space-y-3 p-3">
               {SLOTS.map((slot) => {
                  const Icon = SLOT_ICONS[slot];
                  const entries = getSlotEntries(date, slot);
@@ -1099,7 +1110,7 @@ export default function PlanPage() {
 
                  return (
                    <div key={slot} className="flex gap-3">
-                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] ring-1 bg-white dark:bg-stone-800 ${allPrepared ? 'text-emerald-500 ring-emerald-200 dark:text-emerald-400 dark:ring-emerald-800/50' : 'text-stone-500 dark:text-stone-400 ring-stone-200/80 dark:ring-stone-700/80'} shadow-xs mt-0.5`}>
+                     <div className={`flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-[0.95rem] border-2 border-ink dark:border-stone-600 ${allPrepared ? 'bg-leaf text-white' : SLOT_TILE[slot]} mt-0.5`}>
                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
                      </div>
                      
@@ -1114,17 +1125,21 @@ export default function PlanPage() {
                              return (
                                <div
                                  key={entry.id}
-                                 className={`flex items-center justify-between gap-2 rounded-xl border px-3.5 h-[46px] transition-colors ${
+                                 className={`flex items-center justify-between gap-2 rounded-xl border-2 px-3.5 min-h-12 transition-colors ${
                                    isPrepared
-                                     ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
-                                     : "bg-white dark:bg-stone-800 border-stone-200/80 dark:border-stone-700/80 shadow-xs"
+                                     ? "border-leaf/40 bg-emerald-50 dark:border-stone-700 dark:bg-stone-950"
+                                     : "border-ink bg-cream dark:border-stone-600 dark:bg-stone-800"
                                  }`}
                                >
+                                 {entry.dishes?.image_url ? (
+                                   // eslint-disable-next-line @next/next/no-img-element -- small thumbnail
+                                   <img src={imageVariant(entry.dishes.image_url, 250) ?? entry.dishes.image_url} alt="" loading="lazy" className={`-ml-1.5 h-9 w-9 shrink-0 rounded-full border-2 border-ink object-cover dark:border-stone-600 ${isPrepared ? "opacity-60 grayscale" : ""}`} />
+                                 ) : null}
                                  <span
-                                   className={`truncate text-[15px] font-bold tracking-tight ${
+                                   className={`min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-tight ${
                                      isPrepared
                                        ? "text-stone-500 dark:text-stone-400 line-through decoration-stone-300 dark:decoration-stone-600"
-                                       : "text-stone-800 dark:text-stone-200"
+                                       : "text-ink dark:text-cream"
                                    }`}
                                  >
                                    {dishId ? (
@@ -1158,7 +1173,7 @@ export default function PlanPage() {
                          <button 
                            type="button" 
                            onClick={() => setMobileSlotOpen({ date, slot })}
-                           className="w-full h-[46px] flex items-center justify-center gap-2 rounded-xl bg-stone-100 hover:bg-orange-50 dark:bg-stone-800 dark:hover:bg-orange-900/30 text-stone-500 dark:text-stone-400 transition-colors border border-dashed border-stone-300 dark:border-stone-700/60 font-semibold text-[13px] active:scale-[0.98]"
+                           className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink/35 text-[13px] font-bold text-stone-600 transition-colors hover:border-ink hover:bg-cream active:scale-[0.98] dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
                          >
                            <Plus className="h-4 w-4" strokeWidth={3} /> Add {SLOT_LABELS[slot]}
                          </button>

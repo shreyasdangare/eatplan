@@ -327,7 +327,7 @@ export default function EditDishPage() {
         </Link>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 rounded-4xl glass-panel p-6 sm:p-8">
+      <form onSubmit={handleSubmit} className="space-y-8 rounded-4xl sticker-card p-6 sm:p-8">
         
         {/* Basic Info */}
         <div className="space-y-5">

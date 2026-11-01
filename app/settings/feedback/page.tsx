@@ -62,7 +62,7 @@ export default function FeedbackPage() {
         </p>
       </div>
 
-      <section className="glass-panel overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs">
+      <section className="sticker-card overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs">
         <form onSubmit={submitFeedback} className="space-y-4">
            <div>
              <label htmlFor="feedback_message" className="mb-2 block text-sm font-semibold text-stone-700 dark:text-stone-300">

@@ -95,7 +95,7 @@ export function InstallPrompt() {
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-10 sm:translate-y-10 opacity-0 pointer-events-none"
       }`}
     >
-      <div className="glass-panel relative flex flex-row items-center sm:flex-col sm:items-start gap-3 rounded-2xl border-stone-200 py-3 pl-3 pr-11 sm:p-5 shadow-xl sm:shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
+      <div className="sticker-card relative flex flex-row items-center sm:flex-col sm:items-start gap-3 rounded-2xl border-stone-200 py-3 pl-3 pr-11 sm:p-5 shadow-xl sm:shadow-2xl ring-1 ring-stone-900/5 dark:ring-white/10">
         <button
           type="button"
           onClick={handleDismiss}

@@ -272,7 +272,7 @@ export default function NewDishPage() {
       </div>
 
       {/* Smart import: one field for links and dish names, one button for photos */}
-      <div className={`relative overflow-hidden rounded-4xl glass-panel p-5 sm:p-8 ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : ""}`}>
+      <div className={`relative overflow-hidden rounded-4xl sticker-card p-5 sm:p-8 ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : ""}`}>
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">
             <Wand2 className="h-5 w-5" aria-hidden />
@@ -393,7 +393,7 @@ export default function NewDishPage() {
       </div>
 
       {/* Manual Accordion */}
-      <div className={`overflow-hidden rounded-4xl glass-panel transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl sticker-card transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "shadow-none border-stone-200/40"}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "manual" ? "magic" : "manual")}

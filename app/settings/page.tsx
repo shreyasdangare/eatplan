@@ -78,7 +78,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Option 1: Veg Only Mode */}
-      <section className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs">
+      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
@@ -108,7 +108,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Option 2: Appearance (Dark Mode) */}
-      <section className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between">
+      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between">
         <div className="flex items-center gap-3">
              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
                 <Moon className="h-5 w-5" />
@@ -133,7 +133,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Option 3: Household */}
-      <Link href="/settings/household" className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
+      <Link href="/settings/household" className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
         <div className="flex items-center gap-3">
              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 group-hover:scale-110 transition-transform">
                 <Users className="h-5 w-5" />
@@ -147,7 +147,7 @@ export default function SettingsPage() {
       </Link>
 
       {/* Mother Tongue Option */}
-      <section className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs space-y-4">
+      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs space-y-4">
         <label htmlFor="native_language" className="flex items-center gap-3 font-bold text-stone-900 dark:text-white leading-tight">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400">
              <Globe className="h-5 w-5" />
@@ -188,7 +188,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Option 4: Send Feedback */}
-      <Link href="/settings/feedback" className="glass-panel overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
+      <Link href="/settings/feedback" className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
         <div className="flex items-center gap-3">
              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 group-hover:scale-110 transition-transform">
                 <MessageSquare className="h-5 w-5" />
@@ -202,7 +202,7 @@ export default function SettingsPage() {
       </Link>
 
       {/* Option 5: Account Section (Email & Logout) */}
-      <section className="glass-panel overflow-hidden rounded-4xl p-5 shadow-sm sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-red-100 dark:border-red-900/30">
+      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-sm sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-red-100 dark:border-red-900/30">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
             <User className="h-6 w-6" />

@@ -113,7 +113,7 @@ export default function HouseholdSettings() {
 
       <div className="space-y-8">
         {/* Current Household Info */}
-        <section className="glass-panel overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
+        <section className="sticker-card overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
           <h2 className="text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-6">
             Your Household
           </h2>
@@ -179,7 +179,7 @@ export default function HouseholdSettings() {
         </section>
 
         {/* Join Household */}
-        <section className="glass-panel overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
+        <section className="sticker-card overflow-hidden rounded-4xl p-6 sm:p-8 shadow-xs ring-1 ring-stone-200/50 dark:ring-stone-700/50">
           <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-stone-900 dark:text-white mb-2">
             <LinkIcon className="h-5 w-5 text-stone-500 dark:text-stone-400" /> Join Existing Household
           </h2>

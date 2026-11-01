@@ -72,7 +72,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
 
   if (!dishes.length) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-4xl glass-panel p-10 text-center">
+      <div className="flex flex-col items-center justify-center rounded-4xl sticker-card p-10 text-center">
         <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100 text-orange-700 dark:bg-stone-800 dark:text-orange-400">
           <UtensilsCrossed size={32} aria-hidden />
         </div>
@@ -121,7 +121,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 rounded-3xl glass-panel bg-white p-2 shadow-sm dark:bg-stone-900 sm:top-24 sm:p-5">
+      <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))+3.75rem)] z-40 rounded-3xl sticker-card bg-white p-2 shadow-sm dark:bg-stone-900 sm:top-24 sm:p-5">
         <div className="flex items-center gap-2 sm:mb-4 sm:gap-4">
           <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500 dark:text-stone-400" aria-hidden />
@@ -215,7 +215,7 @@ export function DishesListWithFilter({ dishes, defaultVegOnly = false, children 
             <li key={dish.id} className="group/card relative">
               <Link
                 href={`/dishes/${dish.id}`}
-                className="block overflow-hidden rounded-3xl glass-panel transition-all duration-500 hover:-translate-y-1 hover:shadow-xl sm:rounded-4xl"
+                className="block overflow-hidden rounded-3xl sticker-card transition-all duration-500 hover:-translate-y-1 hover:shadow-xl sm:rounded-4xl"
               >
                 <div className="relative aspect-4/5 w-full overflow-hidden bg-stone-100 dark:bg-stone-800 sm:aspect-4/3">
                   {dish.image_url ? (
