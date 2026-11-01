@@ -1,3 +1,4 @@
+import BlurText from "@/app/components/motion/BlurText";
 import Link from "next/link";
 import { Logo } from "./components/Logo";
 import { Suspense } from "react";
@@ -105,7 +106,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </Link>
             </div>
             <h1 id="home-question" className="relative mt-3 max-w-[11ch] font-mr text-[3.25rem] font-extrabold leading-[1.05] text-balance sm:text-6xl">
-              {tagline}
+              <BlurText text={tagline} />
             </h1>
           </section>
 
@@ -118,7 +119,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <li key={href} className="flex">
                 <Link
                   href={href}
-                  className={`flex min-h-[4.75rem] w-full flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-ink px-1 text-center text-sm font-extrabold leading-none whitespace-nowrap shadow-md transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none dark:border-stone-950 ${tone}`}
+                  className={`flex min-h-[4.75rem] w-full flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-ink px-1 text-center text-sm font-extrabold leading-none whitespace-nowrap shadow-md press dark:border-stone-950 ${tone}`}
                 >
                   <Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden />
                   {label}
@@ -157,7 +158,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </p>
               <Link
                 href="/recipes"
-                className="mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-saffron px-7 text-base font-extrabold text-ink shadow-md transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                className="mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-saffron px-7 text-base font-extrabold text-ink shadow-md press"
               >
                 Open your digital cookbook <span aria-hidden>→</span>
               </Link>

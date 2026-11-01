@@ -3,9 +3,32 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
-import { User, LogOut, ChevronRight, Settings, Moon, Globe, Leaf, MessageSquare, Sun, Users } from "lucide-react";
+import { LogOut, ChevronRight, Moon, Globe, Leaf, MessageSquare, Sun, Users } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+
+function Toggle({ on, onClick, label, disabled }: { on: boolean; onClick: () => void; label: string; disabled?: boolean }) {
+  return (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    role="switch"
+    aria-checked={on}
+    aria-label={label}
+    className={`tap relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 border-ink transition-colors disabled:opacity-50 dark:border-stone-500 ${on ? "bg-leaf" : "bg-stone-200 dark:bg-stone-800"}`}
+  >
+    <span className={`inline-block h-5 w-5 rounded-full border-2 border-ink bg-white transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${on ? "translate-x-7" : "translate-x-1"}`} />
+  </button>
+  );
+}
+
+function SettingIcon({ tone, children }: { tone: string; children: React.ReactNode }) {
+  return (
+  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-ink dark:border-stone-950 ${tone}`}>{children}</span>
+  );
+}
+
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
@@ -56,177 +79,114 @@ export default function SettingsPage() {
   if (loading || !mounted) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-orange-500 dark:border-stone-700 dark:border-t-orange-500" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-saffron dark:border-stone-700 dark:border-t-saffron" />
       </div>
     );
   }
 
   const isDark = resolvedTheme === "dark";
 
+  const rowText = (title: string, sub: string) => (
+    <span className="min-w-0 flex-1">
+      <span className="block font-extrabold leading-tight text-ink dark:text-stone-50">{title}</span>
+      <span className="block text-sm text-stone-600 dark:text-stone-400">{sub}</span>
+    </span>
+  );
+
+  const name = user?.user_metadata?.preferred_name || user?.email?.split("@")[0] || "You";
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 pb-24 sm:px-6 lg:px-8 space-y-6">
-      <div className="mb-6 flex items-center gap-3">
-        <Settings className="h-8 w-8 text-stone-500 dark:text-stone-400" />
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50">
-            Settings
-          </h1>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400 font-medium">
-            Manage your app preferences and account details.
-          </p>
-        </div>
-      </div>
+    <div className="mx-auto max-w-2xl space-y-6 px-4 py-6 pb-28 sm:px-6">
+      <h1 className="text-4xl font-extrabold tracking-tight text-ink dark:text-stone-50">Settings</h1>
 
-      {/* Option 1: Veg Only Mode */}
-      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
-                <Leaf className="h-5 w-5" />
-             </div>
-             <div>
-                <h3 className="font-bold text-stone-900 dark:text-white leading-tight">Dietary Preference</h3>
-                <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Enable Vegetarian Only mode</p>
-             </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              const newVeg = !isVegetarianOnly;
-              setIsVegetarianOnly(newVeg);
-              handleUpdatePreferences(nativeLanguage, newVeg);
-            }}
-            disabled={updating}
-            role="switch"
-            aria-checked={isVegetarianOnly}
-            aria-label="Vegetarian only"
-            className={`tap relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50 ${isVegetarianOnly ? 'bg-emerald-600' : 'bg-stone-300 dark:bg-stone-700'}`}
-          >
-            <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-xs ${isVegetarianOnly ? 'translate-x-6' : 'translate-x-1'}`} />
-          </button>
+      {/* Profile */}
+      <section className="sticker-card overflow-hidden rounded-3xl">
+        <div className="relative flex items-center gap-4 overflow-hidden bg-indigo p-5 text-white">
+          <span aria-hidden className="absolute -right-6 -top-8 h-24 w-24 rounded-full bg-saffron" />
+          <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-pink text-2xl font-extrabold uppercase text-ink">
+            {name.charAt(0)}
+          </span>
+          <span className="relative min-w-0">
+            <span className="block truncate text-xl font-extrabold">{name}</span>
+            <span className="block truncate text-sm text-white/85">{user?.email}</span>
+          </span>
         </div>
       </section>
 
-      {/* Option 2: Appearance (Dark Mode) */}
-      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between">
-        <div className="flex items-center gap-3">
-             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
-                <Moon className="h-5 w-5" />
-             </div>
-             <div>
-                <h3 className="font-bold text-stone-900 dark:text-white leading-tight">Appearance</h3>
-                <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Switch to {isDark ? "Light" : "Dark"} mode</p>
-             </div>
-        </div>
-        <button
-           type="button"
-           onClick={() => setTheme(isDark ? "light" : "dark")}
-           role="switch"
-           aria-checked={isDark}
-           aria-label="Dark mode"
-           className={`tap relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors ${isDark ? 'bg-indigo-600' : 'bg-stone-300 dark:bg-stone-700'}`}
-        >
-           <span className={`inline-block flex items-center justify-center h-5 w-5 transform rounded-full bg-white transition-transform shadow-xs ${isDark ? 'translate-x-6' : 'translate-x-1'}`}>
-              {isDark ? <Moon className="h-3 w-3 text-indigo-600" /> : <Sun className="h-3 w-3 text-amber-500" />}
-           </span>
-        </button>
-      </section>
-
-      {/* Option 3: Household */}
-      <Link href="/settings/household" className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
-        <div className="flex items-center gap-3">
-             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                <Users className="h-5 w-5" />
-             </div>
-             <div>
-                <h3 className="font-bold text-stone-900 dark:text-white leading-tight">Manage Household</h3>
-                <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Invite family members to collaborate</p>
-             </div>
-        </div>
-        <ChevronRight className="h-5 w-5 text-stone-500 dark:text-stone-400 group-hover:text-blue-500 transition-colors" />
-      </Link>
-
-      {/* Mother Tongue Option */}
-      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs space-y-4">
-        <label htmlFor="native_language" className="flex items-center gap-3 font-bold text-stone-900 dark:text-white leading-tight">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400">
-             <Globe className="h-5 w-5" />
+      {/* Preferences */}
+      <section aria-labelledby="prefs" className="space-y-2">
+        <h2 id="prefs" className="px-1 text-xs font-extrabold uppercase tracking-widest text-stone-600 dark:text-stone-400">Preferences</h2>
+        <div className="sticker-card divide-y-2 divide-stone-200 overflow-hidden rounded-3xl dark:divide-stone-800">
+          <div className="flex items-center gap-3 p-4">
+            <SettingIcon tone="bg-leaf text-white"><Leaf className="h-5 w-5" /></SettingIcon>
+            {rowText("Vegetarian only", "Hide non-veg recipes")}
+            <Toggle
+              on={isVegetarianOnly}
+              label="Vegetarian only"
+              disabled={updating}
+              onClick={() => {
+                const v = !isVegetarianOnly;
+                setIsVegetarianOnly(v);
+                handleUpdatePreferences(nativeLanguage, v);
+              }}
+            />
           </div>
-          <div>
-            <h3>Mother Tongue</h3>
-            <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Preferred language for generation</p>
+          <div className="flex items-center gap-3 p-4">
+            <SettingIcon tone="bg-ink text-saffron dark:bg-saffron dark:text-ink">{isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}</SettingIcon>
+            {rowText("Dark mode", isDark ? "On" : "Off")}
+            <Toggle on={isDark} label="Dark mode" onClick={() => setTheme(isDark ? "light" : "dark")} />
           </div>
-        </label>
-        <div className="relative">
-          <select
-            id="native_language"
-            value={nativeLanguage}
-            onChange={(e) => {
-              setNativeLanguage(e.target.value);
-              handleUpdatePreferences(e.target.value, isVegetarianOnly);
-            }}
-            disabled={updating}
-            className="w-full appearance-none rounded-2xl border border-stone-200/80 bg-white px-4 py-3 text-sm font-medium text-stone-800 focus:border-pink-500 focus:outline-hidden focus:ring-1 focus:ring-pink-500 disabled:opacity-50 dark:border-stone-700/80 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-pink-500 dark:focus:ring-pink-500 shadow-xs transition-all"
-          >
-            <option value="">Select a language...</option>
-            <option value="English">English</option>
-            <option value="Hindi">Hindi</option>
-            <option value="Marathi">Marathi</option>
-            <option value="Gujarati">Gujarati</option>
-            <option value="Tamil">Tamil</option>
-            <option value="Telugu">Telugu</option>
-            <option value="Kannada">Kannada</option>
-            <option value="Bengali">Bengali</option>
-            <option value="Malayalam">Malayalam</option>
-            <option value="Spanish">Spanish</option>
-            <option value="French">French</option>
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500 dark:text-stone-400">
-            <ChevronRight className="h-4 w-4 rotate-90" />
+          <div className="p-4">
+            <label htmlFor="native_language" className="flex items-center gap-3">
+              <SettingIcon tone="bg-pink text-ink"><Globe className="h-5 w-5" /></SettingIcon>
+              {rowText("Mother tongue", "Preferred language for generation")}
+            </label>
+            <div className="relative mt-3">
+              <select
+                id="native_language"
+                value={nativeLanguage}
+                onChange={(e) => {
+                  setNativeLanguage(e.target.value);
+                  handleUpdatePreferences(e.target.value, isVegetarianOnly);
+                }}
+                disabled={updating}
+                className="min-h-12 w-full appearance-none rounded-2xl border-2 border-ink bg-cream px-4 text-base font-bold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 disabled:opacity-50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
+              >
+                <option value="">Select a language…</option>
+                {["English", "Hindi", "Marathi", "Gujarati", "Tamil", "Telugu", "Kannada", "Bengali", "Malayalam", "Spanish", "French"].map((l) => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
+              <ChevronRight aria-hidden className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-ink dark:text-stone-300" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Option 4: Send Feedback */}
-      <Link href="/settings/feedback" className="sticker-card overflow-hidden rounded-4xl p-5 shadow-xs flex items-center justify-between group transition-all hover:bg-stone-50 dark:hover:bg-stone-800 hover:scale-[1.01] active:scale-[0.99]">
-        <div className="flex items-center gap-3">
-             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 group-hover:scale-110 transition-transform">
-                <MessageSquare className="h-5 w-5" />
-             </div>
-             <div>
-                <h3 className="font-bold text-stone-900 dark:text-white leading-tight">Send Feedback</h3>
-                <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">Report an issue or suggest a feature</p>
-             </div>
+      {/* Kitchen */}
+      <section aria-labelledby="kitchen" className="space-y-2">
+        <h2 id="kitchen" className="px-1 text-xs font-extrabold uppercase tracking-widest text-stone-600 dark:text-stone-400">Kitchen</h2>
+        <div className="sticker-card divide-y-2 divide-stone-200 overflow-hidden rounded-3xl dark:divide-stone-800">
+          <Link href="/settings/household" className="flex min-h-16 items-center gap-3 p-4 transition-colors hover:bg-cream active:bg-saffron/20 dark:hover:bg-stone-800">
+            <SettingIcon tone="bg-saffron text-ink"><Users className="h-5 w-5" /></SettingIcon>
+            {rowText("Household", "Invite family to plan together")}
+            <ChevronRight className="h-5 w-5 text-ink dark:text-stone-300" />
+          </Link>
+          <Link href="/settings/feedback" className="flex min-h-16 items-center gap-3 p-4 transition-colors hover:bg-cream active:bg-saffron/20 dark:hover:bg-stone-800">
+            <SettingIcon tone="bg-indigo text-white"><MessageSquare className="h-5 w-5" /></SettingIcon>
+            {rowText("Send feedback", "Report a bug or suggest a feature")}
+            <ChevronRight className="h-5 w-5 text-ink dark:text-stone-300" />
+          </Link>
         </div>
-        <ChevronRight className="h-5 w-5 text-stone-500 dark:text-stone-400 group-hover:text-amber-500 transition-colors" />
-      </Link>
-
-      {/* Option 5: Account Section (Email & Logout) */}
-      <section className="sticker-card overflow-hidden rounded-4xl p-5 shadow-sm sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-red-100 dark:border-red-900/30">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
-            <User className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-lg font-extrabold text-stone-900 dark:text-white leading-tight">
-              {user?.user_metadata?.preferred_name || "Account Profile"}
-            </h2>
-            <p className="text-sm text-stone-500 dark:text-stone-400 font-bold">
-              {user?.email}
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-red-100/80 dark:bg-red-900/30 px-5 py-3 text-sm font-bold text-red-700 dark:text-red-400 transition-colors hover:bg-red-200 dark:hover:bg-red-900/50 active:scale-95"
-        >
-          <LogOut className="h-4 w-4" />
-          Log out
-        </button>
       </section>
 
-      <p className="text-center text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 py-4">
-        EatPlan v0.1.2 • A Meal Planner by PP 🇮🇳
+      <button onClick={handleLogout} className="btn-outline press w-full text-chili dark:text-red-400">
+        <LogOut className="h-5 w-5" />
+        Log out
+      </button>
+
+      <p className="py-2 text-center text-xs font-bold uppercase tracking-widest text-stone-600 dark:text-stone-400">
+        EatPlan v0.1.2 · A meal planner by PP
       </p>
     </div>
   );

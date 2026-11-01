@@ -1,6 +1,5 @@
 "use client";
 
-import { getItemEmoji } from "@/lib/categoryEmoji";
 
 export type ShoppingTileItem = {
   id: string;
@@ -39,7 +38,6 @@ export function ShoppingTile({
   dragAttributes,
 }: ShoppingTileProps) {
   const name = displayName(item);
-  const emoji = getItemEmoji(item.category ?? null, name);
   const isBought = item.status === "bought";
 
   const handleClick = () => {
@@ -56,21 +54,21 @@ export function ShoppingTile({
   return (
     <div
       className={`
-        relative flex min-h-[52px] w-full items-stretch rounded-xl border transition-colors duration-150
+        relative flex min-h-[52px] w-full items-stretch rounded-2xl border-2 transition-colors duration-150
         ${disabled ? "pointer-events-none opacity-60" : ""}
         ${animating ? "animate-buy" : ""}
         ${isBought
-          ? "border-lime-200 bg-lime-50/80 dark:border-lime-800 dark:bg-lime-950/40"
+          ? "border-stone-300 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
           : item.urgency === "urgent"
-            ? "border-red-300 bg-red-50/80 dark:border-red-900/50 dark:bg-red-950/30"
-            : "border-orange-200 bg-white dark:border-stone-700 dark:bg-stone-800"
+            ? "border-chili bg-white shadow-[2px_2px_0_var(--color-chili)] dark:border-red-400 dark:bg-stone-900"
+            : "border-ink bg-white shadow-xs dark:border-stone-600 dark:bg-stone-900"
         }
       `}
     >
       {/* Checkmark overlay during buy animation */}
       {animating && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-lime-500/20 dark:bg-lime-500/10" aria-hidden>
-          <svg className="h-8 w-8 text-lime-600 dark:text-lime-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-leaf/15" aria-hidden>
+          <svg className="h-8 w-8 text-leaf dark:text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 13l4 4L19 7" className="animate-checkmark" />
           </svg>
         </div>
@@ -84,8 +82,10 @@ export function ShoppingTile({
         aria-label={`${name}${item.quantity ? `, ${item.quantity}` : ""}${item.urgency === "urgent" ? ", urgent" : ""}. ${isBought ? "Bought – tap to put back on the list" : "Tap to mark as bought"}`}
         className="flex min-w-0 flex-1 items-center gap-2 rounded-l-xl py-2 pl-2.5 pr-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
       >
-        <span className="text-lg leading-none shrink-0" aria-hidden>
-          {emoji}
+        <span aria-hidden className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${isBought ? "border-leaf bg-leaf text-white" : "border-ink bg-cream dark:border-stone-500 dark:bg-stone-800"}`}>
+          {isBought && (
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+          )}
         </span>
         <span className="min-w-0 flex-1" aria-hidden>
           <span
@@ -109,7 +109,7 @@ export function ShoppingTile({
         </span>
         {item.urgency === "urgent" && !isBought && (
           <span
-            className="shrink-0 rounded-full bg-red-200 px-1.5 py-0.5 text-xs font-bold text-red-800 dark:bg-red-900/60 dark:text-red-100"
+            className="shrink-0 rounded-full bg-chili px-1.5 py-0.5 text-xs font-bold text-white"
             aria-hidden
           >
             !
@@ -121,7 +121,7 @@ export function ShoppingTile({
         onClick={handleDetailClick}
         disabled={disabled || animating}
         aria-label={`Edit ${name}`}
-        className="flex w-11 shrink-0 items-center justify-center rounded-r-xl text-amber-700 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-orange-500 dark:text-amber-300 dark:hover:bg-stone-700"
+        className="flex w-11 shrink-0 items-center justify-center rounded-r-xl text-ink hover:bg-cream focus-visible:outline-2 focus-visible:outline-saffron dark:text-stone-300 dark:hover:bg-stone-700"
       >
         <svg
           className="h-5 w-5"

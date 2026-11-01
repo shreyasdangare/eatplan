@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SHOPPING_CATEGORIES, getCategoryEmoji, inferCategoryFromName } from "@/lib/categoryEmoji";
+import { SHOPPING_CATEGORIES, inferCategoryFromName } from "@/lib/categoryEmoji";
 
 type IngredientOption = { id: string; name: string; category?: string | null };
 
@@ -41,12 +41,12 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
   );
 
   return (
-    <div className="rounded-xl border border-orange-200 bg-orange-50/50 px-3 py-0.5 dark:border-stone-600 dark:bg-stone-800">
+    <div className="rounded-2xl border-2 border-dashed border-ink px-3 py-0.5 dark:border-stone-600">
       <button
         type="button"
         onClick={() => setExpanded((p) => (p ? null : SHOPPING_CATEGORIES[0]))}
         aria-expanded={expanded !== null}
-        className="flex min-h-11 w-full items-center justify-between text-left text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200"
+        className="flex min-h-11 w-full items-center justify-between text-left text-xs font-extrabold uppercase tracking-wider text-ink dark:text-stone-200"
       >
         <span>Browse categories</span>
         <svg
@@ -59,7 +59,7 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
         </svg>
       </button>
       {expanded !== null && (
-        <div className="border-t border-orange-200 px-1 pb-2 pt-1.5 dark:border-stone-600">
+        <div className="border-t-2 border-stone-200 px-1 pb-2 pt-1.5 dark:border-stone-600">
           {SHOPPING_CATEGORIES.map((cat) => {
             const items = byCategory.get(cat) ?? [];
             if (items.length === 0) return null;
@@ -70,11 +70,10 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
                   type="button"
                   onClick={() => setExpanded((p) => (p === cat ? null : cat))}
                   aria-expanded={isOpen}
-                  className="flex min-h-11 w-full items-center gap-1.5 text-left text-sm font-semibold text-amber-900 dark:text-amber-100"
+                  className="flex min-h-11 w-full items-center gap-1.5 text-left text-sm font-bold text-ink dark:text-stone-100"
                 >
-                  <span aria-hidden>{getCategoryEmoji(cat)}</span>
                   <span>{cat}</span>
-                  <span className="text-amber-800 dark:text-amber-200">
+                  <span className="text-stone-600 dark:text-stone-400">
                     ({items.length})
                   </span>
                   <svg
@@ -93,13 +92,13 @@ export function CategoryBrowser({ ingredients, onAddItem }: CategoryBrowserProps
                         key={ing.id}
                         type="button"
                         onClick={() => onAddItem({ ingredient_id: ing.id, name: ing.name })}
-                        className="min-h-11 rounded-full border border-orange-200 bg-white px-3.5 text-sm text-amber-950 hover:bg-orange-100 active:scale-95 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+                        className="press min-h-11 rounded-full border-2 border-ink bg-white px-3.5 text-sm font-semibold text-ink shadow-xs hover:bg-cream dark:border-stone-500 dark:bg-stone-900 dark:text-stone-100"
                       >
                         {ing.name}
                       </button>
                     ))}
                     {items.length > 24 && (
-                      <span className="flex items-center text-sm text-amber-800 dark:text-amber-200">
+                      <span className="flex items-center text-sm text-stone-600 dark:text-stone-400">
                         +{items.length - 24} more
                       </span>
                     )}

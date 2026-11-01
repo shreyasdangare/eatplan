@@ -252,33 +252,33 @@ export default function NewDishPage() {
     }
   };
 
-  const inputClasses = "w-full rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 text-sm text-stone-900 shadow-xs transition-all focus:border-orange-500 focus:bg-white focus:outline-hidden focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700/80 dark:bg-stone-900/50 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:bg-stone-800";
-  const labelClasses = "mb-1.5 block text-sm font-bold text-stone-700 dark:text-stone-300";
+  const inputClasses = "w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-3 text-base font-semibold text-ink placeholder:font-normal placeholder:text-stone-500 focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100";
+  const labelClasses = "mb-1.5 block text-sm font-extrabold text-ink dark:text-stone-200";
 
   return (
     <section className="mx-auto max-w-3xl space-y-8 pb-12">
       <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-ink bg-pink text-ink shadow-hard dark:border-stone-950">
           <Plus className="h-6 w-6" strokeWidth={2.5} />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-50 sm:text-3xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-ink dark:text-stone-50">
             Add a new recipe
           </h1>
-          <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">
+          <p className="mt-0.5 text-sm text-stone-600 dark:text-stone-400">
             Import from anywhere or enter details manually.
           </p>
         </div>
       </div>
 
       {/* Smart import: one field for links and dish names, one button for photos */}
-      <div className={`relative overflow-hidden rounded-4xl sticker-card p-5 sm:p-8 ${expandedSection === "magic" ? "ring-2 ring-orange-500/50" : ""}`}>
+      <div className={`relative overflow-hidden rounded-4xl sticker-card p-5 sm:p-8 ${expandedSection === "magic" ? "ring-4 ring-saffron/60" : ""}`}>
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-saffron text-ink dark:border-stone-950">
             <Wand2 className="h-5 w-5" aria-hidden />
           </div>
           <div>
-            <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Import magic</h2>
+            <h2 className="text-xl font-extrabold tracking-tight text-ink dark:text-stone-50">Import magic</h2>
             <p className="text-sm text-stone-600 dark:text-stone-300">Paste a link, type a dish name, speak it or scan a photo.</p>
           </div>
         </div>
@@ -305,7 +305,7 @@ export default function NewDishPage() {
               <button
                 type="button"
                 onClick={pasteFromClipboard}
-                className="absolute right-1 top-1/2 flex min-h-10 -translate-y-1/2 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-orange-700 hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-stone-800"
+                className="absolute right-1.5 top-1/2 flex min-h-10 -translate-y-1/2 items-center gap-1.5 rounded-xl border-2 border-ink bg-cream px-3 text-sm font-bold text-ink dark:border-stone-500 dark:bg-stone-800 dark:text-stone-100"
               >
                 <ClipboardPaste className="h-4 w-4" aria-hidden /> Paste
               </button>
@@ -314,10 +314,10 @@ export default function NewDishPage() {
           <button
             type="submit"
             disabled={!!importingType || !smartValue.trim()}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-4 text-base font-bold text-ink shadow-md transition-all hover:bg-orange-400 active:scale-[0.98] disabled:opacity-50"
+            className="press flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-saffron px-4 text-base font-extrabold text-ink shadow-hard disabled:opacity-50 dark:border-stone-950"
           >
             {importingType === "url" || importingType === "name" ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden />
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-ink/30 border-t-ink" aria-hidden />
             ) : smartIsUrl ? (
               <LinkIcon className="h-5 w-5" aria-hidden />
             ) : (
@@ -334,9 +334,9 @@ export default function NewDishPage() {
         </form>
 
         <div className="my-4 flex items-center gap-3" aria-hidden>
-          <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+          <div className="h-0.5 flex-1 rounded bg-stone-300 dark:bg-stone-700" />
           <span className="text-xs font-bold uppercase tracking-widest text-stone-600 dark:text-stone-300">or</span>
-          <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+          <div className="h-0.5 flex-1 rounded bg-stone-300 dark:bg-stone-700" />
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -344,12 +344,12 @@ export default function NewDishPage() {
           type="button"
           onClick={() => setVoiceOpen(true)}
           disabled={!!importingType}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-orange-600 bg-orange-50 px-4 text-base font-bold text-orange-800 transition-all active:scale-[0.98] disabled:opacity-60 dark:border-orange-500 dark:bg-orange-500/10 dark:text-orange-200"
+          className="press flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-leaf px-4 text-base font-extrabold text-white shadow-hard disabled:opacity-60 dark:border-stone-950"
         >
           <Mic className="h-5 w-5" aria-hidden /> Speak a recipe
         </button>
         <label
-          className={`flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-stone-300 bg-white px-4 text-base font-bold text-stone-800 transition-all active:scale-[0.98] dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100 ${
+          className={`btn-outline press min-h-12 w-full cursor-pointer text-base font-extrabold ${
             importingType ? "pointer-events-none opacity-60" : ""
           }`}
         >
@@ -393,7 +393,7 @@ export default function NewDishPage() {
       </div>
 
       {/* Manual Accordion */}
-      <div className={`overflow-hidden rounded-4xl sticker-card transition-all ${expandedSection === "manual" ? "ring-2 ring-orange-500/50" : "shadow-none border-stone-200/40"}`}>
+      <div className={`overflow-hidden rounded-4xl sticker-card transition-all ${expandedSection === "manual" ? "ring-4 ring-saffron/60" : ""}`}>
         <button
           type="button"
           onClick={() => setExpandedSection(expandedSection === "manual" ? "magic" : "manual")}
@@ -401,20 +401,20 @@ export default function NewDishPage() {
           className="flex w-full items-center justify-between p-6 sm:p-8 text-left"
         >
           <div className="flex items-center gap-4">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${expandedSection === "manual" ? "bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400" : "bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors bg-indigo text-white border-2 border-ink dark:border-stone-950`}>
               <PenLine className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold tracking-tight text-stone-900 dark:text-stone-50">Enter manually</h2>
-              <p className="mt-0.5 text-xs font-medium text-stone-500 dark:text-stone-400">Fill out recipe details yourself</p>
+              <h2 className="text-xl font-extrabold tracking-tight text-ink dark:text-stone-50">Enter manually</h2>
+              <p className="mt-0.5 text-sm text-stone-600 dark:text-stone-400">Fill out recipe details yourself</p>
             </div>
           </div>
-          <ChevronDown className={`h-5 w-5 text-stone-500 dark:text-stone-400 transition-transform ${expandedSection === "manual" ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-5 w-5 text-ink dark:text-stone-300 transition-transform ${expandedSection === "manual" ? "rotate-180" : ""}`} />
         </button>
 
         {expandedSection === "manual" && (
           <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-0 animate-in fade-in slide-in-from-top-4">
-             <div className="h-px bg-stone-200/50 dark:bg-stone-700/50 mb-6 -mt-2" />
+             <div className="mb-6 -mt-2 h-0.5 rounded bg-stone-300 dark:bg-stone-700" />
              <form onSubmit={handleSubmit} className="space-y-8">
                
                {/* Basic Info */}
@@ -504,12 +504,12 @@ export default function NewDishPage() {
                  />
                </div>
 
-               <div className="h-px w-full bg-stone-200 dark:bg-stone-700" />
+               <div className="h-0.5 w-full rounded bg-stone-300 dark:bg-stone-700" />
 
                {/* Ingredients Builder */}
                <div className="space-y-6">
-                 <div className="space-y-4 rounded-2xl bg-stone-50 p-5 dark:bg-stone-900 border border-stone-200/50 dark:border-stone-700/50">
-                   <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">
+                 <div className="space-y-4 rounded-2xl border-2 border-dashed border-stone-400 p-5 dark:border-stone-600">
+                   <h3 className="text-sm font-extrabold text-ink dark:text-stone-200">
                       Build Ingredient List
                    </h3>
                    <div className="max-w-md">
@@ -543,7 +543,7 @@ export default function NewDishPage() {
                              key={ing.id}
                              onClick={() => toggleIngredient(ing.id)}
                              aria-label={`Remove ${ing.name}`}
-                             className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white transition-all active:scale-95"
+                             className="press inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-ink bg-leaf px-4 text-sm font-bold text-white dark:border-stone-950"
                            >
                              {ing.name}
                              <span aria-hidden className="text-base leading-none">×</span>
@@ -556,7 +556,7 @@ export default function NewDishPage() {
 
                  {selectedIngredients.length > 0 && (
                    <div className="space-y-3">
-                     <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 mb-2">
+                     <h3 className="mb-2 text-sm font-extrabold text-ink dark:text-stone-200">
                        Selected Ingredients Details
                      </h3>
                      <div className="grid gap-3 sm:grid-cols-2">
@@ -566,7 +566,7 @@ export default function NewDishPage() {
                          return (
                            <div
                              key={sel.ingredient_id}
-                             className="group flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-xs transition-all hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800 dark:hover:border-orange-500"
+                             className="group flex flex-col gap-3 rounded-2xl border-2 border-stone-300 bg-cream p-4 dark:border-stone-700 dark:bg-stone-950"
                            >
                              <div className="flex items-center justify-between">
                                <span className="font-bold text-stone-800 dark:text-stone-100 truncate">
@@ -579,7 +579,7 @@ export default function NewDishPage() {
                                    onChange={(e) =>
                                      updateIngredient(sel.ingredient_id, "is_optional", e.target.checked)
                                    }
-                                   className="h-5 w-5 rounded-sm border-stone-300 text-orange-500 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-700"
+                                   className="h-5 w-5 rounded-sm border-2 border-ink accent-leaf dark:border-stone-500"
                                  />
                                  Optional
                                </label>
@@ -587,7 +587,7 @@ export default function NewDishPage() {
                              <div className="flex flex-wrap items-center gap-2">
                                 <input
                                  placeholder="Display Text (e.g. '2 cups diced')"
-                                 className="w-full sm:flex-1 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                 className="w-full sm:flex-1 min-h-11 rounded-xl border-2 border-ink bg-white px-3 text-base sm:text-sm focus:ring-4 focus:ring-saffron/50 focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                  value={sel.quantity}
                                  onChange={(e) =>
                                    updateIngredient(sel.ingredient_id, "quantity", e.target.value)
@@ -600,7 +600,7 @@ export default function NewDishPage() {
                                      step="any"
                                     inputMode="decimal"
                                      placeholder="Amt"
-                                     className="w-20 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-20 min-h-11 rounded-xl border-2 border-ink bg-white px-3 text-base sm:text-sm focus:ring-4 focus:ring-saffron/50 focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.amount ?? ""}
                                      onChange={(e) =>
                                        updateIngredient(
@@ -612,7 +612,7 @@ export default function NewDishPage() {
                                    />
                                    <input
                                      placeholder="Unit"
-                                     className="w-24 min-h-11 rounded-lg border border-stone-200 bg-stone-50 px-3 text-base sm:text-sm focus:border-orange-500 focus:bg-white focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
+                                     className="w-24 min-h-11 rounded-xl border-2 border-ink bg-white px-3 text-base sm:text-sm focus:ring-4 focus:ring-saffron/50 focus:outline-hidden dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:focus:border-orange-500"
                                      value={sel.unit}
                                      onChange={(e) => updateIngredient(sel.ingredient_id, "unit", e.target.value)}
                                    />
@@ -630,10 +630,10 @@ export default function NewDishPage() {
                  <button
                    type="submit"
                    disabled={loading}
-                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-lg font-bold text-ink shadow-xl transition-all hover:bg-orange-400 hover:shadow-2xl active:scale-95 disabled:opacity-60 dark:bg-orange-500 dark:hover:bg-orange-400"
+                   className="press group flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-saffron px-8 py-4 text-lg font-extrabold text-ink shadow-hard disabled:opacity-50 dark:border-stone-950"
                  >
                    {loading ? (
-                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-ink/20 border-t-ink" />
                    ) : (
                      <Save className="h-5 w-5 transition-transform group-hover:scale-110" />
                    )}

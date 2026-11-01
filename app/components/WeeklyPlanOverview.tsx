@@ -99,7 +99,7 @@ export async function WeeklyPlanOverview() {
           const past = slotPast(key, timeZone);
           const pill = <span className={`inline-block rounded-full px-2 py-px text-[11px] font-extrabold uppercase tracking-wide ${SLOT_PILL[key]}`}>{label}</span>;
           const card =
-            "flex min-h-[4.75rem] items-center gap-3 rounded-2xl border-2 border-ink bg-white p-2.5 shadow-md transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none dark:border-stone-600 dark:bg-stone-900";
+            "flex min-h-[4.75rem] items-center gap-3 rounded-2xl border-2 border-ink bg-white p-2.5 shadow-md press dark:border-stone-600 dark:bg-stone-900";
           if (entry?.dishes) {
             const thumb = entry.dishes.image_url ? imageVariant(entry.dishes.image_url, 250) ?? entry.dishes.image_url : null;
             return (

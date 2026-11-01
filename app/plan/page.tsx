@@ -62,10 +62,10 @@ function DraggableDish({ dish }: { dish: Dish }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`group/tray relative shrink-0 cursor-grab overflow-hidden rounded-full border w-[150px] h-[46px] text-[16px] font-bold transition-all active:scale-[0.98] active:cursor-grabbing ${
+      className={`group/tray relative shrink-0 cursor-grab overflow-hidden press rounded-full border-2 w-[150px] h-[46px] text-[15px] font-bold active:cursor-grabbing ${
         isDragging
-          ? "border-orange-400 ring-2 ring-orange-400 shadow-xl opacity-0"
-          : "border-stone-200/60 shadow-xs hover:border-orange-300 hover:shadow-md dark:border-stone-700/60"
+          ? "border-ink opacity-0"
+          : "border-ink shadow-xs hover:-translate-y-0.5 dark:border-stone-500"
       }`}
     >
       {/* Blurred background image */}
@@ -76,7 +76,7 @@ function DraggableDish({ dish }: { dish: Dish }) {
         />
       )}
       <div className="absolute inset-0 bg-white dark:bg-stone-900" />
-      <span className="relative z-10 block truncate px-4 text-stone-700 dark:text-stone-200 group-hover/tray:text-orange-900 dark:group-hover/tray:text-orange-300">
+      <span className="relative z-10 block truncate px-4 text-ink dark:text-stone-100">
         {dish.name}
       </span>
     </button>
@@ -117,10 +117,10 @@ function SortableDishPill({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group/pill relative flex items-center gap-1.5 overflow-hidden rounded-xl border px-3 py-2 transition-all ${
+      className={`group/pill relative flex items-center gap-1.5 overflow-hidden rounded-xl border-2 px-3 py-2 transition-all ${
         prepared
-          ? "bg-emerald-50/50 border-emerald-200/50 dark:bg-emerald-950/20 dark:border-emerald-800/30"
-          : "bg-white dark:bg-stone-800 border-stone-200/80 dark:border-stone-700/80 shadow-xs"
+          ? "bg-leaf/10 border-leaf/50 dark:border-emerald-700"
+          : "bg-white dark:bg-stone-900 border-ink dark:border-stone-600 shadow-xs"
       }`}
     >
       {/* Blurred background image if not prepared */}
@@ -271,15 +271,15 @@ function DroppableSlot({
   const allPrepared = entries.length > 0 && entries.every((e) => isMealPast(date, slot));
 
   return (
-    <td className="min-w-40 border-b border-stone-200/50 p-2 align-top dark:border-stone-700/50 group/slot">
+    <td className="min-w-40 p-2 align-top group/slot">
       <div
         ref={setNodeRef}
         className={`relative flex min-h-22 flex-col rounded-[1.25rem] border-2 p-2.5 transition-all duration-300 ${
           isOver
-            ? "scale-[1.02] border-orange-400 bg-orange-50 shadow-md dark:border-orange-500/80 dark:bg-orange-900/30"
+            ? "scale-[1.02] border-ink bg-saffron/30 shadow-hard dark:border-saffron"
             : allPrepared && entries.length > 0
-            ? "border-emerald-300/80 bg-emerald-50/80 dark:border-emerald-700/80 dark:bg-emerald-950/40"
-            : "border-dashed border-stone-200/60 bg-stone-50 hover:border-stone-300 dark:border-stone-700/60 dark:bg-stone-800/30 dark:hover:border-stone-600"
+            ? "border-leaf bg-leaf/10 dark:border-emerald-600"
+            : "border-dashed border-stone-300 bg-cream hover:border-ink dark:border-stone-700 dark:bg-stone-950 dark:hover:border-stone-500"
         }`}
       >
         {entries.length > 0 ? (
@@ -319,7 +319,7 @@ function DroppableSlot({
               <button
                 type="button"
                 onClick={() => setShowInlineAdd(true)}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-500 opacity-0 transition-all hover:bg-orange-50 hover:text-orange-600 group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-400"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold text-stone-500 opacity-0 transition-all hover:bg-saffron hover:text-ink group-hover/slot:opacity-100 dark:hover:bg-orange-900/20 dark:hover:text-orange-400 dark:text-stone-400"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Add
@@ -918,12 +918,12 @@ export default function PlanPage() {
         </div>
 
         {/* Desktop Only: Calendar Grid */}
-        <div className="hidden sm:block overflow-hidden rounded-4xl sticker-card shadow-xs mt-4">
+        <div className="hidden sm:block overflow-hidden rounded-3xl sticker-card mt-4">
           <div className="overflow-x-auto pb-2 scrollbar-thin">
             <table className="w-full min-w-160 border-collapse text-left">
               <thead>
-                <tr className="border-b border-stone-200/50 dark:border-stone-700/50">
-                  <th className="sticky left-0 z-20 min-w-24 border-b border-r border-stone-200/50 bg-stone-50 p-4 text-xs font-bold uppercase tracking-widest text-stone-500 dark:border-stone-700/50 dark:bg-stone-800 dark:text-stone-400">
+                <tr className="bg-ink text-white dark:bg-stone-950">
+                  <th className="sticky left-0 z-20 min-w-24 bg-ink p-4 text-xs font-extrabold uppercase tracking-widest text-saffron dark:bg-stone-950">
                     Day
                   </th>
                   {SLOTS.map((s) => {
@@ -931,7 +931,7 @@ export default function PlanPage() {
                     return (
                       <th
                         key={s}
-                        className="min-w-0 border-b border-stone-200/50 bg-stone-50/30 p-4 text-xs font-bold uppercase tracking-widest text-stone-600 dark:border-stone-700/50 dark:bg-stone-800/30 dark:text-stone-400 sm:min-w-40"
+                        className="min-w-0 p-4 text-xs font-extrabold uppercase tracking-widest text-white sm:min-w-40"
                       >
                         <span className="flex items-center gap-2">
                           <Icon className="h-4 w-4" aria-hidden />
@@ -942,7 +942,7 @@ export default function PlanPage() {
                   })}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-200/50 dark:divide-stone-700/50">
+              <tbody className="divide-y-2 divide-stone-200 dark:divide-stone-800">
                   {weekDates.map((date) => (
                   <tr
                     key={date}
@@ -950,15 +950,15 @@ export default function PlanPage() {
                   >
                     <th
                       scope="row"
-                      className="sticky left-0 z-10 min-w-24 border-r border-stone-200/50 bg-white p-4 text-left transition-colors group-hover:bg-stone-50 dark:border-stone-700/50 dark:bg-stone-900 dark:group-hover:bg-stone-800"
+                      className={`sticky left-0 z-10 min-w-24 border-r-2 border-stone-200 p-4 text-left dark:border-stone-800 ${date === todayIso ? "bg-saffron text-ink" : "bg-white dark:bg-stone-900"}`}
                     >
                       <div className="flex flex-col">
-                        <span className="text-sm font-extrabold text-stone-900 dark:text-stone-50">
+                        <span className="text-sm font-extrabold">
                           {new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
                             weekday: "short",
                           })}
                         </span>
-                        <span className="mt-0.5 text-xs font-semibold text-stone-500 dark:text-stone-400">
+                        <span className="mt-0.5 text-xs font-semibold opacity-80">
                            {new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "short"
@@ -990,7 +990,7 @@ export default function PlanPage() {
             easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
           }}>
           {activeDish ? (
-            <div className="rotate-3 scale-105 overflow-hidden flex items-center justify-center rounded-2xl border-2 border-orange-400 bg-white shadow-2xl dark:border-orange-500 dark:bg-stone-800 w-40 h-24 relative group">
+            <div className="rotate-3 scale-105 overflow-hidden flex items-center justify-center rounded-2xl border-2 border-ink bg-saffron shadow-[6px_6px_0_var(--shadow-ink,#1b1530)] dark:border-stone-950 w-40 h-24 relative group">
               {activeDish.image_url && (
                 <div 
                    className="absolute inset-0 bg-cover bg-center opacity-40 blur-[2px] transition-all"

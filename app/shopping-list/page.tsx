@@ -25,7 +25,7 @@ import { CategoryBrowser } from "@/app/components/CategoryBrowser";
 import { BottomSheet } from "@/app/components/ui/BottomSheet";
 import { Skeleton, LoadingRegion } from "@/app/components/ui/Skeleton";
 import { toast } from "@/app/components/ui/Toast";
-import { SHOPPING_CATEGORIES, getCategoryEmoji, inferCategoryFromName } from "@/lib/categoryEmoji";
+import { SHOPPING_CATEGORIES, inferCategoryFromName } from "@/lib/categoryEmoji";
 
 function SortableTile({
   item,
@@ -375,7 +375,7 @@ export default function ShoppingListPage() {
 
       {loading ? (
         <LoadingRegion label="Loading your shopping list">
-          <div className="space-y-2 rounded-xl border border-orange-200 p-2 dark:border-stone-700">
+          <div className="space-y-2 rounded-2xl border-2 border-stone-300 p-3 dark:border-stone-700">
             <Skeleton className="h-4 w-32" />
             <div className="grid grid-cols-2 gap-2">
               {Array.from({ length: 6 }, (_, i) => (
@@ -385,32 +385,32 @@ export default function ShoppingListPage() {
           </div>
         </LoadingRegion>
       ) : toBuy.length === 0 && bought.length === 0 ? (
-        <div className="flex flex-col items-center rounded-3xl border border-dashed border-orange-300 bg-orange-50/60 px-6 py-10 text-center dark:border-stone-700 dark:bg-stone-900">
+        <div className="flex flex-col items-center rounded-3xl border-2 border-dashed border-ink bg-white px-6 py-10 text-center dark:border-stone-600 dark:bg-stone-900">
           <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ink bg-saffron text-ink shadow-md" aria-hidden><ShoppingCart className="h-7 w-7" strokeWidth={2.5} /></span>
-          <h2 className="mt-3 text-lg font-bold text-stone-900 dark:text-stone-50">Your list is empty</h2>
+          <h2 className="mt-3 text-xl font-extrabold text-ink dark:text-stone-50">Your list is empty</h2>
           <p className="mt-1 max-w-xs text-sm text-stone-700 dark:text-stone-300">
             Type an item above, or pull in everything you need for this week&apos;s meals.
           </p>
           <button
             type="button"
             onClick={handleAddFromMealPlan}
-            className="mt-4 min-h-12 rounded-full bg-orange-500 px-6 text-base font-bold text-ink active:scale-95"
+            className="press mt-4 min-h-12 rounded-2xl border-2 border-ink bg-saffron px-6 text-base font-extrabold text-ink shadow-hard dark:border-stone-950"
           >
             Add from this week&apos;s plan
           </button>
         </div>
       ) : (
         <>
-          <div className="rounded-lg border border-orange-200 bg-orange-50/80 p-2 dark:border-stone-600 dark:bg-stone-800">
-            <h3 className="mb-2 px-0.5 text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
-              To buy{groupByCategory ? " · by aisle" : ""} <span className="font-medium normal-case tracking-normal">· hold &amp; drag to reorder</span>
+          <div className="sticker-card rounded-3xl p-3">
+            <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 px-0.5 text-sm font-extrabold uppercase tracking-wider text-ink dark:text-stone-100">
+              To buy{groupByCategory ? " · by aisle" : ""} <span className="text-xs font-semibold normal-case tracking-normal text-stone-600 dark:text-stone-400">hold &amp; drag to reorder</span>
             </h3>
             {toBuy.length === 0 && bought.length === 0 ? (
-              <p className="py-4 text-center text-sm text-amber-800 dark:text-amber-200">
+              <p className="py-4 text-center text-sm text-stone-600 dark:text-stone-400">
                 Add items above or from meal plan.
               </p>
             ) : toBuy.length === 0 ? (
-              <p className="py-2 text-sm text-amber-800 dark:text-amber-200">
+              <p className="py-2 text-sm text-stone-600 dark:text-stone-400">
                 All done. Tap items below to re-add.
               </p>
             ) : (
@@ -441,12 +441,12 @@ export default function ShoppingListPage() {
                           return (
                             <div key={cat}>
                               <div className="mb-1 flex items-center gap-1.5 px-0.5">
-                                <span className="text-sm" aria-hidden>{getCategoryEmoji(cat)}</span>
-                                <span className="text-xs font-semibold text-amber-900 dark:text-amber-100">
+
+                                <span className="rounded-full border-2 border-ink bg-cream px-2 py-0.5 text-xs font-extrabold uppercase tracking-wide text-ink dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100">
                                   {cat} ({items.length})
                                 </span>
                               </div>
-                              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-4">
                                 {items.map((item) => (
                                   <SortableTile
                                     key={item.id}
@@ -463,7 +463,7 @@ export default function ShoppingListPage() {
                       })()}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-4">
                       {toBuy.map((item) => (
                         <SortableTile
                           key={item.id}
@@ -481,21 +481,21 @@ export default function ShoppingListPage() {
           </div>
 
           {bought.length > 0 && (
-            <div className="rounded-lg border border-lime-200 bg-lime-50/50 p-2 dark:border-lime-800 dark:bg-lime-950/30">
+            <div className="rounded-3xl border-2 border-dashed border-leaf p-3 dark:border-leaf">
               <div className="mb-1.5 flex items-center justify-between px-0.5">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-lime-800 dark:text-lime-200">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-leaf dark:text-emerald-300">
                   Recently bought · tap to re-add
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowClearModal(true)}
                   disabled={clearingBought}
-                  className="min-h-11 rounded-full bg-lime-200 px-4 text-sm font-semibold text-lime-900 hover:bg-lime-300 disabled:opacity-50 dark:bg-lime-900/60 dark:text-lime-100 dark:hover:bg-lime-800/60"
+                  className="btn-outline press min-h-11 text-sm disabled:opacity-50"
                 >
                   {clearingBought ? "Clearing…" : "Clear all"}
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-4">
                 {bought.map((item) => (
                   <ShoppingTile
                     key={item.id}
@@ -521,29 +521,29 @@ export default function ShoppingListPage() {
             type="button"
             onClick={runPopulate}
             disabled={populateLoading}
-            className="min-h-12 w-full rounded-full bg-orange-500 text-base font-bold text-ink hover:bg-orange-400 disabled:opacity-50"
+            className="press min-h-12 w-full rounded-2xl border-2 border-ink bg-saffron text-base font-extrabold text-ink shadow-hard disabled:opacity-50 dark:border-stone-950"
           >
             {populateLoading ? "Adding…" : "Add ingredients"}
           </button>
         }
       >
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-sm font-semibold text-stone-700 dark:text-stone-200">
+          <label className="flex flex-col gap-1 text-sm font-extrabold text-ink dark:text-stone-200">
             From
             <input
               type="date"
               value={mealPlanFrom}
               onChange={(e) => setMealPlanFrom(e.target.value)}
-              className="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-3 text-base dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              className="min-h-12 w-full rounded-2xl border-2 border-ink bg-white px-3 text-base font-semibold dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm font-semibold text-stone-700 dark:text-stone-200">
+          <label className="flex flex-col gap-1 text-sm font-extrabold text-ink dark:text-stone-200">
             To
             <input
               type="date"
               value={mealPlanTo}
               onChange={(e) => setMealPlanTo(e.target.value)}
-              className="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-3 text-base dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100"
+              className="min-h-12 w-full rounded-2xl border-2 border-ink bg-white px-3 text-base font-semibold dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
             />
           </label>
         </div>
@@ -569,7 +569,7 @@ export default function ShoppingListPage() {
                   handleClearBought(true);
                 }}
                 disabled={clearingBought}
-                className="min-h-12 w-full rounded-full bg-lime-700 text-base font-bold text-white hover:bg-lime-800 disabled:opacity-50"
+                className="press min-h-12 w-full rounded-2xl border-2 border-ink bg-leaf text-base font-extrabold text-white shadow-hard disabled:opacity-50 dark:border-stone-950"
               >
                 Add to pantry &amp; clear
               </button>
@@ -581,7 +581,7 @@ export default function ShoppingListPage() {
                 handleClearBought(false);
               }}
               disabled={clearingBought}
-              className="min-h-12 w-full rounded-full border border-stone-300 text-base font-semibold text-stone-800 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-100 dark:hover:bg-stone-800"
+              className="btn-outline press min-h-12 w-full text-base"
             >
               Clear only
             </button>

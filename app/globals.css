@@ -384,4 +384,32 @@ input[type="range"].range-touch::-moz-range-thumb {
 }
 
 /* Dark mode: ink shadows vanish on an ink background, so offset in pure black. */
-.dark { --shadow-ink: #000; }
+.dark { --shadow-ink: #5b3d0a; }
+
+/* Motion (adapted from React Bits BlurText + spring press). Kept CSS-only. */
+@keyframes blur-word-in {
+  0% { opacity: 0; filter: blur(10px); transform: translateY(-0.35em); }
+  60% { opacity: 0.7; filter: blur(3px); transform: translateY(0.06em); }
+  100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+.blur-word {
+  display: inline-block;
+  animation: blur-word-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Springy sticker press: the card sinks into its hard shadow, then overshoots back. */
+.press {
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.press:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--shadow-ink, #1b1530);
+  transition-duration: 70ms;
+}
+/* Secondary buttons: full 2px ink outline. */
+.btn-outline {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-white px-4 font-bold text-ink shadow-hard dark:border-stone-500 dark:bg-stone-900 dark:text-stone-100;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blur-word { animation: none; }
+  .press, .press:active { transition: none; transform: none; }
+}

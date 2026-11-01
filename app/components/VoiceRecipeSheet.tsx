@@ -25,9 +25,9 @@ type SpeechRec = {
 
 const BARS = 32;
 const btnBase = "flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-base font-bold transition-all active:scale-[0.98] disabled:opacity-50";
-const btnPrimary = `${btnBase} bg-orange-600 text-white shadow-md hover:bg-orange-700`;
-const iconBtn = "flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-stone-300 bg-white text-stone-800 transition-all active:scale-95 disabled:opacity-50 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100";
-const btnSecondary = `${btnBase} border-2 border-stone-300 bg-white text-stone-800 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100`;
+const btnPrimary = `${btnBase} press border-2 border-ink bg-saffron text-ink font-extrabold shadow-hard dark:border-stone-950`;
+const iconBtn = "press flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-white text-ink shadow-hard disabled:opacity-50 dark:border-stone-500 dark:bg-stone-900 dark:text-stone-100";
+const btnSecondary = `${btnBase} press border-2 border-ink bg-white text-ink font-extrabold shadow-hard dark:border-stone-500 dark:bg-stone-900 dark:text-stone-100`;
 const input = "min-h-11 rounded-xl border border-stone-300 bg-white px-3 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-4 focus:ring-orange-500/15 dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100";
 
 function usePrefersReducedMotion() {
@@ -411,9 +411,9 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
             onClick={start}
             disabled={phase === "requesting"}
             aria-label="Start recording"
-            className="group relative flex h-28 w-28 items-center justify-center rounded-full bg-orange-500 text-ink shadow-sm transition-transform hover:bg-orange-400 active:scale-95 disabled:opacity-70"
+            className="press group relative flex h-28 w-28 items-center justify-center rounded-full border-[3px] border-ink bg-saffron text-ink shadow-[5px_5px_0_var(--shadow-ink,#1b1530)] disabled:opacity-70 dark:border-stone-950"
           >
-            <span aria-hidden className="absolute -inset-3 rounded-full bg-orange-500/20 motion-safe:animate-pulse" />
+            <span aria-hidden className="absolute -inset-4 rounded-full border-2 border-dashed border-saffron motion-safe:animate-[spin_12s_linear_infinite]" />
             {phase === "requesting" ? <Loader2 className="relative h-10 w-10 motion-safe:animate-spin" aria-hidden /> : <Mic className="relative h-11 w-11" aria-hidden />}
           </button>
           <p className="text-base font-bold text-stone-900 dark:text-stone-50">{phase === "requesting" ? "Allow microphone access…" : "Tap to start"}</p>
@@ -438,18 +438,18 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
             {levels.map((l, i) => (
               <span
                 key={i}
-                className={`w-1.5 rounded-full ${phase === "recording" ? "bg-orange-600 dark:bg-orange-400" : "bg-stone-300 dark:bg-stone-600"} ${reducedMotion ? "" : "transition-[height] duration-75"}`}
+                className={`w-1.5 rounded-full ${phase === "recording" ? "bg-ink dark:bg-saffron" : "bg-stone-300 dark:bg-stone-600"} ${reducedMotion ? "" : "transition-[height] duration-75"}`}
                 style={{ height: `${Math.max(6, l * 80)}px` }}
               />
             ))}
           </div>
           {elapsed >= RECORDING_WARN_SECONDS && (
-            <p role="alert" className="flex items-center gap-2 rounded-xl bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-900 dark:bg-amber-500/15 dark:text-amber-200">
+            <p role="alert" className="flex items-center gap-2 rounded-xl border-2 border-ink bg-saffron px-3 py-2 text-sm font-semibold text-ink dark:border-stone-950">
               <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> {Math.max(0, Math.ceil(remaining))}s left — we&apos;ll stop at 10 minutes.
             </p>
           )}
           {live && (
-            <div className="w-full rounded-2xl bg-stone-100 p-3 dark:bg-stone-800">
+            <div className="w-full rounded-2xl border-2 border-dashed border-stone-400 p-3 dark:border-stone-600">
               <p className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300">Live preview (rough)</p>
               <p className="mt-1 text-sm text-stone-800 dark:text-stone-200">{live}</p>
             </div>
@@ -470,7 +470,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
               const state = i < idx ? "done" : i === idx ? "active" : "todo";
               return (
                 <li key={key} className="flex items-center gap-3">
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${state === "done" ? "bg-emerald-600 text-white" : state === "active" ? "bg-orange-500 text-ink" : "bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-ink dark:border-stone-950 ${state === "done" ? "bg-leaf text-white" : state === "active" ? "bg-saffron text-ink" : "bg-stone-200 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
                     {state === "done" ? <Check className="h-5 w-5" aria-hidden /> : state === "active" ? <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden /> : <span className="text-sm font-bold">{i + 1}</span>}
                   </span>
                   <span className={`text-base ${state === "todo" ? "text-stone-500 dark:text-stone-400" : "font-bold text-stone-900 dark:text-stone-50"}`}>{label}</span>
@@ -484,7 +484,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
 
       {phase === "denied" && (
         <div className="flex flex-col items-center gap-3 py-8 text-center">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300"><MicOff className="h-8 w-8" aria-hidden /></span>
+          <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-ink bg-pink text-chili dark:border-stone-950"><MicOff className="h-8 w-8" aria-hidden /></span>
           <p className="text-lg font-bold text-stone-900 dark:text-stone-50">Microphone is blocked</p>
           <p className="max-w-xs text-sm text-stone-700 dark:text-stone-300">Allow microphone access for eatplan.app in your browser or phone settings (on iPhone: Settings › Safari › Microphone), then try again.</p>
           <button type="button" onClick={start} className={`${btnPrimary} mt-2`}><RotateCcw className="h-5 w-5" aria-hidden /> Try again</button>
@@ -501,7 +501,7 @@ export function VoiceRecipeSheet({ open, onClose }: { open: boolean; onClose: ()
       )}
 
       {phase === "error" && (
-        <div role="alert" className="my-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-900 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+        <div role="alert" className="my-6 flex items-start gap-3 rounded-2xl border-2 border-chili bg-chili/10 p-4 text-chili dark:border-red-400/60 dark:text-red-200">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
           <div>
             <p className="font-bold">That didn&apos;t work</p>

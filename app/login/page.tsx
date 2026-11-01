@@ -113,16 +113,19 @@ function LoginForm() {
   };
 
   return (
-    <section className="mx-auto max-w-sm space-y-6 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-        Log in
-      </h1>
+    <section className="mx-auto max-w-sm space-y-6 pt-4">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-ink bg-indigo p-6 text-white shadow-hard dark:border-stone-950">
+        <span aria-hidden className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-saffron" />
+        <span aria-hidden className="absolute -bottom-6 right-14 h-12 w-12 rounded-full bg-chili" />
+        <h1 className="relative text-4xl font-extrabold tracking-tight">Log in</h1>
+        <p className="relative mt-1 max-w-[22ch] font-semibold text-white/90">Welcome back. Your thali is waiting.</p>
+      </div>
 
       <button
         type="button"
         onClick={handleGoogleSignIn}
         disabled={googleLoading}
-        className="flex w-full min-h-[44px] items-center justify-center gap-3 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-xs transition hover:bg-stone-50 active:scale-[0.98] disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:hover:bg-stone-700"
+        className="btn-outline press w-full min-h-12 gap-3 disabled:opacity-50"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -134,14 +137,14 @@ function LoginForm() {
       </button>
 
       <div className="flex items-center gap-4">
-        <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+        <div className="h-0.5 flex-1 rounded bg-stone-300 dark:bg-stone-700" />
         <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400">or</span>
-        <div className="h-px flex-1 bg-stone-200 dark:bg-stone-700" />
+        <div className="h-0.5 flex-1 rounded bg-stone-300 dark:bg-stone-700" />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+          <label htmlFor="email" className="mb-1.5 block text-sm font-bold text-ink dark:text-stone-200">
             Email
           </label>
           <input
@@ -151,15 +154,15 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
           />
         </div>
         <div>
           <div className="mb-1 flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
+            <label htmlFor="password" className="block text-sm font-bold text-ink dark:text-stone-200">
               Password
             </label>
-            <Link href="/forgot-password" className="text-sm text-orange-600 dark:text-orange-400">
+            <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm font-bold text-ink underline decoration-saffron decoration-2 underline-offset-4 dark:text-saffron">
               Forgot password?
             </Link>
           </div>
@@ -170,7 +173,7 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full min-h-[44px] rounded-lg border border-stone-300 px-3 py-2.5 text-base text-stone-900 focus:border-orange-500 focus:outline-hidden focus:ring-1 focus:ring-orange-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:focus:border-orange-500 dark:focus:ring-orange-500"
+            className="w-full min-h-12 rounded-2xl border-2 border-ink bg-white px-4 py-2.5 text-base font-semibold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
           />
         </div>
         {(error || searchParams.get("error") === "auth_callback_failed") && (
@@ -187,7 +190,7 @@ function LoginForm() {
               type="button"
               onClick={handleResendConfirmation}
               disabled={resendLoading}
-              className="min-h-[44px] w-full rounded-xl border border-amber-600 bg-transparent px-4 py-2.5 text-sm font-medium text-amber-800 transition hover:bg-amber-100 active:opacity-90 disabled:opacity-50 dark:border-amber-500 dark:text-amber-200 dark:hover:bg-amber-900/50"
+              className="btn-outline press w-full min-h-11 text-sm disabled:opacity-50"
             >
               {resendLoading ? "Sending…" : "Resend confirmation email"}
             </button>
@@ -201,7 +204,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full min-h-[44px] rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white shadow-xs transition hover:bg-stone-800 active:opacity-90 disabled:opacity-50 dark:bg-stone-700 dark:hover:bg-stone-600"
+          className="press w-full min-h-12 rounded-2xl border-2 border-ink bg-saffron px-4 py-3 text-base font-extrabold text-ink shadow-hard disabled:opacity-50 dark:border-stone-950"
         >
           {loading ? "Signing in…" : "Log in"}
         </button>
@@ -213,7 +216,7 @@ function LoginForm() {
               setEmail("test@eatplan.com");
               setPassword("tester");
             }}
-            className="w-full min-h-[44px] rounded-xl bg-orange-100 px-4 py-3 text-sm font-medium text-orange-900 shadow-xs transition hover:bg-orange-200 active:opacity-90 dark:bg-orange-900/40 dark:text-orange-200 dark:hover:bg-orange-800/60 mt-2"
+            className="btn-outline press w-full min-h-12 disabled:opacity-50 mt-2"
           >
             Bypass Login (Test User)
           </button>
@@ -221,7 +224,7 @@ function LoginForm() {
       </form>
       <p className="text-center text-sm text-stone-600 dark:text-stone-400">
         Don&apos;t have an account?{" "}
-        <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-semibold text-orange-700 underline underline-offset-2 dark:text-orange-400">
+        <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-semibold text-ink underline decoration-saffron decoration-2 underline-offset-4 dark:text-saffron">
           Sign up
         </Link>
       </p>
