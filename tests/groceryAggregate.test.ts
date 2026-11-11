@@ -2,8 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   aggregateGroceries,
   groceryListToText,
-  ahSearchUrl,
-  jumboSearchUrl,
   normalizeUnit,
 } from "@/lib/groceryAggregate";
 
@@ -81,9 +79,5 @@ describe("helpers", () => {
       "Groceries"
     );
     expect(text).toBe("Groceries\n\nDairy:\n- Milk (1 l)\n\nOther:\n- Salt");
-  });
-  it("builds encoded store search URLs", () => {
-    expect(ahSearchUrl("crème fraîche")).toBe("https://www.ah.nl/zoeken?query=cr%C3%A8me%20fra%C3%AEche");
-    expect(jumboSearchUrl("red onion")).toBe("https://www.jumbo.com/producten/?searchTerms=red%20onion");
   });
 });

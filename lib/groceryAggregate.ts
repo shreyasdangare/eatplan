@@ -161,7 +161,3 @@ export function groceryListToText(groups: GroceryGroup[], title?: string): strin
   }
   return lines.join("\n").trim();
 }
-
-export const ahSearchUrl = (name: string) => `https://www.ah.nl/zoeken?query=${encodeURIComponent(name)}`;
-export const jumboSearchUrl = (name: string) =>
-  `https://www.jumbo.com/producten/?searchTerms=${encodeURIComponent(name)}`;

@@ -34,6 +34,8 @@ export type SessionUser = {
   native_language?: string;
   has_visited_home?: boolean;
   is_vegetarian_only?: boolean;
+  /** Chosen grocery store id (user metadata), if the user picked one. */
+  grocery_store?: string;
 };
 
 type UserMetadata = { 
@@ -41,6 +43,7 @@ type UserMetadata = {
   native_language?: string; 
   has_visited_home?: boolean;
   isVegetarianOnly?: boolean;
+  grocery_store?: string;
 };
 
 /**
@@ -70,6 +73,7 @@ export const getSession = cache(async (): Promise<{
       native_language: meta.native_language ?? undefined,
       has_visited_home: meta.has_visited_home === true,
       is_vegetarian_only: meta.isVegetarianOnly === true,
+      grocery_store: typeof meta.grocery_store === "string" ? meta.grocery_store : undefined,
     },
     error: null,
   };
