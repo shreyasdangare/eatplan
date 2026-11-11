@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabaseBrowser";
-import { LogOut, ChevronRight, Moon, Globe, Leaf, MessageSquare, Sun, Users } from "lucide-react";
+import { LogOut, ChevronRight, Moon, Globe, Leaf, MessageSquare, ShoppingBasket, Sun, Users } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { mutate as mutateCache } from "swr";
+import { GROCERY_STORES, GROCERY_STORE_IDS, inferGroceryStore, isGroceryStore, type GroceryStore } from "@/lib/groceryStores";
 
 function Toggle({ on, onClick, label, disabled }: { on: boolean; onClick: () => void; label: string; disabled?: boolean }) {
   return (
@@ -36,6 +38,8 @@ export default function SettingsPage() {
   const [updating, setUpdating] = useState(false);
   const [nativeLanguage, setNativeLanguage] = useState("");
   const [isVegetarianOnly, setIsVegetarianOnly] = useState(false);
+  const [groceryStore, setGroceryStore] = useState<GroceryStore>("ah");
+  // Only a store the user picked is saved (newStore below); until then the list infers one from the locale.
   const router = useRouter();
   
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -53,22 +57,31 @@ export default function SettingsPage() {
         setUser(u);
         setNativeLanguage(u.user_metadata?.native_language || "");
         setIsVegetarianOnly(u.user_metadata?.isVegetarianOnly || false);
+        const savedStore = u.user_metadata?.grocery_store;
+        setGroceryStore(
+          isGroceryStore(savedStore)
+            ? savedStore
+            : inferGroceryStore({ timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, language: navigator.language })
+        );
         setLoading(false);
       });
     });
   }, [router]);
 
-  const handleUpdatePreferences = async (newLang: string, newVeg: boolean) => {
+  const handleUpdatePreferences = async (newLang: string, newVeg: boolean, newStore?: GroceryStore) => {
     setUpdating(true);
     const supabase = await getSupabaseClient();
     await supabase.auth.updateUser({
       data: {
         native_language: newLang,
-        isVegetarianOnly: newVeg
+        isVegetarianOnly: newVeg,
+        ...(newStore ? { grocery_store: newStore } : {}),
       }
     });
     // Server reads metadata from the JWT; refresh so the next request sees the change.
     await supabase.auth.refreshSession();
+    // The grocery list caches the chosen store; drop it so the new choice shows straight away.
+    void mutateCache("/api/grocery-prefs");
     setUpdating(false);
   };
 
@@ -138,6 +151,34 @@ export default function SettingsPage() {
             <SettingIcon tone="bg-ink text-saffron dark:bg-saffron dark:text-ink">{isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}</SettingIcon>
             {rowText("Dark mode", isDark ? "On" : "Off")}
             <Toggle on={isDark} label="Dark mode" onClick={() => setTheme(isDark ? "light" : "dark")} />
+          </div>
+          <div className="p-4">
+            <label htmlFor="grocery_store" className="flex items-center gap-3">
+              <SettingIcon tone="bg-indigo text-white"><ShoppingBasket className="h-5 w-5" /></SettingIcon>
+              {rowText("Grocery store", "Where the weekly ingredient list links to")}
+            </label>
+            <div className="relative mt-3">
+              <select
+                id="grocery_store"
+                value={groceryStore}
+                onChange={(e) => {
+                  const v = e.target.value as GroceryStore;
+                  setGroceryStore(v);
+                  handleUpdatePreferences(nativeLanguage, isVegetarianOnly, v);
+                }}
+                disabled={updating}
+                className="min-h-12 w-full appearance-none rounded-2xl border-2 border-ink bg-cream px-4 text-base font-bold text-ink focus:outline-hidden focus:ring-4 focus:ring-saffron/50 disabled:opacity-50 dark:border-stone-500 dark:bg-stone-950 dark:text-stone-100"
+              >
+                {(["Netherlands", "India"] as const).map((region) => (
+                  <optgroup key={region} label={region}>
+                    {GROCERY_STORE_IDS.filter((id) => GROCERY_STORES[id].region === region).map((id) => (
+                      <option key={id} value={id}>{GROCERY_STORES[id].label}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <ChevronRight aria-hidden className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-ink dark:text-stone-300" />
+            </div>
           </div>
           <div className="p-4">
             <label htmlFor="native_language" className="flex items-center gap-3">

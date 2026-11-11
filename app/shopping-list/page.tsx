@@ -23,6 +23,7 @@ import { ShoppingTile, type ShoppingTileItem } from "@/app/components/ShoppingTi
 import { ShoppingItemDetail } from "@/app/components/ShoppingItemDetail";
 import { ShoppingListHeader } from "@/app/components/ShoppingListHeader";
 import { CategoryBrowser } from "@/app/components/CategoryBrowser";
+import { WeeklyGroceryList } from "@/app/components/WeeklyGroceryList";
 import { BottomSheet } from "@/app/components/ui/BottomSheet";
 import { Skeleton, LoadingRegion } from "@/app/components/ui/Skeleton";
 import { toast } from "@/app/components/ui/Toast";
@@ -363,6 +364,8 @@ export default function ShoppingListPage() {
       />
 
       <CategoryBrowser ingredients={ingredients} onAddItem={handleAddItem} />
+
+      <WeeklyGroceryList />
 
       {loading ? (
         <LoadingRegion label="Loading your shopping list">
