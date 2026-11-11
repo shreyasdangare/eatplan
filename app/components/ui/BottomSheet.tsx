@@ -108,7 +108,7 @@ export function BottomSheet({
   return createPortal(
     <div className="fixed inset-0 z-200 flex flex-col justify-end sm:items-center sm:justify-center sm:p-6">
       <div
-        className="absolute inset-0 bg-stone-950 motion-safe:animate-[fade-in_150ms_ease-out]"
+        className="absolute inset-0 bg-ink/55 dark:bg-black/70 motion-safe:animate-[fade-in_150ms_ease-out]"
         aria-hidden
         onClick={() => dismissible && onClose()}
       />
